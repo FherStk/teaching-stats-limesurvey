@@ -7,7 +7,7 @@
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/teaching-stats-import.csproj",
+                "${workspaceFolder}/teaching-stats-reports.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],
@@ -19,7 +19,7 @@
             "type": "process",
             "args": [
                 "publish",
-                "${workspaceFolder}/teaching-stats-import.csproj",
+                "${workspaceFolder}/teaching-stats-reports.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],
@@ -33,7 +33,7 @@
                 "watch",
                 "run",
                 "--project",
-                "${workspaceFolder}/teaching-stats-import.csproj"
+                "${workspaceFolder}/teaching-stats-reports.csproj"
             ],
             "problemMatcher": "$msCompile"
         }

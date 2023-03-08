@@ -1,0 +1,17 @@
+/home/fher/repos/teaching-stats-reports/bin/Debug/net6.0/teaching-stats-reports
+/home/fher/repos/teaching-stats-reports/bin/Debug/net6.0/teaching-stats-reports.deps.json
+/home/fher/repos/teaching-stats-reports/bin/Debug/net6.0/teaching-stats-reports.runtimeconfig.json
+/home/fher/repos/teaching-stats-reports/bin/Debug/net6.0/teaching-stats-reports.dll
+/home/fher/repos/teaching-stats-reports/bin/Debug/net6.0/ref/teaching-stats-reports.dll
+/home/fher/repos/teaching-stats-reports/bin/Debug/net6.0/teaching-stats-reports.pdb
+/home/fher/repos/teaching-stats-reports/obj/Debug/net6.0/teaching-stats-reports.csproj.AssemblyReference.cache
+/home/fher/repos/teaching-stats-reports/obj/Debug/net6.0/teaching-stats-reports.GeneratedMSBuildEditorConfig.editorconfig
+/home/fher/repos/teaching-stats-reports/obj/Debug/net6.0/teaching-stats-reports.AssemblyInfoInputs.cache
+/home/fher/repos/teaching-stats-reports/obj/Debug/net6.0/teaching-stats-reports.AssemblyInfo.cs
+/home/fher/repos/teaching-stats-reports/obj/Debug/net6.0/teaching-stats-reports.csproj.CoreCompileInputs.cache
+/home/fher/repos/teaching-stats-reports/obj/Debug/net6.0/teaching-stats-reports.dll
+/home/fher/repos/teaching-stats-reports/obj/Debug/net6.0/ref/teaching-stats-reports.dll
+/home/fher/repos/teaching-stats-reports/obj/Debug/net6.0/teaching-stats-reports.pdb
+/home/fher/repos/teaching-stats-reports/obj/Debug/net6.0/teaching-stats-reports.genruntimeconfig.cache
+/home/fher/repos/teaching-stats-reports/bin/Debug/net6.0/Npgsql.dll
+/home/fher/repos/teaching-stats-reports/obj/Debug/net6.0/teaching-stats-reports.csproj.CopyComplete

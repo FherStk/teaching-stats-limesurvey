@@ -1,8 +1,11 @@
 {
   "version": 2,
-  "dgSpecHash": "eZimbmds6VCfmPKlpDhSZumFQ/xDVBTijPEi9wFlWI5Sr5Q+dtsYsiyiOMesx+l6ea/ITvR3FR5uFn4l9mj4IA==",
+  "dgSpecHash": "qcMjK1beg0TlFrEmlrInqdtLw1ufqTnG3T/wSgiB5ftM91ug6mW2E0ehYQoCaN59LMHQNYQis0lmHHk+1RudJw==",
   "success": true,
   "projectFilePath": "/home/fher/repos/teaching-stats-reports/teaching-stats-reports.csproj",
-  "expectedPackageFiles": [],
+  "expectedPackageFiles": [
+    "/home/fher/.nuget/packages/npgsql/6.0.0/npgsql.6.0.0.nupkg.sha512",
+    "/home/fher/.nuget/packages/system.runtime.compilerservices.unsafe/6.0.0/system.runtime.compilerservices.unsafe.6.0.0.nupkg.sha512"
+  ],
   "logs": []
 }
