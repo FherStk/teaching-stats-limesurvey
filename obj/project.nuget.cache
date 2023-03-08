@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "PMBPTWyzU7fbtrKwu09cIH2SMWZ+ySocdTvY6cQU+ncDm8/PMzGGxBLlZg5D5Xy9tlGBMMVtrQ1W3DObNyFJ0w==",
+  "dgSpecHash": "eZimbmds6VCfmPKlpDhSZumFQ/xDVBTijPEi9wFlWI5Sr5Q+dtsYsiyiOMesx+l6ea/ITvR3FR5uFn4l9mj4IA==",
   "success": true,
-  "projectFilePath": "/home/fher/repos/teaching-stats-import/teaching-stats-import.csproj",
+  "projectFilePath": "/home/fher/repos/teaching-stats-reports/teaching-stats-reports.csproj",
   "expectedPackageFiles": [],
   "logs": []
 }

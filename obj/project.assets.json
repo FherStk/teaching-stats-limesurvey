@@ -13,11 +13,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/home/fher/repos/teaching-stats-import/teaching-stats-import.csproj",
-      "projectName": "teaching-stats-import",
-      "projectPath": "/home/fher/repos/teaching-stats-import/teaching-stats-import.csproj",
+      "projectUniqueName": "/home/fher/repos/teaching-stats-reports/teaching-stats-reports.csproj",
+      "projectName": "teaching-stats-reports",
+      "projectPath": "/home/fher/repos/teaching-stats-reports/teaching-stats-reports.csproj",
       "packagesPath": "/home/fher/.nuget/packages/",
-      "outputPath": "/home/fher/repos/teaching-stats-import/obj/",
+      "outputPath": "/home/fher/repos/teaching-stats-reports/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/home/fher/.nuget/NuGet/NuGet.Config"
