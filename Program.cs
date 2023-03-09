@@ -14,6 +14,7 @@ void Menu(){
         Info("Please, select an option:");
         Info("   1: Load reporting data from 'teaching-stats'");
         Info("   2: Load reporting data from 'limesurvey'");
+        Info("   3: Create a new survey into 'limesurvey'");
         Info("   0: Exit");
         Console.WriteLine();
 
@@ -54,16 +55,42 @@ void Menu(){
 
 void CreateNewSurvey(){
     using(var ls = new LimeSurvey()){
-        ls.Client.Method = "copy_survey";
-        ls.Client.Parameters.Add("sSessionKey", ls.SessionKey);
-        ls.Client.Parameters.Add("iSurveyID_org", "123549");
-        ls.Client.Parameters.Add("sNewname", "Automated Survey");
-        ls.Client.Post();
-        ls.Client.ClearParameters();
+        try{
+            Info("Creating a new survey... ");    
+            ls.Client.Method = "copy_survey";
+            ls.Client.Parameters.Add("sSessionKey", ls.SessionKey);
+            ls.Client.Parameters.Add("iSurveyID_org", "123549");
+            ls.Client.Parameters.Add("sNewname", "Automated Survey");
+            ls.Client.Post();
+            ls.Client.ClearParameters();
 
-        int newID = 0;
-        if(ls.Client.Response != null && ls.Client.Response.result != null) 
-            newID = (int)ls.Client.Response.result;        
+            int newID = 0;
+            if(ls.Client.Response != null && ls.Client.Response.result != null){
+                var response = ls.Client.Response.result.ToString();
+                if(!int.TryParse(response, out newID)) throw new Exception($"Unable to parse the new survey ID from '{response}'");
+            }
+            Success();
+
+            Info("Setting up the survey group... ");    
+            // ls.Client.Method = "set_survey_properties";
+            // ls.Client.Parameters.Add("sSessionKey", ls.SessionKey);
+            // ls.Client.Parameters.Add("iSurveyID", newID);
+            // ls.Client.Parameters.Add("aSurveyData", );
+            // ls.Client.Post();
+            // ls.Client.ClearParameters();
+
+            // int newID = 0;
+            // if(ls.Client.Response != null && ls.Client.Response.result != null){
+            //     var response = ls.Client.Response.result.ToString();
+            //     if(!int.TryParse(response, out newID)) throw new Exception($"Unable to parse the new survey ID from '{response}'");
+            // }
+            // Success();
+
+
+        }
+        catch(Exception ex){
+            Error("Error: " + ex.ToString());
+        }
     }
 }
 
