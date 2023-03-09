@@ -13,6 +13,7 @@ void Menu(){
     while(true){        
         Info("Please, select an option:");
         Info("   1: Load reporting data from 'teaching-stats'");
+        Info("   2: Load reporting data from 'limesurvey'");
         Info("   0: Exit");
         Console.WriteLine();
 
@@ -27,6 +28,15 @@ void Menu(){
                     LoadFromTeachingStats();
                     break;
 
+                 case 2:
+                    LoadFromLimeSurvey();
+                    break;
+
+                //new cases:
+                //  load participants into its surveys using CSV files and generate the passwords (limesurvey)
+                //  open the surveys and send the invitations (limesurvey)
+                //  create new surveys (limesurvey)
+
                 default:
                     Error("Please, select a valid option.");
                     break;
@@ -36,6 +46,61 @@ void Menu(){
         Console.WriteLine();
     }
     
+}
+
+void LoadFromLimeSurvey(){
+    var response = Question("This option will load all the current 'limesurvey' responses into the report tables, closing and cleaning the original surveys. Do you want no continue? [Y/n]", "y");
+    if(response == "n") Error("Operation cancelled.");
+    else{
+        //Get the existing sirveys within the correct groups.
+        //For each survey:
+        //  1. Warn if the survey is not ready to collect (its open or closed).
+        //  2. Open a transaction to the database
+        //  3. Download its data, cook it and store it into the database
+        //  4. When done, close the survey.
+        //  5. If everything worked, then commit the transaction (or rollback on error).
+        //  6. Next survey.
+        
+        
+        
+        // using(var conn = GetTeachingStatsConnection()){
+        //     NpgsqlTransaction trans = null;
+
+        //     try{
+        //         conn.Open();
+        //         trans = conn.BeginTransaction();
+                            
+        //         Info("Loading data into the reporting tables... ", false);
+        //         using (NpgsqlCommand cmd = new NpgsqlCommand(@"
+        //             INSERT INTO reports.answer
+        //             SELECT * FROM reports.answer_all;", conn)){
+                    
+        //             cmd.ExecuteNonQuery();
+        //         }
+        //         Success();
+
+        //         Info("Cleaning the original answers... ", false);
+        //         using (NpgsqlCommand cmd = new NpgsqlCommand(@"
+        //             TRUNCATE TABLE public.forms_answer;
+        //             TRUNCATE TABLE public.forms_participation;
+        //             TRUNCATE TABLE public.forms_evaluation CASCADE;", conn)){
+                    
+        //             cmd.ExecuteNonQuery();
+        //         }
+        //         Success();  
+
+        //         trans.Commit();
+        //         Success("Done!");
+        //     }
+        //     catch(Exception ex){               
+        //         if(trans != null) trans.Rollback(); 
+        //         Error("Error: " + ex.ToString());
+        //     }
+        //     finally{
+        //         conn.Close();                
+        //     }
+        // }
+    }
 }
 
 void LoadFromTeachingStats(){
