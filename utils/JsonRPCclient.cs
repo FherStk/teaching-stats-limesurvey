@@ -7,7 +7,7 @@ using Newtonsoft.Json.Linq;
  
 //Source: https://manual.limesurvey.org/RemoteControl_2_API#How_to_use_LSRC2
 
-namespace JsonRPCclient {
+namespace JsonRPC {
  
   public class JsonRPCclient {
  
@@ -23,7 +23,7 @@ namespace JsonRPCclient {
     /// <summary>
     /// Add JSON-RPC params
     /// </summary>
-    public JObject? Parameters { set; get; }
+    public JObject Parameters { set; get; }
  
     /// <summary>
     /// Results of the request
