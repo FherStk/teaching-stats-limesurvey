@@ -6,12 +6,12 @@
   "compilationOptions": {},
   "targets": {
     ".NETCoreApp,Version=v6.0": {
-      "teaching-stats-reports/1.0.0": {
+      "teaching-stats-limesurvey/1.0.0": {
         "dependencies": {
           "Npgsql": "6.0.0"
         },
         "runtime": {
-          "teaching-stats-reports.dll": {}
+          "teaching-stats-limesurvey.dll": {}
         }
       },
       "Npgsql/6.0.0": {
@@ -29,7 +29,7 @@
     }
   },
   "libraries": {
-    "teaching-stats-reports/1.0.0": {
+    "teaching-stats-limesurvey/1.0.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "/home/fher/repos/teaching-stats-reports/teaching-stats-reports.csproj": {}
+    "/home/fher/repos/teaching-stats-limesurvey/teaching-stats-limesurvey.csproj": {}
   },
   "projects": {
-    "/home/fher/repos/teaching-stats-reports/teaching-stats-reports.csproj": {
+    "/home/fher/repos/teaching-stats-limesurvey/teaching-stats-limesurvey.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/home/fher/repos/teaching-stats-reports/teaching-stats-reports.csproj",
-        "projectName": "teaching-stats-reports",
-        "projectPath": "/home/fher/repos/teaching-stats-reports/teaching-stats-reports.csproj",
+        "projectUniqueName": "/home/fher/repos/teaching-stats-limesurvey/teaching-stats-limesurvey.csproj",
+        "projectName": "teaching-stats-limesurvey",
+        "projectPath": "/home/fher/repos/teaching-stats-limesurvey/teaching-stats-limesurvey.csproj",
         "packagesPath": "/home/fher/.nuget/packages/",
-        "outputPath": "/home/fher/repos/teaching-stats-reports/obj/",
+        "outputPath": "/home/fher/repos/teaching-stats-limesurvey/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/home/fher/.nuget/NuGet/NuGet.Config"

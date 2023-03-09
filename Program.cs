@@ -230,7 +230,7 @@ void DisplayInfo(){
     Console.ForegroundColor = ConsoleColor.Yellow;
     Console.Write("Teaching Stats: ");
     Console.ResetColor();
-    Console.WriteLine($"Reports (v{_VERSION})");
+    Console.WriteLine($"LimeSurvey (v{_VERSION})");
 
     Console.ForegroundColor = ConsoleColor.Yellow;
     Console.Write("Copyright © 2023: ");
@@ -245,6 +245,6 @@ void DisplayInfo(){
     Console.ForegroundColor = ConsoleColor.Yellow;
     Console.Write("Under the AGPL license: ");
     Console.ResetColor();
-    Console.WriteLine($"https://github.com/FherStk/teaching-stats-reports/blob/main/LICENSE");
+    Console.WriteLine($"https://github.com/FherStk/teaching-stats-limesurvey/blob/main/LICENSE");
     Console.WriteLine();
 }

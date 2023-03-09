@@ -1,4 +1,4 @@
-# teaching-stats-reports
+# teaching-stats-limesurvey
 Reporting setup project for teaching-stats.
 
 This program prepares the teaching-stats reporting system, collecting up all needed data from diferent sources and setting up the reporting environment.
