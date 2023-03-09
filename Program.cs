@@ -32,6 +32,10 @@ void Menu(){
                     LoadFromLimeSurvey();
                     break;
 
+                case 3:
+                    CreateNewSurvey();
+                    break;
+
                 //new cases:
                 //  load participants into its surveys using CSV files and generate the passwords (limesurvey)
                 //  open the surveys and send the invitations (limesurvey)
@@ -48,11 +52,29 @@ void Menu(){
     
 }
 
+void CreateNewSurvey(){
+    using(var ls = new LimeSurvey()){
+        ls.Client.Method = "copy_survey";
+        ls.Client.Parameters.Add("sSessionKey", ls.SessionKey);
+        ls.Client.Parameters.Add("iSurveyID_org", "123549");
+        ls.Client.Parameters.Add("sNewname", "Automated Survey");
+        ls.Client.Post();
+        ls.Client.ClearParameters();
+
+        int newID = 0;
+        if(ls.Client.Response != null && ls.Client.Response.result != null) 
+            newID = (int)ls.Client.Response.result;        
+    }
+}
+
 void LoadFromLimeSurvey(){
     var response = Question("This option will load all the current 'limesurvey' responses into the report tables, closing and cleaning the original surveys. Do you want no continue? [Y/n]", "y");
     if(response == "n") Error("Operation cancelled.");
     else{
-        var ls = new LimeSurvey();
+        using(var ls = new LimeSurvey()){
+
+        }
+
         //Get the existing sirveys within the correct groups.
         //For each survey:
         //  1. Warn if the survey is not ready to collect (its open or closed).
@@ -62,16 +84,7 @@ void LoadFromLimeSurvey(){
         //  5. If everything worked, then commit the transaction (or rollback on error).
         //  6. Next survey.
         
-        //Source: https://manual.limesurvey.org/RemoteControl_2_API#How_to_use_LSRC2
-    //   string Baseurl = "http://localhost/limesurvey/index.php?r=admin/remotecontrol";
-    //   JsonRPCclient client = new JsonRPCclient(Baseurl);
-    //   client.Method = "get_session_key";
-    //   client.Parameters.Add("username", "admin");
-    //   client.Parameters.Add("password", "mypassword");
-    //   client.Post();
-    //   string SessionKey = client.Response.result.ToString();
- 
-    //   client.ClearParameters();
+      
  
     //   if(client.Response.StatusCode == System.Net.HttpStatusCode.OK){
     //     client.Method = "import_survey";
@@ -203,7 +216,10 @@ bool CheckConfig(){
             }
         }
 
-        //TODO: limesurvey config file
+        //Testing LimeSurvey config
+        using(var ls = new LimeSurvey()){}
+
+        //All tests clear
         return true;
     }
     catch (FileNotFoundException ex){
