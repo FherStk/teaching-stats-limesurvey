@@ -61,7 +61,31 @@ void LoadFromLimeSurvey(){
         //  5. If everything worked, then commit the transaction (or rollback on error).
         //  6. Next survey.
         
-        
+        //Source: https://manual.limesurvey.org/RemoteControl_2_API#How_to_use_LSRC2
+    //   string Baseurl = "http://localhost/limesurvey/index.php?r=admin/remotecontrol";
+    //   JsonRPCclient client = new JsonRPCclient(Baseurl);
+    //   client.Method = "get_session_key";
+    //   client.Parameters.Add("username", "admin");
+    //   client.Parameters.Add("password", "mypassword");
+    //   client.Post();
+    //   string SessionKey = client.Response.result.ToString();
+ 
+    //   client.ClearParameters();
+ 
+    //   if(client.Response.StatusCode == System.Net.HttpStatusCode.OK){
+    //     client.Method = "import_survey";
+    //     client.Parameters.Add("sSessionKey", SessionKey);
+    //     client.Parameters.Add("sImportData", Base64Encode(yourImportDataString));
+    //     client.Parameters.Add("sImportDataType", "lss");
+    //     //client.Parameters.Add("sNewSurveyName", "test");
+    //     //client.Parameters.Add("DestSurveyID", 1);
+    //     client.Post();
+    //   }
+ 
+    //   client.ClearParameters();
+ 
+    //   Console.WriteLine("new survey id:" + client.Response.result.ToString());
+    //   Console.ReadLine();
         
         // using(var conn = GetTeachingStatsConnection()){
         //     NpgsqlTransaction trans = null;
