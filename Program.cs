@@ -1,16 +1,14 @@
 ﻿using Npgsql;
-using System.Collections.Generic;
 
 //Global vars
 var _VERSION = "0.0.1";
-var _TSCONN = new TeachingStatsConnector();
 
 //Main
 DisplayInfo();
-CheckDataBase();
-Menu();
+if(!CheckConfig()) return;
+else Menu();
 
-
+//Methods
 void Menu(){
     while(true){        
         Info("Please, select an option:");
@@ -54,6 +52,7 @@ void LoadFromLimeSurvey(){
     var response = Question("This option will load all the current 'limesurvey' responses into the report tables, closing and cleaning the original surveys. Do you want no continue? [Y/n]", "y");
     if(response == "n") Error("Operation cancelled.");
     else{
+        var ls = new LimeSurvey();
         //Get the existing sirveys within the correct groups.
         //For each survey:
         //  1. Warn if the survey is not ready to collect (its open or closed).
@@ -136,78 +135,85 @@ void LoadFromTeachingStats(){
         NpgsqlTransaction? trans = null;
 
         try{
-            _TSCONN.Connection.Open();
-            trans = _TSCONN.Connection.BeginTransaction();
-                        
-            Info("Loading data into the reporting tables... ", false);
-            using (NpgsqlCommand cmd = new NpgsqlCommand(@"
-                INSERT INTO reports.answer
-                SELECT * FROM reports.answer_all;", _TSCONN.Connection)){
-                
-                cmd.ExecuteNonQuery();
-            }
-            Success();
+            using(var ts = new TeachingStats()){
+                ts.Connection.Open();   //closed when disposing
+                trans = ts.Connection.BeginTransaction();
+                            
+                Info("Loading data into the reporting tables... ", false);
+                using (NpgsqlCommand cmd = new NpgsqlCommand(@"
+                    INSERT INTO reports.answer
+                    SELECT * FROM reports.answer_all;", ts.Connection)){
+                    
+                    cmd.ExecuteNonQuery();
+                }
+                Success();
 
-            Info("Cleaning the original answers... ", false);
-            using (NpgsqlCommand cmd = new NpgsqlCommand(@"
-                TRUNCATE TABLE public.forms_answer;
-                TRUNCATE TABLE public.forms_participation;
-                TRUNCATE TABLE public.forms_evaluation CASCADE;", _TSCONN.Connection)){
-                
-                cmd.ExecuteNonQuery();
-            }
-            Success();  
+                Info("Cleaning the original answers... ", false);
+                using (NpgsqlCommand cmd = new NpgsqlCommand(@"
+                    TRUNCATE TABLE public.forms_answer;
+                    TRUNCATE TABLE public.forms_participation;
+                    TRUNCATE TABLE public.forms_evaluation CASCADE;", ts.Connection)){
+                    
+                    cmd.ExecuteNonQuery();
+                }
+                Success();  
 
-            trans.Commit();
-            Success("Done!");
+                trans.Commit();
+                Success("Done!");
+            }
         }
         catch(Exception ex){               
             if(trans != null) trans.Rollback(); 
             Error("Error: " + ex.ToString());
-        }
-        finally{
-            _TSCONN.Connection.Close();                
-        }
+        }        
     }
 }
 
-void CheckDataBase(){        
+bool CheckConfig(){        
     try{
-        _TSCONN.Connection.Open();
-    
-        using (NpgsqlCommand existCmd = new NpgsqlCommand("SELECT EXISTS (SELECT relname FROM pg_class WHERE relname='answer' AND relkind = 'r');", _TSCONN.Connection)){
-            var exists = (bool)(existCmd.ExecuteScalar() ?? false);
-            if(!exists){
-                //The 'answer' table does not exists
-                var response = Question("The current 'teaching-stats' database has not been upgraded, do you want to perform the necessary changes to use this program? [Y/n]", "y");
-                if(response.ToLower() != "y"){
-                    Error("The program cannot continue, becasue the 'teaching-stats' database has not been upgraded.");
-                    return;
-                }
+        using(var ts = new TeachingStats()){    
+            ts.Connection.Open();   //closed on dispose
+            
+            using (NpgsqlCommand existCmd = new NpgsqlCommand("SELECT EXISTS (SELECT relname FROM pg_class WHERE relname='answer' AND relkind = 'r');", ts.Connection)){
+                var exists = (bool)(existCmd.ExecuteScalar() ?? false);
+                if(!exists){
+                    //The 'answer' table does not exists
+                    var response = Question("The current 'teaching-stats' database has not been upgraded, do you want to perform the necessary changes to use this program? [Y/n]", "y");
+                    if(response.ToLower() != "y"){
+                        Error("The program cannot continue, becasue the 'teaching-stats' database has not been upgraded.");
+                        return false;
+                    }
 
-                //Must upgrade
-                Info("Upgrading the teaching-stats' database... ", false);
-                using (NpgsqlCommand upgradeCmd = new NpgsqlCommand(@"
-                    ALTER VIEW reports.answer RENAME TO answer_all;
-                    SELECT * INTO reports.answer FROM reports.answer_all;                        
-                    TRUNCATE TABLE public.forms_answer;
-                    TRUNCATE TABLE public.forms_participation;
-                    TRUNCATE TABLE public.forms_evaluation CASCADE;                        
-                    CREATE INDEX answer_year_idx ON reports.answer ('year');", _TSCONN.Connection)){
-                    
-                    upgradeCmd.ExecuteNonQuery();
-                }
-                Success();
+                    //Must upgrade
+                    Info("Upgrading the teaching-stats' database... ", false);
+                    using (NpgsqlCommand upgradeCmd = new NpgsqlCommand(@"
+                        ALTER VIEW reports.answer RENAME TO answer_all;
+                        SELECT * INTO reports.answer FROM reports.answer_all;                        
+                        TRUNCATE TABLE public.forms_answer;
+                        TRUNCATE TABLE public.forms_participation;
+                        TRUNCATE TABLE public.forms_evaluation CASCADE;                        
+                        CREATE INDEX answer_year_idx ON reports.answer (""year"");", ts.Connection)){
+                        
+                        upgradeCmd.ExecuteNonQuery();
+                    }
+                    Success();
+                    Console.WriteLine();
 
+                }
             }
         }
+
+        //TODO: limesurvey config file
+        return true;
+    }
+    catch (FileNotFoundException ex){
+        Error(ex.Message);
     }
     catch(Exception ex){
         Error("Error: " + ex.ToString());
     }
-    finally{
-        _TSCONN.Connection.Close();
-    }
+
+    return false;   
 }
 
 void Info(string text, bool newLine = true){

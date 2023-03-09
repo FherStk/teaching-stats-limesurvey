@@ -1,10 +1,9 @@
-using Npgsql;
 using JsonRPC;
 
-public class LimeSurveyConnector{
+public class LimeSurvey{
     public string? SessionKey {get; private set;}
 
-    public LimeSurveyConnector(){
+    public LimeSurvey(){
         Dictionary<string, string> items = new Dictionary<string, string>();
         var config = File.ReadAllText(Path.Combine(Utils.ConfigFolder, "limesurvey-connection-string.txt")).Split(";");    
 
