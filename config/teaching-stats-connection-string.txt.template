@@ -1,1 +1,1 @@
-Server=localhost;User Id=postgres;Password=postgres;Database=teaching-stats;
+Server=hostname;User Id=username;Password=password;Database=teaching-stats;
