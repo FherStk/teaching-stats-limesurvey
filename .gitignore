@@ -1,3 +1,4 @@
 obj
 bin
 config/teaching-stats-connection-string.txt
+config/limesurvey-connection-string.txt
