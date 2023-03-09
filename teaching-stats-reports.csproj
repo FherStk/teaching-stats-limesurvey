@@ -10,5 +10,6 @@
 
   <ItemGroup>
     <PackageReference Include="Npgsql" Version="6.0.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
   </ItemGroup>
 </Project>
