@@ -6,64 +6,9 @@ using YamlDotNet.Serialization.NamingConventions;
 var _VERSION = "0.0.1";
 
 //Main
-SerializeYaml();
-
 // DisplayInfo();
 // if(!CheckConfig()) return;
 // else Menu();
-
-void SerializeYaml(){
-    //This is just a test method
-    var settings = new Settings
-    {
-        TeachingStats = new Settings.TeachingStatsSettings(){
-            Host = "localhost",
-            Username = "postgres",
-            Password = "postgres"
-        },
-        LimeSurvey = new Settings.LimeSurveySettings(){
-            Host = "https://limesurvey.elpuig.xeill.net",
-            Username = "admin",
-            Password = "admin"
-        },
-        Templates = new Settings.TemplateCollection(){
-            Templates = new Dictionary<string, Settings.TemplateSettings>{
-                {
-                    "subject-ccff", new Settings.TemplateSettings(){
-                        Name = "Subject (CCFF)",
-                        ID = 123456
-                    }
-                },
-                {
-                    "subject-ccff", new Settings.TemplateSettings(){
-                        Name = "Mentoring 1st (CCFF)",
-                        ID = 123457
-                    }
-                },
-                {
-                    "subject-ccff", new Settings.TemplateSettings(){
-                        Name = "Mentoring 2nd (CCFF)",
-                        ID = 123458
-                    }
-                },
-                {
-                    "subject-ccff", new Settings.TemplateSettings(){
-                        Name = "School (General)",
-                        ID = 123459
-                    }
-                }
-            }
-        }
-        
-    };
-
-    var serializer = new SerializerBuilder()
-        .WithNamingConvention(CamelCaseNamingConvention.Instance)
-        .Build();
-   
-    var yaml = serializer.Serialize(settings);
-    System.Console.WriteLine(yaml);
-}
 
 //Methods
 void Menu(){
