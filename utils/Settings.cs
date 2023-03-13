@@ -22,7 +22,7 @@ public class Settings
 
     public class TemplateSettings{
         public string? Name {get; set;}
-        public int ID {get; set;}
+        public int Id {get; set;}
     }
 }
 

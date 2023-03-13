@@ -1,26 +1,27 @@
-teaching-stats:
-  host: "localhost"
-  username: "postgres"
-  password: "postgres"
+teachingStats:
+  host: localhost
+  username: postgres
+  password: postgres
 
-limesurvey:
-  host: "https://limesurvey.elpuig.xeill.net"
-  username: "admin"
-  password: "admin"
+limeSurvey:
+  host: https://limesurvey.elpuig.xeill.net
+  username: admin
+  password: admin
 
 templates:
-  subject-ccff:
-    Name: "Subject (CCFF)"
-    ID: 123456
+  templates:
+    subject-ccff:
+      name: Subject (CCFF)
+      id: 123456
 
-  mentoring-1-ccff:
-    Name: "Mentoring 1st (CCFF)"
-    ID: 123457      
+    mentoring-1-ccff:
+      name: Mentoring 1st (CCFF)
+      id: 123457
 
-  mentoring-2-ccff:
-    Name: "Mentoring 2nd (CCFF)"
-    ID: 123458
-
-  school:
-    Name: "School (General)"
-    ID: 123459
+    mentoring-2-ccff:
+      name: Mentoring 2nd (CCFF)
+      id: 123458
+      
+    school:
+      name: School (General)
+      id: 123459
