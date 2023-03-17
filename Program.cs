@@ -168,6 +168,13 @@ void CreateNewSurvey(){
             ls.Client.ClearParameters();
             Success();
             
+            //TODO:
+            /*
+             "attributes": {
+                "equation": "{'DEGREE'}",
+                "hidden": "1"
+            },
+            */
             // var responseQuestions = JArray.Parse(ls.ReadClientResult() ?? "");
             // if(responseQuestions == null) throw new Exception($"Unable to read properties from the survey ID '{templateID}'");            
 
