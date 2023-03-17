@@ -11,6 +11,13 @@ public class LimeSurvey : IDisposable{
         TRAINER
     }
 
+    public enum Type{
+        SCHOOL,
+        MENTORING_1_CCFF,
+        MENTORING_2_CCFF,
+        SUBJECT_CCFF        
+    }
+
     public string? SessionKey {get; private set;}    
 
     public JsonRPCclient Client {get; private set;}    
@@ -57,7 +64,7 @@ public class LimeSurvey : IDisposable{
         return int.Parse((response["newsid"] ?? "").ToString());
     }
 
-    public Dictionary<Question, int> GetSurveyQuestionIDs(int surveyID){
+    public Dictionary<Question, int> GetQuestionIDs(int surveyID){
         var IDs = new Dictionary<Question, int>();
         
         this.Client.Method = "list_questions";
@@ -104,8 +111,8 @@ public class LimeSurvey : IDisposable{
 
     public string GetQuestionProperties(int questionID){
         this.Client.Method = "get_question_properties";
-        this.Client.Parameters.Add("iQuestionID", this.SessionKey);
-        this.Client.Parameters.Add("iSurveyID", questionID);
+        this.Client.Parameters.Add("sSessionKey", this.SessionKey);
+        this.Client.Parameters.Add("iQuestionID", questionID);
 
         this.Client.Post();
         this.Client.ClearParameters();
@@ -115,14 +122,50 @@ public class LimeSurvey : IDisposable{
 
     public string SetQuestionProperties(int questionID, JObject properties){
         this.Client.Method = "set_question_properties";
-        this.Client.Parameters.Add("iQuestionID", this.SessionKey);
-        this.Client.Parameters.Add("iSurveyID", questionID);
+        this.Client.Parameters.Add("sSessionKey", this.SessionKey);
+        this.Client.Parameters.Add("iQuestionID", questionID);
 
         this.Client.Parameters.Add("aQuestionData", properties);
         this.Client.Post();
         this.Client.ClearParameters();
 
         return this.ReadClientResult() ?? "";
+    }
+
+    public string GetSurveySummary(int surveyID){
+        this.Client.Method = "get_summary";
+        this.Client.Parameters.Add("sSessionKey", this.SessionKey);
+        this.Client.Parameters.Add("iSurveyID", surveyID);
+        this.Client.Parameters.Add("sStatName", "all");
+
+        this.Client.Post();
+        this.Client.ClearParameters();
+
+        return this.ReadClientResult() ?? "";
+    }
+
+    public string GetSurveyProperties(int surveyID){
+        this.Client.Method = "get_survey_properties";
+        this.Client.Parameters.Add("sSessionKey", this.SessionKey);
+        this.Client.Parameters.Add("iSurveyID", surveyID);
+
+        this.Client.Post();
+        this.Client.ClearParameters();
+
+        return this.ReadClientResult() ?? "";
+    }
+
+    public string ExportSurveyResponses(int surveyID){
+        this.Client.Method = "export_responses";
+        this.Client.Parameters.Add("sSessionKey", this.SessionKey);
+        this.Client.Parameters.Add("iSurveyID", surveyID);
+        this.Client.Parameters.Add("sDocumentType", "json");
+
+        this.Client.Post();
+        this.Client.ClearParameters();
+
+        var base64EncodedBytes = System.Convert.FromBase64String(this.ReadClientResult() ?? "");
+        return System.Text.Encoding.UTF8.GetString(base64EncodedBytes);
     }
 
     public void Dispose()

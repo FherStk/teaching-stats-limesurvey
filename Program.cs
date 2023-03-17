@@ -10,7 +10,7 @@ var _VERSION = "0.0.1";
 // else Menu();
 
 //Utils.SerializeSettingsTemplateAsYamlFile();
-CreateNewSurvey();
+CreateNewSurveyFromTemplate();
 
 //Methods
 void Menu(){
@@ -38,7 +38,7 @@ void Menu(){
                     break;
 
                 case 3:
-                    CreateNewSurvey();
+                    CreateNewSurveyFromTemplate();
                     break;
 
                 //new cases:
@@ -57,18 +57,18 @@ void Menu(){
     
 }
 
-void CreateNewSurvey(){   
+void CreateNewSurveyFromTemplate(){   
     var settings = Utils.Settings;
     if(settings == null || settings.Templates == null) throw new IncorrectSettingsException();
 
     int i = 1;
   
     var options = new Dictionary<int, object>();    
-    foreach(var t in settings.Templates){
+    foreach(var t in settings.Templates){  
         options.Add(i++, new {
             ID = t.Value.Id,
             Caption = t.Value.Name ?? "",
-            Type = t.Key 
+            Type = (LimeSurvey.Type)Enum.Parse(typeof(LimeSurvey.Type), t.Key.Replace("-", "_").ToUpper())
         });
     }
 
@@ -93,43 +93,37 @@ void CreateNewSurvey(){
     }
 
     dynamic template = options[option];
-    switch(template.Type){
-        case "subject-ccff":
-            CreateNewSubjectSurvey(template.ID);
-            break;
-
-        case "mentoring-1-ccff":
-            break;
-
-        case "mentoring-2-ccff":
-            break;
-
-        case "school":
-            break;
-    }
+    CreateNewSurveyIntoLimeSurvey(template.ID, template.Type);    
 }
 
-void CreateNewSubjectSurvey(int templateID){
-    //TODO: split the method by template type (subject, school, etc...)
+void CreateNewSurveyIntoLimeSurvey(int templateID, LimeSurvey.Type type){   
 
     // var degreeName = Question("Please, write the DEGREE NAME:");
-    // var departmentName = Question("Please, write the DEPARTMENT NAME:");
-    // var subjectCode = Question("Please, write the SUBJECT CODE:");
-    // var subjectName = Question("Please, write the SUBJECT NAME:");
+    // var departmentName = Question("Please, write the DEPARTMENT NAME:");    
     // var groupName = Question("Please, write the GROUP NAME:");
     // var trainerName = Question("Please, write the TRAINER NAME:");    
+    
+    var subjectCode = string.Empty;
+    var subjectName = string.Empty;
+    if(type == LimeSurvey.Type.SUBJECT_CCFF){
+        // subjectCode = Question("Please, write the SUBJECT CODE:");
+        // subjectName = Question("Please, write the SUBJECT NAME:");
+    }
 
     var degreeName = "DAM";
-    var departmentName = "Informàtica";
-    var subjectCode = "M10";
-    var subjectName = "Sistemes de gestió empresarial";
+    var departmentName = "Informàtica";    
     var groupName = "DAM2A";
     var trainerName = "Fernando Porrino";
+    subjectCode = "M10";
+    subjectName = "Sistemes de gestió empresarial";
     
 
-    using(var ls = new LimeSurvey()){       
+    using(var ls = new LimeSurvey()){   
+        Console.WriteLine(ls.GetQuestionProperties(4142));
+        return;
+
         try{            
-            Info("Creating a new survey... ");    
+            Info("Creating a new survey... ", false);    
             var surveyName = $"{degreeName} {subjectCode} - {subjectName}";
             if(!string.IsNullOrEmpty(trainerName)) surveyName += $" ({trainerName})";
 
@@ -138,89 +132,56 @@ void CreateNewSubjectSurvey(int templateID){
             Success();
 
             //Loading the question IDs in order to set the correct values
-            Info("Loading the survey data... ");    
-            var qIDs = ls.GetSurveyQuestionIDs(newID);            
+            Info("Loading the survey data... ", false);    
+            var qIDs = ls.GetQuestionIDs(newID);            
             Success();
 
             //Changing the copied question data with the correct values
-            Info("Setting up the survey degree... ");    
-            ls.SetQuestionProperties(qIDs[LimeSurvey.Question.DEGREE], JObject.Parse(
-                @"{
-                    ""question"" : ""degree: {'" + degreeName + @"'}""  
-                }"
-            ));           
-
-            //TODO: this does not work!!!
-            ls.SetQuestionProperties(qIDs[LimeSurvey.Question.DEGREE], JObject.Parse(
-                @"{
-                    ""attributes"" : {
-                        ""equation"": ""{'" + degreeName + @"'}"",
-                        ""hidden"": ""1""
-                    } 
-                }"
-            ));
-            //ls.SetQuestionProperties(qIDs[LimeSurvey.Question.DEGREE], new JObject(new JProperty("attributes", new JProperty("equation", "{'" + degreeName + "'}"))));
+            Info("Setting up the survey degree... ", false);
+            SetQuestionValue(ls, qIDs, LimeSurvey.Question.DEGREE, degreeName);                    
             Success();
-            
 
-            //TODO:
-            /*
-            {
-                "qid": "3793",
-                "parent_qid": "0",
-                "sid": "195332",
-                "gid": "218",
-                "type": "*",
-                "title": "degree",
-                "question": "degree: {'DEGREE'}",
-                "preg": "",
-                "help": "",
-                "other": "N",
-                "mandatory": "N",
-                "question_order": "5",
-                "language": "ca",
-                "scale_id": "0",
-                "same_default": "0",
-                "relevance": "1",
-                "modulename": "",
-                "available_answers": "No available answers",
-                "subquestions": "No available answers",
-                "attributes": {
-                    "equation": "{'DEGREE'}",
-                    "hidden": "1"
-                },
-                "attributes_lang": "No available attributes",
-                "answeroptions": "No available answer options",
-                "defaultvalue": null
-                }
-            */
-            // var responseQuestions = JArray.Parse(ls.ReadClientResult() ?? "");
-            // if(responseQuestions == null) throw new Exception($"Unable to read properties from the survey ID '{templateID}'");            
+            Info("Setting up the survey department... ", false);
+            SetQuestionValue(ls, qIDs, LimeSurvey.Question.DEPARTMENT, departmentName);                    
+            Success();
 
-            
+            Info("Setting up the survey group... ", false);
+            SetQuestionValue(ls, qIDs, LimeSurvey.Question.GROUP, groupName);                    
+            Success();
 
+            Info("Setting up the survey trainer... ", false);
+            SetQuestionValue(ls, qIDs, LimeSurvey.Question.TRAINER, trainerName);                    
+            Success();                    
 
-            // Info("Setting up the survey group... ");    
-            // // ls.Client.Method = "set_survey_properties";
-            // // ls.Client.Parameters.Add("sSessionKey", ls.SessionKey);
-            // // ls.Client.Parameters.Add("iSurveyID", newID);
-            // // ls.Client.Parameters.Add("aSurveyData", );
-            // // ls.Client.Post();
-            // // ls.Client.ClearParameters();
-
-            // // int newID = 0;
-            // // if(ls.Client.Response != null && ls.Client.Response.result != null){
-            // //     var response = ls.Client.Response.result.ToString();
-            // //     if(!int.TryParse(response, out newID)) throw new Exception($"Unable to parse the new survey ID from '{response}'");
-            // // }
-            // // Success();
-
-        
+            if(type == LimeSurvey.Type.SUBJECT_CCFF){
+                Info("Setting up the survey subject... ", false);
+                SetQuestionValue(ls, qIDs, LimeSurvey.Question.SUBJECT_CODE, subjectCode);                    
+                SetQuestionValue(ls, qIDs, LimeSurvey.Question.SUBJECT_NAME, subjectName);
+                Success();
+            }
         }
         catch(Exception ex){
             Error("Error: " + ex.ToString());
         }
     }
+}
+
+void SetQuestionValue(LimeSurvey ls, Dictionary<LimeSurvey.Question, int> questionIDs, LimeSurvey.Question question, string value){
+    ls.SetQuestionProperties(questionIDs[question], JObject.Parse(
+        @"{
+            ""question"" : """ + question.ToString().ToLower() + ": {'" + value + @"'}""  
+        }"
+    ));           
+
+    //TODO: this does not work!!!
+    ls.SetQuestionProperties(questionIDs[question], JObject.Parse(
+        @"{
+            ""attributes"" : {
+                ""equation"": ""{'" + value + @"'}"",
+                ""hidden"": ""1""
+            } 
+        }"
+    ));  
 }
 
 void LoadFromLimeSurvey(){
