@@ -1,6 +1,7 @@
 public class Settings
 {
     public TeachingStatsSettings? TeachingStats {get; set;}
+    
     public LimeSurveySettings? LimeSurvey {get; set;}
     public TemplateCollection? Templates {get; set;}
 
@@ -17,10 +18,10 @@ public class Settings
     }
 
     public class TemplateCollection{
-        public Dictionary<string, TemplateSettings>? Templates;
+        public Dictionary<string, SurveySettings>? Surveys;
     }
 
-    public class TemplateSettings{
+    public class SurveySettings{
         public string? Name {get; set;}
         public int Id {get; set;}
     }

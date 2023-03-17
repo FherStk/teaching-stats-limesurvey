@@ -9,7 +9,7 @@ limeSurvey:
   password: admin
 
 templates:
-  templates:
+  surveys:
     subject-ccff:
       name: Subject (CCFF)
       id: 123456

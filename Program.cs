@@ -1,6 +1,5 @@
 ﻿using Npgsql;
-using YamlDotNet.Serialization;
-using YamlDotNet.Serialization.NamingConventions;
+using Newtonsoft.Json.Linq;
 
 //Global vars
 var _VERSION = "0.0.1";
@@ -10,10 +9,10 @@ var _VERSION = "0.0.1";
 // if(!CheckConfig()) return;
 // else Menu();
 
+CreateNewSurvey();
+
 //Methods
 void Menu(){
-    CreateNewSurvey();
-
     while(true){        
         Info("Please, select an option:");
         Info("   1: Load reporting data from 'teaching-stats'");
@@ -57,57 +56,145 @@ void Menu(){
     
 }
 
-void CreateNewSurvey(){
-    //TODO: do the inverse, fill the class and generate the yaml
-    //TODO: create the settings.yml and fill all the settings there, it will be easier to manage with a static class
+void CreateNewSurvey(){   
+    var settings = Utils.Settings;
+    if(settings == null || settings.Templates == null || settings.Templates.Surveys == null) throw new IncorrectSettingsException();
 
-    var deserializer = new DeserializerBuilder()
-    .WithNamingConvention(UnderscoredNamingConvention.Instance)  // see height_in_inches in sample yml 
-    .Build();
+    //int templateID = -1;
+    int templateID = 195332;
+    while(templateID == -1){        
+        Info("Please, select the template ID to create a new survey:");
 
-    // var p = deserializer.Deserialize<Templates>(File.ReadAllText(Path.Combine(Utils.ConfigFolder, "templates.yml")));
-    // var h = p.Surveys["school"];
-    // using(var ls = new LimeSurvey()){
-    //     try{
+        foreach(var template in settings.Templates.Surveys)
+            Info($"   {template.Key}: {template.Value}");            
+
+        Info("   0: Exit");                        
+        Console.WriteLine();
+
+        
+        if(!int.TryParse(Console.ReadLine(), out templateID)){
+            Error("Please, select a valid option.");
+            Console.WriteLine();
+        }        
+    }
+
+    //TODO: split the method by template type (subject, school, etc...)
+
+    // var degreeName = Question("Please, write the DEGREE NAME:");
+    // var departmentName = Question("Please, write the DEPARTMENT NAME:");
+    // var subjectCode = Question("Please, write the SUBJECT CODE:");
+    // var subjectName = Question("Please, write the SUBJECT NAME:");
+    // var groupName = Question("Please, write the GROUP NAME:");
+    // var trainerName = Question("Please, write the TRAINER NAME:");    
+
+    var degreeName = "DAM";
+    var departmentName = "Informàtica";
+    var subjectCode = "M10";
+    var subjectName = "Sistemes de gestió empresarial";
+    var groupName = "DAM2A";
+    var trainerName = "Fernando Porrino";
+    
+
+    using(var ls = new LimeSurvey()){       
+        try{            
+            Info("Creating a new survey... ");    
+            ls.Client.Method = "copy_survey";
+            ls.Client.Parameters.Add("sSessionKey", ls.SessionKey);
+            ls.Client.Parameters.Add("iSurveyID_org", templateID);
+            ls.Client.Parameters.Add("sNewname", "Automated Survey");
+            ls.Client.Post();
+            ls.Client.ClearParameters();
+
+            int newID = 0;
+            var responseID = JObject.Parse(ls.ReadClientResult() ?? "");
+            if(!int.TryParse((responseID["newsid"] ?? "").ToString(), out newID)) throw new Exception($"Unable to parse the new survey ID from '{responseID}'");
+            Success();
+
+            Info("Getting the templatye data... ");    
+            ls.Client.Method = "list_questions";
+            ls.Client.Parameters.Add("sSessionKey", ls.SessionKey);
+            ls.Client.Parameters.Add("iSurveyID", templateID);
+            ls.Client.Post();
+            ls.Client.ClearParameters();
+
+            var responseQuestions = JArray.Parse(ls.ReadClientResult() ?? "");
+            if(responseQuestions == null) throw new Exception($"Unable to read properties from the survey ID '{templateID}'");            
+
+            var items = string.Empty;
+            var degreeNameQuestionID = string.Empty;
+            var departmentNameQuestionID = string.Empty;
+            var subjectCodeQuestionID = string.Empty;
+            var subjectNameQuestionID = string.Empty;
+            var groupNameQuestionID = string.Empty;
+            var trainerNameQuestionID = string.Empty;
 
 
+            foreach(var q in responseQuestions){
+                switch((q["title"] ?? "").ToString().ToLower()){
+                    case "degree":
+                        degreeNameQuestionID = (q["qid"] ?? "").ToString();
+                        break;
 
-    //         Info("Creating a new survey... ");    
-    //         ls.Client.Method = "copy_survey";
-    //         ls.Client.Parameters.Add("sSessionKey", ls.SessionKey);
-    //         ls.Client.Parameters.Add("iSurveyID_org", "123549");
-    //         ls.Client.Parameters.Add("sNewname", "Automated Survey");
-    //         ls.Client.Post();
-    //         ls.Client.ClearParameters();
+                    case "department":
+                        departmentNameQuestionID = (q["qid"] ?? "").ToString();
+                        break;
 
-    //         int newID = 0;
-    //         if(ls.Client.Response != null && ls.Client.Response.result != null){
-    //             var response = ls.Client.Response.result.ToString();
-    //             if(!int.TryParse(response, out newID)) throw new Exception($"Unable to parse the new survey ID from '{response}'");
-    //         }
-    //         Success();
+                    case "subjectcode":
+                        subjectCodeQuestionID = (q["qid"] ?? "").ToString();
+                        break;
 
-    //         Info("Setting up the survey group... ");    
-    //         // ls.Client.Method = "set_survey_properties";
-    //         // ls.Client.Parameters.Add("sSessionKey", ls.SessionKey);
-    //         // ls.Client.Parameters.Add("iSurveyID", newID);
-    //         // ls.Client.Parameters.Add("aSurveyData", );
-    //         // ls.Client.Post();
-    //         // ls.Client.ClearParameters();
+                    case "subjectname":
+                        subjectNameQuestionID = (q["qid"] ?? "").ToString();
+                        break;
 
-    //         // int newID = 0;
-    //         // if(ls.Client.Response != null && ls.Client.Response.result != null){
-    //         //     var response = ls.Client.Response.result.ToString();
-    //         //     if(!int.TryParse(response, out newID)) throw new Exception($"Unable to parse the new survey ID from '{response}'");
-    //         // }
-    //         // Success();
+                    case "group":
+                        groupNameQuestionID = (q["qid"] ?? "").ToString();
+                        break;
+
+                    case "trainer":
+                        trainerNameQuestionID = (q["qid"] ?? "").ToString();
+                        break;
+                }                
+            }
+            Success();
+
+            Info("Setting up the survey degree... ");    
+            ls.Client.Method = "set_question_properties";
+            ls.Client.Parameters.Add("iQuestionID", ls.SessionKey);
+            ls.Client.Parameters.Add("iSurveyID", degreeNameQuestionID);
+
+            ls.Client.Parameters.Add("aQuestionData", new JObject(new JProperty("question", "degree: {'" + degreeName + "'}")));
+            ls.Client.Post();
+            ls.Client.ClearParameters();
+            Success();
+            
+            // var responseQuestions = JArray.Parse(ls.ReadClientResult() ?? "");
+            // if(responseQuestions == null) throw new Exception($"Unable to read properties from the survey ID '{templateID}'");            
+
+            
 
 
-    //     }
-    //     catch(Exception ex){
-    //         Error("Error: " + ex.ToString());
-    //     }
-    // }
+            // Info("Setting up the survey group... ");    
+            // // ls.Client.Method = "set_survey_properties";
+            // // ls.Client.Parameters.Add("sSessionKey", ls.SessionKey);
+            // // ls.Client.Parameters.Add("iSurveyID", newID);
+            // // ls.Client.Parameters.Add("aSurveyData", );
+            // // ls.Client.Post();
+            // // ls.Client.ClearParameters();
+
+            // // int newID = 0;
+            // // if(ls.Client.Response != null && ls.Client.Response.result != null){
+            // //     var response = ls.Client.Response.result.ToString();
+            // //     if(!int.TryParse(response, out newID)) throw new Exception($"Unable to parse the new survey ID from '{response}'");
+            // // }
+            // // Success();
+
+        
+        }
+        catch(Exception ex){
+            Error("Error: " + ex.ToString());
+        }
+    }
 }
 
 void LoadFromLimeSurvey(){

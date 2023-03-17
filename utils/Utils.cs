@@ -17,7 +17,7 @@ public static class Utils{
     private static Settings? _settings;
     public static Settings Settings{
         get{
-            if(_settings == null) _settings = LoadSettings();
+            if(_settings == null) _settings = LoadSettings();           
             return _settings;
         }
         
@@ -29,7 +29,7 @@ public static class Utils{
     private static Settings LoadSettings(){
         //Source: https://github.com/aaubry/YamlDotNet
         var deserializer = new DeserializerBuilder()
-        .WithNamingConvention(UnderscoredNamingConvention.Instance)  // see height_in_inches in sample yml 
+        .WithNamingConvention(CamelCaseNamingConvention.Instance)  // see height_in_inches in sample yml 
         .Build();
 
         var yml = File.ReadAllText(Path.Combine(ConfigFolder, "settings.yml"));
@@ -59,27 +59,27 @@ public static class Utils{
                 Password = "admin"
             },
             Templates = new Settings.TemplateCollection(){
-                Templates = new Dictionary<string, Settings.TemplateSettings>{
+                Surveys = new Dictionary<string, Settings.SurveySettings>{
                     {
-                        "subject-ccff", new Settings.TemplateSettings(){
+                        "subject-ccff", new Settings.SurveySettings(){
                             Name = "Subject (CCFF)",
                             Id = 123456
                         }
                     },
                     {
-                        "mentoring-1-ccff", new Settings.TemplateSettings(){
+                        "mentoring-1-ccff", new Settings.SurveySettings(){
                             Name = "Mentoring 1st (CCFF)",
                             Id = 123457
                         }
                     },
                     {
-                        "mentoring-2-ccff", new Settings.TemplateSettings(){
+                        "mentoring-2-ccff", new Settings.SurveySettings(){
                             Name = "Mentoring 2nd (CCFF)",
                             Id = 123458
                         }
                     },
                     {
-                        "school", new Settings.TemplateSettings(){
+                        "school", new Settings.SurveySettings(){
                             Name = "School (General)",
                             Id = 123459
                         }
