@@ -9,19 +9,18 @@ limeSurvey:
   password: admin
 
 templates:
-  surveys:
-    subject-ccff:
-      name: Subject (CCFF)
-      id: 123456
+  subject-ccff:
+    name: Subject (CCFF)
+    id: 123456
 
-    mentoring-1-ccff:
-      name: Mentoring 1st (CCFF)
-      id: 123457
+  mentoring-1-ccff:
+    name: Mentoring 1st (CCFF)
+    id: 123457
 
-    mentoring-2-ccff:
-      name: Mentoring 2nd (CCFF)
-      id: 123458
-      
-    school:
-      name: School (General)
-      id: 123459
+  mentoring-2-ccff:
+    name: Mentoring 2nd (CCFF)
+    id: 123458
+    
+  school:
+    name: School (General)
+    id: 123459

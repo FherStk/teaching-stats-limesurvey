@@ -9,6 +9,7 @@ var _VERSION = "0.0.1";
 // if(!CheckConfig()) return;
 // else Menu();
 
+//Utils.SerializeSettingsTemplateAsYamlFile();
 CreateNewSurvey();
 
 //Methods
@@ -58,26 +59,57 @@ void Menu(){
 
 void CreateNewSurvey(){   
     var settings = Utils.Settings;
-    if(settings == null || settings.Templates == null || settings.Templates.Surveys == null) throw new IncorrectSettingsException();
+    if(settings == null || settings.Templates == null) throw new IncorrectSettingsException();
 
-    //int templateID = -1;
-    int templateID = 195332;
-    while(templateID == -1){        
+    int i = 1;
+  
+    var options = new Dictionary<int, object>();    
+    foreach(var t in settings.Templates){
+        options.Add(i++, new {
+            ID = t.Value.Id,
+            Caption = t.Value.Name ?? "",
+            Type = t.Key 
+        });
+    }
+
+    //int option = -1;
+    int option = 1;
+    while(option == -1){        
         Info("Please, select the template ID to create a new survey:");
 
-        foreach(var template in settings.Templates.Surveys)
-            Info($"   {template.Key}: {template.Value}");            
+        foreach(var e in options){
+            dynamic v = e.Value;
+            Info($"   {e.Key}: {v.Caption}");            
+        }
 
         Info("   0: Exit");                        
         Console.WriteLine();
 
         
-        if(!int.TryParse(Console.ReadLine(), out templateID)){
+        if(!int.TryParse(Console.ReadLine(), out option)){
             Error("Please, select a valid option.");
             Console.WriteLine();
         }        
     }
 
+    dynamic template = options[option];
+    switch(template.Type){
+        case "subject-ccff":
+            CreateNewSubjectSurvey(template.ID);
+            break;
+
+        case "mentoring-1-ccff":
+            break;
+
+        case "mentoring-2-ccff":
+            break;
+
+        case "school":
+            break;
+    }
+}
+
+void CreateNewSubjectSurvey(int templateID){
     //TODO: split the method by template type (subject, school, etc...)
 
     // var degreeName = Question("Please, write the DEGREE NAME:");
@@ -98,82 +130,69 @@ void CreateNewSurvey(){
     using(var ls = new LimeSurvey()){       
         try{            
             Info("Creating a new survey... ");    
-            ls.Client.Method = "copy_survey";
-            ls.Client.Parameters.Add("sSessionKey", ls.SessionKey);
-            ls.Client.Parameters.Add("iSurveyID_org", templateID);
-            ls.Client.Parameters.Add("sNewname", "Automated Survey");
-            ls.Client.Post();
-            ls.Client.ClearParameters();
+            var surveyName = $"{degreeName} {subjectCode} - {subjectName}";
+            if(!string.IsNullOrEmpty(trainerName)) surveyName += $" ({trainerName})";
 
-            int newID = 0;
-            var responseID = JObject.Parse(ls.ReadClientResult() ?? "");
-            if(!int.TryParse((responseID["newsid"] ?? "").ToString(), out newID)) throw new Exception($"Unable to parse the new survey ID from '{responseID}'");
+            //Copying the survey with the correct name
+            int newID = ls.CopySurvey(templateID, surveyName);            
             Success();
 
-            Info("Getting the templatye data... ");    
-            ls.Client.Method = "list_questions";
-            ls.Client.Parameters.Add("sSessionKey", ls.SessionKey);
-            ls.Client.Parameters.Add("iSurveyID", templateID);
-            ls.Client.Post();
-            ls.Client.ClearParameters();
-
-            var responseQuestions = JArray.Parse(ls.ReadClientResult() ?? "");
-            if(responseQuestions == null) throw new Exception($"Unable to read properties from the survey ID '{templateID}'");            
-
-            var items = string.Empty;
-            var degreeNameQuestionID = string.Empty;
-            var departmentNameQuestionID = string.Empty;
-            var subjectCodeQuestionID = string.Empty;
-            var subjectNameQuestionID = string.Empty;
-            var groupNameQuestionID = string.Empty;
-            var trainerNameQuestionID = string.Empty;
-
-
-            foreach(var q in responseQuestions){
-                switch((q["title"] ?? "").ToString().ToLower()){
-                    case "degree":
-                        degreeNameQuestionID = (q["qid"] ?? "").ToString();
-                        break;
-
-                    case "department":
-                        departmentNameQuestionID = (q["qid"] ?? "").ToString();
-                        break;
-
-                    case "subjectcode":
-                        subjectCodeQuestionID = (q["qid"] ?? "").ToString();
-                        break;
-
-                    case "subjectname":
-                        subjectNameQuestionID = (q["qid"] ?? "").ToString();
-                        break;
-
-                    case "group":
-                        groupNameQuestionID = (q["qid"] ?? "").ToString();
-                        break;
-
-                    case "trainer":
-                        trainerNameQuestionID = (q["qid"] ?? "").ToString();
-                        break;
-                }                
-            }
+            //Loading the question IDs in order to set the correct values
+            Info("Loading the survey data... ");    
+            var qIDs = ls.GetSurveyQuestionIDs(newID);            
             Success();
 
+            //Changing the copied question data with the correct values
             Info("Setting up the survey degree... ");    
-            ls.Client.Method = "set_question_properties";
-            ls.Client.Parameters.Add("iQuestionID", ls.SessionKey);
-            ls.Client.Parameters.Add("iSurveyID", degreeNameQuestionID);
+            ls.SetQuestionProperties(qIDs[LimeSurvey.Question.DEGREE], JObject.Parse(
+                @"{
+                    ""question"" : ""degree: {'" + degreeName + @"'}""  
+                }"
+            ));           
 
-            ls.Client.Parameters.Add("aQuestionData", new JObject(new JProperty("question", "degree: {'" + degreeName + "'}")));
-            ls.Client.Post();
-            ls.Client.ClearParameters();
+            //TODO: this does not work!!!
+            ls.SetQuestionProperties(qIDs[LimeSurvey.Question.DEGREE], JObject.Parse(
+                @"{
+                    ""attributes"" : {
+                        ""equation"": ""{'" + degreeName + @"'}"",
+                        ""hidden"": ""1""
+                    } 
+                }"
+            ));
+            //ls.SetQuestionProperties(qIDs[LimeSurvey.Question.DEGREE], new JObject(new JProperty("attributes", new JProperty("equation", "{'" + degreeName + "'}"))));
             Success();
             
+
             //TODO:
             /*
-             "attributes": {
-                "equation": "{'DEGREE'}",
-                "hidden": "1"
-            },
+            {
+                "qid": "3793",
+                "parent_qid": "0",
+                "sid": "195332",
+                "gid": "218",
+                "type": "*",
+                "title": "degree",
+                "question": "degree: {'DEGREE'}",
+                "preg": "",
+                "help": "",
+                "other": "N",
+                "mandatory": "N",
+                "question_order": "5",
+                "language": "ca",
+                "scale_id": "0",
+                "same_default": "0",
+                "relevance": "1",
+                "modulename": "",
+                "available_answers": "No available answers",
+                "subquestions": "No available answers",
+                "attributes": {
+                    "equation": "{'DEGREE'}",
+                    "hidden": "1"
+                },
+                "attributes_lang": "No available attributes",
+                "answeroptions": "No available answer options",
+                "defaultvalue": null
+                }
             */
             // var responseQuestions = JArray.Parse(ls.ReadClientResult() ?? "");
             // if(responseQuestions == null) throw new Exception($"Unable to read properties from the survey ID '{templateID}'");            

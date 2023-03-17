@@ -58,31 +58,30 @@ public static class Utils{
                 Username = "admin",
                 Password = "admin"
             },
-            Templates = new Settings.TemplateCollection(){
-                Surveys = new Dictionary<string, Settings.SurveySettings>{
-                    {
-                        "subject-ccff", new Settings.SurveySettings(){
-                            Name = "Subject (CCFF)",
-                            Id = 123456
-                        }
-                    },
-                    {
-                        "mentoring-1-ccff", new Settings.SurveySettings(){
-                            Name = "Mentoring 1st (CCFF)",
-                            Id = 123457
-                        }
-                    },
-                    {
-                        "mentoring-2-ccff", new Settings.SurveySettings(){
-                            Name = "Mentoring 2nd (CCFF)",
-                            Id = 123458
-                        }
-                    },
-                    {
-                        "school", new Settings.SurveySettings(){
-                            Name = "School (General)",
-                            Id = 123459
-                        }
+            Templates =new Dictionary<string, Settings.SurveySettings>
+            {
+                {
+                    "subject-ccff", new Settings.SurveySettings(){
+                        Name = "Subject (CCFF)",
+                        Id = 123456
+                    }
+                },
+                {
+                    "mentoring-1-ccff", new Settings.SurveySettings(){
+                        Name = "Mentoring 1st (CCFF)",
+                        Id = 123457
+                    }
+                },
+                {
+                    "mentoring-2-ccff", new Settings.SurveySettings(){
+                        Name = "Mentoring 2nd (CCFF)",
+                        Id = 123458
+                    }
+                },
+                {
+                    "school", new Settings.SurveySettings(){
+                        Name = "School (General)",
+                        Id = 123459
                     }
                 }
             }

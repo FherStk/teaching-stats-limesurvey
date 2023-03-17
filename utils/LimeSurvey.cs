@@ -1,6 +1,16 @@
 using JsonRPC;
+using Newtonsoft.Json.Linq;
 
 public class LimeSurvey : IDisposable{
+    public enum Question{
+        DEGREE,
+        DEPARTMENT,
+        SUBJECT_CODE,
+        SUBJECT_NAME,
+        GROUP,
+        TRAINER
+    }
+
     public string? SessionKey {get; private set;}    
 
     public JsonRPCclient Client {get; private set;}    
@@ -30,9 +40,89 @@ public class LimeSurvey : IDisposable{
         return Path.Combine(appFolder, "config");
     }
 
-    public string? ReadClientResult(){
+    private string? ReadClientResult(){
         if(this.Client.Response != null && this.Client.Response.result != null) return this.Client.Response.result.ToString();
         else return null;
+    }
+
+    public int CopySurvey(int templateID, string newName){
+        this.Client.Method = "copy_survey";
+        this.Client.Parameters.Add("sSessionKey", this.SessionKey);
+        this.Client.Parameters.Add("iSurveyID_org", templateID);
+        this.Client.Parameters.Add("sNewname", newName);
+        this.Client.Post();
+        this.Client.ClearParameters();
+
+        var response = JObject.Parse(this.ReadClientResult() ?? "");
+        return int.Parse((response["newsid"] ?? "").ToString());
+    }
+
+    public Dictionary<Question, int> GetSurveyQuestionIDs(int surveyID){
+        var IDs = new Dictionary<Question, int>();
+        
+        this.Client.Method = "list_questions";
+        this.Client.Parameters.Add("sSessionKey", this.SessionKey);
+        this.Client.Parameters.Add("iSurveyID_org", surveyID);
+        this.Client.Post();
+        this.Client.ClearParameters();
+
+        var response = JArray.Parse(this.ReadClientResult() ?? "");
+        if(response == null) throw new Exception($"Unable to read properties from the survey ID '{surveyID}'");
+
+        foreach(var q in response){
+            var qID = int.Parse((q["qid"] ?? "").ToString());
+
+            switch((q["title"] ?? "").ToString().ToLower()){
+                case "degree":
+                    IDs.Add(Question.DEGREE, qID);
+                    break;
+
+                case "department":
+                    IDs.Add(Question.DEPARTMENT, qID);
+                    break;
+
+                case "subjectcode":
+                    IDs.Add(Question.SUBJECT_CODE, qID);
+                    break;
+
+                case "subjectname":
+                    IDs.Add(Question.SUBJECT_NAME, qID);
+                    break;
+
+                case "group":
+                    IDs.Add(Question.GROUP, qID);
+                    break;
+
+                case "trainer":
+                    IDs.Add(Question.TRAINER, qID);
+                    break;
+            }          
+        }            
+
+        return IDs;
+    }
+
+    public string GetQuestionProperties(int questionID){
+        this.Client.Method = "get_question_properties";
+        this.Client.Parameters.Add("iQuestionID", this.SessionKey);
+        this.Client.Parameters.Add("iSurveyID", questionID);
+
+        this.Client.Post();
+        this.Client.ClearParameters();
+
+        return this.ReadClientResult() ?? "";
+    }
+
+    public string SetQuestionProperties(int questionID, JObject properties){
+        this.Client.Method = "set_question_properties";
+        this.Client.Parameters.Add("iQuestionID", this.SessionKey);
+        this.Client.Parameters.Add("iSurveyID", questionID);
+
+        this.Client.Parameters.Add("aQuestionData", properties);
+        this.Client.Post();
+        this.Client.ClearParameters();
+
+        return this.ReadClientResult() ?? "";
     }
 
     public void Dispose()
