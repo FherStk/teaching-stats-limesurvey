@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace DBContext;
+namespace EF;
 
 public partial class AccountEmailconfirmation
 {

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 
-namespace DBContext;
+namespace EF;
 
 #pragma warning disable CS8618 
 public partial class TeachingStatsContext : DbContext
@@ -11,7 +11,8 @@ public partial class TeachingStatsContext : DbContext
     {
     }
 
-    public TeachingStatsContext(DbContextOptions<TeachingStatsContext> options) : base(options)
+    public TeachingStatsContext(DbContextOptions<TeachingStatsContext> options)
+        : base(options)
     {
     }
 
@@ -102,8 +103,8 @@ public partial class TeachingStatsContext : DbContext
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder){
         var settings = Utils.Settings;  
         if(settings == null || settings.TeachingStats == null) throw new IncorrectSettingsException();      
-        
-        optionsBuilder.UseNpgsql("Host={settings.TeachingStats.Host};Database=teaching-stats;Username={settings.TeachingStats.Username};Password={settings.TeachingStats.Password}");    
+
+        optionsBuilder.UseNpgsql("Host={settings.TeachingStats.Host};Database=teaching-stats;Username={settings.TeachingStats.Username};Password={settings.TeachingStats.Password}");
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
