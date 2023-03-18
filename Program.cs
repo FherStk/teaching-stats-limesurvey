@@ -10,7 +10,7 @@ var _VERSION = "0.0.1";
 // else Menu();
 
 //Utils.SerializeSettingsTemplateAsYamlFile();
-CreateNewSurveyFromTemplate();
+LoadFromLimeSurvey();
 
 //Methods
 void Menu(){
@@ -72,8 +72,8 @@ void CreateNewSurveyFromTemplate(){
         });
     }
 
-    //int option = -1;
-    int option = 1;
+    int option = -1;
+    //int option = 1;
     while(option == -1){        
         Info("Please, select the template ID to create a new survey:");
 
@@ -98,30 +98,27 @@ void CreateNewSurveyFromTemplate(){
 
 void CreateNewSurveyIntoLimeSurvey(int templateID, LimeSurvey.Type type){   
 
-    // var degreeName = Question("Please, write the DEGREE NAME:");
-    // var departmentName = Question("Please, write the DEPARTMENT NAME:");    
-    // var groupName = Question("Please, write the GROUP NAME:");
-    // var trainerName = Question("Please, write the TRAINER NAME:");    
+    var degreeName = Question("Please, write the DEGREE NAME:");
+    var departmentName = Question("Please, write the DEPARTMENT NAME:");    
+    var groupName = Question("Please, write the GROUP NAME:");
+    var trainerName = Question("Please, write the TRAINER NAME:");    
     
     var subjectCode = string.Empty;
     var subjectName = string.Empty;
     if(type == LimeSurvey.Type.SUBJECT_CCFF){
-        // subjectCode = Question("Please, write the SUBJECT CODE:");
-        // subjectName = Question("Please, write the SUBJECT NAME:");
+        subjectCode = Question("Please, write the SUBJECT CODE:");
+        subjectName = Question("Please, write the SUBJECT NAME:");
     }
 
-    var degreeName = "DAM";
-    var departmentName = "Informàtica";    
-    var groupName = "DAM2A";
-    var trainerName = "Fernando Porrino";
-    subjectCode = "M10";
-    subjectName = "Sistemes de gestió empresarial";
+    // var degreeName = "DAM";
+    // var departmentName = "Informàtica";    
+    // var groupName = "DAM2A";
+    // var trainerName = "Fernando Porrino";
+    // subjectCode = "M10";
+    // subjectName = "Sistemes de gestió empresarial";
     
 
     using(var ls = new LimeSurvey()){   
-        Console.WriteLine(ls.ExportSurveyResponses(272798));
-        return;
-
         try{            
             Info("Creating a new survey... ", false);    
             var surveyName = $"{degreeName} {subjectCode} - {subjectName}";
@@ -185,77 +182,22 @@ void SetQuestionValue(LimeSurvey ls, Dictionary<LimeSurvey.Question, List<int>> 
 }
 
 void LoadFromLimeSurvey(){
-    var response = Question("This option will load all the current 'limesurvey' responses into the report tables, closing and cleaning the original surveys. Do you want no continue? [Y/n]", "y");
-    if(response == "n") Error("Operation cancelled.");
-    else{
+    // var response = Question("This option will load all the current 'limesurvey' responses into the report tables, closing and cleaning the original surveys. Do you want no continue? [Y/n]", "y");
+    // if(response == "n") Error("Operation cancelled.");
+    // else{
         using(var ls = new LimeSurvey()){
+            using(var ts = new TeachingStats()){
+                //TODO: chech for all the survey IDs...
 
+                var surveyID = 272798;
+                var answers = ls.GetSurveyResponses(surveyID);
+                var questions = ls.GetAllQuestionsProperties(surveyID);
+
+                ts.ImportFromLimeSurvey(questions, answers);
+            }
         }
 
-        //Get the existing sirveys within the correct groups.
-        //For each survey:
-        //  1. Warn if the survey is not ready to collect (its open or closed).
-        //  2. Open a transaction to the database
-        //  3. Download its data, cook it and store it into the database
-        //  4. When done, close the survey.
-        //  5. If everything worked, then commit the transaction (or rollback on error).
-        //  6. Next survey.
-        
-      
- 
-    //   if(client.Response.StatusCode == System.Net.HttpStatusCode.OK){
-    //     client.Method = "import_survey";
-    //     client.Parameters.Add("sSessionKey", SessionKey);
-    //     client.Parameters.Add("sImportData", Base64Encode(yourImportDataString));
-    //     client.Parameters.Add("sImportDataType", "lss");
-    //     //client.Parameters.Add("sNewSurveyName", "test");
-    //     //client.Parameters.Add("DestSurveyID", 1);
-    //     client.Post();
-    //   }
- 
-    //   client.ClearParameters();
- 
-    //   Console.WriteLine("new survey id:" + client.Response.result.ToString());
-    //   Console.ReadLine();
-        
-        // using(var conn = GetTeachingStatsConnection()){
-        //     NpgsqlTransaction trans = null;
-
-        //     try{
-        //         conn.Open();
-        //         trans = conn.BeginTransaction();
-                            
-        //         Info("Loading data into the reporting tables... ", false);
-        //         using (NpgsqlCommand cmd = new NpgsqlCommand(@"
-        //             INSERT INTO reports.answer
-        //             SELECT * FROM reports.answer_all;", conn)){
-                    
-        //             cmd.ExecuteNonQuery();
-        //         }
-        //         Success();
-
-        //         Info("Cleaning the original answers... ", false);
-        //         using (NpgsqlCommand cmd = new NpgsqlCommand(@"
-        //             TRUNCATE TABLE public.forms_answer;
-        //             TRUNCATE TABLE public.forms_participation;
-        //             TRUNCATE TABLE public.forms_evaluation CASCADE;", conn)){
-                    
-        //             cmd.ExecuteNonQuery();
-        //         }
-        //         Success();  
-
-        //         trans.Commit();
-        //         Success("Done!");
-        //     }
-        //     catch(Exception ex){               
-        //         if(trans != null) trans.Rollback(); 
-        //         Error("Error: " + ex.ToString());
-        //     }
-        //     finally{
-        //         conn.Close();                
-        //     }
-        // }
-    }
+    // }
 }
 
 void LoadFromTeachingStats(){

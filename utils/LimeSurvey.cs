@@ -82,7 +82,10 @@ public class LimeSurvey : IDisposable{
 
         foreach(var q in response){
             var qID = int.Parse((q["qid"] ?? "").ToString());
-            var type = (Question)Enum.Parse(typeof(Question), (q["title"] ?? "").ToString().ToUpper());
+            
+            Question type;            
+            if(!Enum.TryParse<Question>((q["title"] ?? "").ToString(), true, out type))
+                type = Question.QUESTIONS;           
 
             List<int> list;
             try{
@@ -156,7 +159,7 @@ public class LimeSurvey : IDisposable{
         return JObject.Parse(this.ReadClientResult() ?? "");
     }
 
-    public JObject ExportSurveyResponses(int surveyID){
+    public JObject GetSurveyResponses(int surveyID){
         this.Client.Method = "export_responses";
         this.Client.Parameters.Add("sSessionKey", this.SessionKey);
         this.Client.Parameters.Add("iSurveyID", surveyID);
