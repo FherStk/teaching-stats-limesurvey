@@ -5,12 +5,9 @@ using Newtonsoft.Json.Linq;
 var _VERSION = "0.0.1";
 
 //Main
-// DisplayInfo();
-// if(!CheckConfig()) return;
-// else Menu();
-
-//Utils.SerializeSettingsTemplateAsYamlFile();
-LoadFromLimeSurvey();
+DisplayInfo();
+if(!CheckConfig()) return;
+else Menu();
 
 //Methods
 void Menu(){
@@ -182,9 +179,9 @@ void SetQuestionValue(LimeSurvey ls, Dictionary<LimeSurvey.Question, List<int>> 
 }
 
 void LoadFromLimeSurvey(){
-    // var response = Question("This option will load all the current 'limesurvey' responses into the report tables, closing and cleaning the original surveys. Do you want no continue? [Y/n]", "y");
-    // if(response == "n") Error("Operation cancelled.");
-    // else{
+    var response = Question("This option will load all the current 'limesurvey' responses into the report tables, closing and cleaning the original surveys. Do you want no continue? [Y/n]", "y");
+    if(response == "n") Error("Operation cancelled.");
+    else{
         using(var ls = new LimeSurvey()){
             using(var ts = new TeachingStats()){
                 //TODO: chech for all the survey IDs...
@@ -194,10 +191,11 @@ void LoadFromLimeSurvey(){
                 var questions = ls.GetAllQuestionsProperties(surveyID);
 
                 ts.ImportFromLimeSurvey(questions, answers);
+
+                //TODO: stop the LS surveys
             }
         }
-
-    // }
+    }
 }
 
 void LoadFromTeachingStats(){

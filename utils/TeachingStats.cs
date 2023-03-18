@@ -38,8 +38,6 @@ public class TeachingStats : System.IDisposable{
             context.Answers.AddRange(data);
             context.SaveChanges();
         }
-
-        //TODO: import into the databse. It could be nice to use an EntityFramework.
     }
 
     private string Cut(string text, int maxLength){
