@@ -124,9 +124,10 @@ public class TeachingStats : System.IDisposable{
             this.Connection.Open();   //closed when disposing
             trans = this.Connection.BeginTransaction();
             
-            //TODO: evaluation_id could conflict with other sources, like lime-survey.
-            //      the last evaluation_id must be found, and ensure that all are consecutive.
-            //      Example: last evaluation_id from teaching-stats is 123; last evaluation_id from reports is 214 so: 214-123 = 91; all evaluation_id from teaching-stats must be ID+91+1.
+            //TODO: Teaching-Stats should not be used anymore, but if does:
+            //      The evaluation_id could conflict with other sources, like lime-survey.
+            //      The last evaluation_id must be found, and ensure that all are consecutive.
+            //      Example: last evaluation_id from teaching-stats is 123; last evaluation_id from reports is 214 so: 214-123 = 91; all evaluation_id from teaching-stats must be ID+91+1.            
             using (NpgsqlCommand cmd = new NpgsqlCommand(@"
                 INSERT INTO reports.answer
                 SELECT * FROM reports.answer_all;", this.Connection, trans)){
