@@ -99,7 +99,7 @@ public class LimeSurvey : IDisposable{
         return IDs;
     }
 
-    public string GetQuestionProperties(int questionID){
+    public JObject GetQuestionProperties(int questionID){
         this.Client.Method = "get_question_properties";
         this.Client.Parameters.Add("sSessionKey", this.SessionKey);
         this.Client.Parameters.Add("iQuestionID", questionID);
@@ -107,10 +107,10 @@ public class LimeSurvey : IDisposable{
         this.Client.Post();
         this.Client.ClearParameters();
 
-        return this.ReadClientResult() ?? "";
+        return JObject.Parse(this.ReadClientResult() ?? "");
     }
 
-    public string GetAllQuestionsProperties(int surveyID){
+    public JArray GetAllQuestionsProperties(int surveyID){
         
         this.Client.Method = "list_questions";
         this.Client.Parameters.Add("sSessionKey", this.SessionKey);
@@ -118,10 +118,10 @@ public class LimeSurvey : IDisposable{
         this.Client.Post();
         this.Client.ClearParameters();
 
-        return this.ReadClientResult() ?? "";        
+        return JArray.Parse(this.ReadClientResult() ?? "");
     }
 
-    public string SetQuestionProperties(int questionID, JObject properties){
+    public JObject SetQuestionProperties(int questionID, JObject properties){
         this.Client.Method = "set_question_properties";
         this.Client.Parameters.Add("sSessionKey", this.SessionKey);
         this.Client.Parameters.Add("iQuestionID", questionID);
@@ -130,10 +130,10 @@ public class LimeSurvey : IDisposable{
         this.Client.Post();
         this.Client.ClearParameters();
 
-        return this.ReadClientResult() ?? "";
+        return JObject.Parse(this.ReadClientResult() ?? "");
     }
 
-    public string GetSurveySummary(int surveyID){
+    public JObject GetSurveySummary(int surveyID){
         this.Client.Method = "get_summary";
         this.Client.Parameters.Add("sSessionKey", this.SessionKey);
         this.Client.Parameters.Add("iSurveyID", surveyID);
@@ -142,10 +142,10 @@ public class LimeSurvey : IDisposable{
         this.Client.Post();
         this.Client.ClearParameters();
 
-        return this.ReadClientResult() ?? "";
+        return JObject.Parse(this.ReadClientResult() ?? "");
     }
 
-    public string GetSurveyProperties(int surveyID){
+    public JObject GetSurveyProperties(int surveyID){
         this.Client.Method = "get_survey_properties";
         this.Client.Parameters.Add("sSessionKey", this.SessionKey);
         this.Client.Parameters.Add("iSurveyID", surveyID);
@@ -153,10 +153,10 @@ public class LimeSurvey : IDisposable{
         this.Client.Post();
         this.Client.ClearParameters();
 
-        return this.ReadClientResult() ?? "";
+        return JObject.Parse(this.ReadClientResult() ?? "");
     }
 
-    public string ExportSurveyResponses(int surveyID){
+    public JObject ExportSurveyResponses(int surveyID){
         this.Client.Method = "export_responses";
         this.Client.Parameters.Add("sSessionKey", this.SessionKey);
         this.Client.Parameters.Add("iSurveyID", surveyID);
@@ -166,24 +166,7 @@ public class LimeSurvey : IDisposable{
         this.Client.ClearParameters();
 
         var base64EncodedBytes = System.Convert.FromBase64String(this.ReadClientResult() ?? "");
-        return System.Text.Encoding.UTF8.GetString(base64EncodedBytes);
-
-        //TODO: cook the json in order to help with the teaching-stats database import
-        //TODO: the questions json is needed because the LimeSurvey API does not allow changing the 'equation' property.
-        //1. Repeat the question block for each "questions[CODE] and comments"
-        //2. id -> evaluation_id (get the next participationID, the same for each repeated block))
-        //3. submitdate -> timestamp
-        //4. null -> year (extract from timestamp)
-        //5. level -> level
-        //6. department -> departament (get the 'question' value for the 'title=department' within questions json)
-        //7. degree -> degree (get the 'question' value for the 'title=degree' within questions json)
-        //8. group -> group (get the 'question' value for the 'title=group' within questions json)
-        //9. subjectcode -> subject_code (get the 'question' value for the 'title=subjectcode' within questions json)
-        //10. subjectname -> subject_name (get the 'question' value for the 'title=subjectname' within questions json)
-        //11. trainer -> trainer subject_name (get the 'question' value for the 'title=trainer' within questions json)
-        //12. topic -> topic
-        //13. null -> question_sort (get the order from 'questions[SQ00x]' and add the 'comments' at the end)
-        //14. aaa -> value (get it from 'questions[SQ00x]' and the 'comments' fields)
+        return JObject.Parse(System.Text.Encoding.UTF8.GetString(base64EncodedBytes));
     }
 
     public void Dispose()

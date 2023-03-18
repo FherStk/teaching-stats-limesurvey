@@ -262,75 +262,35 @@ void LoadFromTeachingStats(){
     var response = Question("This option will load all the current 'teaching-stats' responses into the report tables, cleaning the original tables (evaluation, answer and participation). Do you want no continue? [Y/n]", "y");
     if(response == "n") Error("Operation cancelled.");
     else{
-        NpgsqlTransaction? trans = null;
-
-        try{
-            using(var ts = new TeachingStats()){
-                ts.Connection.Open();   //closed when disposing
-                trans = ts.Connection.BeginTransaction();
-                            
-                Info("Loading data into the reporting tables... ", false);
-                using (NpgsqlCommand cmd = new NpgsqlCommand(@"
-                    INSERT INTO reports.answer
-                    SELECT * FROM reports.answer_all;", ts.Connection)){
-                    
-                    cmd.ExecuteNonQuery();
-                }
-                Success();
-
-                Info("Cleaning the original answers... ", false);
-                using (NpgsqlCommand cmd = new NpgsqlCommand(@"
-                    TRUNCATE TABLE public.forms_answer;
-                    TRUNCATE TABLE public.forms_participation;
-                    TRUNCATE TABLE public.forms_evaluation CASCADE;", ts.Connection)){
-                    
-                    cmd.ExecuteNonQuery();
-                }
-                Success();  
-
-                trans.Commit();
-                Success("Done!");
+        using(var ts = new TeachingStats()){
+            try{
+                Info("Loading data into the reporting tables and clearing the answers... ", false);
+                ts.ImportFromTeachingStats();
+                Success();     
             }
-        }
-        catch(Exception ex){               
-            if(trans != null) trans.Rollback(); 
-            Error("Error: " + ex.ToString());
-        }        
+            catch(Exception ex){                               
+                Error("Error: " + ex.ToString());
+            }        
+
+        }     
     }
 }
 
-bool CheckConfig(){        
-    try{
+bool CheckConfig(){            
+    try{    
         using(var ts = new TeachingStats()){    
-            ts.Connection.Open();   //closed on dispose
-            
-            using (NpgsqlCommand existCmd = new NpgsqlCommand("SELECT EXISTS (SELECT relname FROM pg_class WHERE relname='answer' AND relkind = 'r');", ts.Connection)){
-                var exists = (bool)(existCmd.ExecuteScalar() ?? false);
-                if(!exists){
-                    //The 'answer' table does not exists
-                    var response = Question("The current 'teaching-stats' database has not been upgraded, do you want to perform the necessary changes to use this program? [Y/n]", "y");
-                    if(response.ToLower() != "y"){
-                        Error("The program cannot continue, becasue the 'teaching-stats' database has not been upgraded.");
-                        return false;
-                    }
-
-                    //Must upgrade
-                    Info("Upgrading the teaching-stats' database... ", false);
-                    using (NpgsqlCommand upgradeCmd = new NpgsqlCommand(@"
-                        ALTER VIEW reports.answer RENAME TO answer_all;
-                        SELECT * INTO reports.answer FROM reports.answer_all;                        
-                        TRUNCATE TABLE public.forms_answer;
-                        TRUNCATE TABLE public.forms_participation;
-                        TRUNCATE TABLE public.forms_evaluation CASCADE;                        
-                        CREATE INDEX answer_year_idx ON reports.answer (""year"");", ts.Connection)){
-                        
-                        upgradeCmd.ExecuteNonQuery();
-                    }
-                    Success();
-                    Console.WriteLine();
-
+            if(!ts.CheckIfUpgraded()){
+                var response = Question("The current 'teaching-stats' database has not been upgraded, do you want to perform the necessary changes to use this program? [Y/n]", "y");
+                if(response.ToLower() != "y"){
+                    Error("The program cannot continue, becasue the 'teaching-stats' database has not been upgraded.");
+                    return false;
                 }
             }
+
+            Info("Upgrading the teaching-stats' database... ", false);
+            ts.PerformDataDaseUpgrade();
+            Success();
+            Console.WriteLine();
         }
 
         //Testing LimeSurvey config
