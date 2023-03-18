@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 
+#pragma warning disable CS8618 
 namespace EF;
 
-#pragma warning disable CS8618 
 public partial class TeachingStatsContext : DbContext
 {
     public TeachingStatsContext()
@@ -104,7 +104,7 @@ public partial class TeachingStatsContext : DbContext
         var settings = Utils.Settings;  
         if(settings == null || settings.TeachingStats == null) throw new IncorrectSettingsException();      
 
-        optionsBuilder.UseNpgsql("Host={settings.TeachingStats.Host};Database=teaching-stats;Username={settings.TeachingStats.Username};Password={settings.TeachingStats.Password}");
+        optionsBuilder.UseNpgsql($"Host={settings.TeachingStats.Host};Database=teaching-stats;Username={settings.TeachingStats.Username};Password={settings.TeachingStats.Password}");
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -163,10 +163,11 @@ public partial class TeachingStatsContext : DbContext
 
         modelBuilder.Entity<Answer>(entity =>
         {
-            entity
-                .HasNoKey()
-                .ToTable("answer", "reports");
+            entity.HasKey(e => e.Id).HasName("answer_pkey");
 
+            entity.ToTable("answer", "reports");
+
+            entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.Degree)
                 .HasMaxLength(4)
                 .HasColumnName("degree");
