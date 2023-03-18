@@ -18,17 +18,32 @@ public class TeachingStats : System.IDisposable{
     }
 
     public void ImportFromLimeSurvey(JArray questions, JObject answers){
-        var importData = ParseFromLimeSurveyToTeachingStats(questions, answers);
+        var data = ParseFromLimeSurveyToTeachingStats(questions, answers);
         
         using(var context = new EF.TeachingStatsContext()){
             var lastID = context.Answers.OrderByDescending(x => x.EvaluationId).Select(x => x.EvaluationId).FirstOrDefault() + 1;
-            importData.ForEach(x => x.EvaluationId = lastID++);
-
-            context.Answers.AddRange(importData);
+            foreach(var item in data){
+                item.EvaluationId = lastID++;
+                item.Level = Cut(item.Level ?? "", 3);
+                item.Department = Cut(item.Department ?? "", 75);
+                item.Degree = Cut(item.Degree ?? "", 4);
+                item.Group = Cut(item.Group ?? "", 11);
+                item.SubjectCode = Cut(item.SubjectCode ?? "", 10);
+                item.SubjectName = Cut(item.SubjectName ?? "", 75);
+                item.Trainer = Cut(item.Trainer ?? "", 75);
+                item.Topic = Cut(item.Topic ?? "", 25);
+                item.QuestionType = Cut(item.QuestionType ?? "", 25);
+            }
+            
+            context.Answers.AddRange(data);
             context.SaveChanges();
         }
 
         //TODO: import into the databse. It could be nice to use an EntityFramework.
+    }
+
+    private string Cut(string text, int maxLength){
+        return (!string.IsNullOrEmpty(text) && text.Length > maxLength ? text.Substring(0, maxLength) : text);        
     }
 
     private List<EF.Answer> ParseFromLimeSurveyToTeachingStats(JArray questions, JObject answers){
@@ -121,7 +136,8 @@ public class TeachingStats : System.IDisposable{
             //      Example: last evaluation_id from teaching-stats is 123; last evaluation_id from reports is 214 so: 214-123 = 91; all evaluation_id from teaching-stats must be ID+91+1.            
             using (NpgsqlCommand cmd = new NpgsqlCommand(@"
                 INSERT INTO reports.answer
-                SELECT * FROM reports.answer_all;", this.Connection, trans)){
+                SELECT * FROM reports.answer_all;
+                ALTER TABLE reports.answer ADD COLUMN id SERIAL PRIMARY KEY;", this.Connection, trans)){
                 
                 cmd.ExecuteNonQuery();
             }

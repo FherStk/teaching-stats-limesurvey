@@ -9,11 +9,13 @@ public partial class TeachingStatsContext : DbContext
 {
     public TeachingStatsContext()
     {
+        AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
     }
 
     public TeachingStatsContext(DbContextOptions<TeachingStatsContext> options)
         : base(options)
     {
+        AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
     }
 
     public virtual DbSet<AccountEmailaddress> AccountEmailaddresses { get; set; }
@@ -104,7 +106,7 @@ public partial class TeachingStatsContext : DbContext
         var settings = Utils.Settings;  
         if(settings == null || settings.TeachingStats == null) throw new IncorrectSettingsException();      
 
-        optionsBuilder.UseNpgsql($"Host={settings.TeachingStats.Host};Database=teaching-stats;Username={settings.TeachingStats.Username};Password={settings.TeachingStats.Password}");
+        optionsBuilder.UseNpgsql($"Host={settings.TeachingStats.Host};Database=teaching-stats;Username={settings.TeachingStats.Username};Password={settings.TeachingStats.Password}");        
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
