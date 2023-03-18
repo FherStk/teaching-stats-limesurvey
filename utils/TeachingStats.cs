@@ -171,7 +171,8 @@ public class TeachingStats : System.IDisposable{
             //closed on dispose
             this.Connection.Open();   
             trans = this.Connection.BeginTransaction();    
-            using (NpgsqlCommand upgradeCmd = new NpgsqlCommand(@"
+
+            using (NpgsqlCommand cmd = new NpgsqlCommand(@"
                 ALTER VIEW reports.answer RENAME TO answer_all;
                 SELECT * INTO reports.answer FROM reports.answer_all;                        
                 TRUNCATE TABLE public.forms_answer;
@@ -179,9 +180,251 @@ public class TeachingStats : System.IDisposable{
                 TRUNCATE TABLE public.forms_evaluation CASCADE;                        
                 CREATE INDEX answer_year_idx ON reports.answer (""year"");", this.Connection, trans)){
                 
-                upgradeCmd.ExecuteNonQuery();
-                trans.Commit();                
+                cmd.ExecuteNonQuery();                
             }
+
+            using (NpgsqlCommand cmd = new NpgsqlCommand(@"
+                DROP VIEW public.forms_subject;
+                DROP VIEW public.forms_student;
+                DROP VIEW reports.participation;
+                DROP VIEW reports.answer_all CASCADE;
+                ALTER TABLE master.""group"" ALTER COLUMN degree_id TYPE int4 USING degree_id::int4;
+                ALTER TABLE master.""degree"" ALTER COLUMN department_id TYPE int4 USING department_id::int4;
+                ALTER TABLE master.""degree"" ALTER COLUMN level_id TYPE int4 USING level_id::int4;
+                ALTER TABLE master.question ALTER COLUMN type_id TYPE int4 USING type_id::int4;
+                ALTER TABLE master.question ALTER COLUMN level_id TYPE int4 USING level_id::int4;
+                ALTER TABLE master.question ALTER COLUMN topic_id TYPE int4 USING topic_id::int4;
+                ALTER TABLE master.student ALTER COLUMN group_id TYPE int4 USING group_id::int4;
+                ALTER TABLE master.subject ALTER COLUMN degree_id TYPE int4 USING degree_id::int4;
+                ALTER TABLE master.subject ALTER COLUMN topic_id TYPE int4 USING topic_id::int4;
+                ALTER TABLE master.subject_student ALTER COLUMN subject_id TYPE int4 USING subject_id::int4;
+                ALTER TABLE master.subject_trainer_group ALTER COLUMN subject_id TYPE int4 USING subject_id::int4;
+                ALTER TABLE master.subject_trainer_group ALTER COLUMN trainer_id TYPE int4 USING trainer_id::int4;
+                ALTER TABLE master.subject_trainer_group ALTER COLUMN group_id TYPE int4 USING group_id::int4;
+                ALTER TABLE public.forms_participation ALTER COLUMN student_id TYPE int4 USING student_id::int4;
+                ALTER TABLE public.forms_evaluation ALTER COLUMN group_id TYPE int4 USING group_id::int4;
+                ALTER TABLE public.forms_evaluation ALTER COLUMN subject_id TYPE int4 USING subject_id::int4;
+                ALTER TABLE public.forms_evaluation ALTER COLUMN trainer_id TYPE int4 USING trainer_id::int4;
+                ALTER TABLE public.forms_answer ALTER COLUMN question_id TYPE int4 USING question_id::int4;", this.Connection, trans)){                
+                cmd.ExecuteNonQuery();                
+            }
+            
+            using (NpgsqlCommand cmd = new NpgsqlCommand(@"
+                CREATE OR REPLACE VIEW public.forms_subject
+                AS SELECT sb.id,
+                    sb.code,
+                        CASE
+                            WHEN tr.name IS NULL THEN sb.name::text
+                            ELSE concat(sb.name, ' (', tr.name, ')')
+                        END AS name,
+                    dg.id AS degree_id,
+                    dg.code AS degree_code,
+                    dg.name AS degree_name,
+                    tr.id AS trainer_id,
+                    st.group_id
+                FROM master.subject sb
+                    LEFT JOIN master.degree dg ON dg.id = sb.degree_id
+                    LEFT JOIN master.subject_trainer_group st ON st.subject_id = sb.id
+                    LEFT JOIN master.trainer tr ON tr.id = st.trainer_id;", this.Connection, trans)){
+                
+                cmd.ExecuteNonQuery();                
+            }
+
+            using (NpgsqlCommand cmd = new NpgsqlCommand(@"
+                CREATE OR REPLACE VIEW public.forms_student
+                AS SELECT st.id,
+                    st.email,
+                    st.name,
+                    st.surname,
+                    lv.id AS level_id,
+                    lv.code AS level_code,
+                    lv.name AS level_name,
+                    gr.id AS group_id,
+                    gr.name AS group_name,
+                    dg.id AS degree_id,
+                    dg.code AS degree_code,
+                    subjects.subjects
+                FROM master.student st
+                    LEFT JOIN master.""group"" gr ON gr.id = st.group_id
+                    LEFT JOIN master.degree dg ON dg.id = gr.degree_id
+                    LEFT JOIN master.level lv ON lv.id = dg.level_id
+                    LEFT JOIN ( SELECT ss.student_id,
+                            string_agg(su.code::text, ','::text) AS subjects
+                        FROM master.subject_student ss
+                            LEFT JOIN master.subject su ON ss.subject_id = su.id
+                        GROUP BY ss.student_id) subjects ON subjects.student_id = st.id;", this.Connection, trans)){
+                
+                cmd.ExecuteNonQuery();                
+            }
+
+            using (NpgsqlCommand cmd = new NpgsqlCommand(@"
+                CREATE OR REPLACE VIEW reports.participation
+                AS SELECT pa.""timestamp"",
+                    st.email,
+                    st.surname,
+                    st.name,
+                    gr.name AS group_name,
+                    dg.name AS degree_name,
+                    lv.name AS level_name,
+                    de.name AS department_name
+                FROM forms_participation pa
+                    LEFT JOIN master.student st ON st.id = pa.student_id
+                    LEFT JOIN master.""group"" gr ON gr.id = st.group_id
+                    LEFT JOIN master.degree dg ON dg.id = gr.degree_id
+                    LEFT JOIN master.level lv ON lv.id = dg.level_id
+                    LEFT JOIN master.department de ON de.id = dg.department_id;", this.Connection, trans)){
+                
+                cmd.ExecuteNonQuery();                
+            }
+
+            using (NpgsqlCommand cmd = new NpgsqlCommand(@"
+                CREATE OR REPLACE VIEW reports.answer_all
+                AS SELECT ev.id AS evaluation_id,
+                    ev.""timestamp"",
+                    date_part('year'::text, ev.""timestamp"") AS year,
+                    lv.code AS level,
+                    de.name AS department,
+                    dg.code AS degree,
+                    gr.name AS ""group"",
+                    su.code AS subject_code,
+                    su.name AS subject_name,
+                    tr.name AS trainer,
+                    tp.name AS topic,
+                    qu.sort AS question_sort,
+                    ty.name AS question_type,
+                    qu.statement AS question_statement,
+                    an.value
+                FROM forms_evaluation ev
+                    LEFT JOIN master.""group"" gr ON gr.id = ev.group_id
+                    LEFT JOIN master.trainer tr ON tr.id = ev.trainer_id
+                    LEFT JOIN master.subject su ON su.id = ev.subject_id
+                    LEFT JOIN forms_answer an ON an.evaluation_id = ev.id
+                    LEFT JOIN master.question qu ON qu.id = an.question_id
+                    LEFT JOIN master.degree dg ON dg.id = su.degree_id
+                    LEFT JOIN master.department de ON de.id = dg.department_id
+                    LEFT JOIN master.level lv ON lv.id = dg.level_id
+                    LEFT JOIN master.topic tp ON tp.id = qu.topic_id
+                    LEFT JOIN master.type ty ON ty.id = qu.type_id;", this.Connection, trans)){
+                
+                cmd.ExecuteNonQuery();                
+            }
+
+            using (NpgsqlCommand cmd = new NpgsqlCommand(@"
+                CREATE OR REPLACE VIEW reports.answer_cf_mp
+                AS SELECT answer_all.evaluation_id,
+                    answer_all.""timestamp"",
+                    answer_all.year,
+                    answer_all.level,
+                    answer_all.department,
+                    answer_all.degree,
+                    answer_all.""group"",
+                    answer_all.subject_code,
+                    answer_all.subject_name,
+                    answer_all.trainer,
+                    answer_all.topic,
+                    answer_all.question_sort,
+                    answer_all.question_type,
+                    answer_all.question_statement,
+                    answer_all.value
+                FROM reports.answer_all
+                WHERE answer_all.level::text = 'CF'::text AND answer_all.topic::text = 'Assignatura'::text;", this.Connection, trans)){
+                
+                cmd.ExecuteNonQuery();                
+            }
+
+            using (NpgsqlCommand cmd = new NpgsqlCommand(@"
+                CREATE OR REPLACE VIEW reports.answer_dept_adm
+                AS SELECT answer_all.evaluation_id,
+                    answer_all.""timestamp"",
+                    answer_all.year,
+                    answer_all.level,
+                    answer_all.department,
+                    answer_all.degree,
+                    answer_all.""group"",
+                    answer_all.subject_code,
+                    answer_all.subject_name,
+                    answer_all.trainer,
+                    answer_all.topic,
+                    answer_all.question_sort,
+                    answer_all.question_type,
+                    answer_all.question_statement,
+                    answer_all.value
+                FROM reports.answer_all
+                WHERE answer_all.department::text = 'Administració i gestió'::text;", this.Connection, trans)){
+                
+                cmd.ExecuteNonQuery();                
+            }
+
+            using (NpgsqlCommand cmd = new NpgsqlCommand(@"
+                CREATE OR REPLACE VIEW reports.answer_dept_adm_mp
+                AS SELECT answer_all.evaluation_id,
+                    answer_all.""timestamp"",
+                    answer_all.year,
+                    answer_all.level,
+                    answer_all.department,
+                    answer_all.degree,
+                    answer_all.""group"",
+                    answer_all.subject_code,
+                    answer_all.subject_name,
+                    answer_all.trainer,
+                    answer_all.topic,
+                    answer_all.question_sort,
+                    answer_all.question_type,
+                    answer_all.question_statement,
+                    answer_all.value
+                FROM reports.answer_all
+                WHERE answer_all.department::text = 'Administració i gestió'::text AND answer_all.topic::text = 'Assignatura'::text;", this.Connection, trans)){
+                
+                cmd.ExecuteNonQuery();                
+            }
+
+            using (NpgsqlCommand cmd = new NpgsqlCommand(@"
+                CREATE OR REPLACE VIEW reports.answer_dept_inf
+                AS SELECT answer_all.evaluation_id,
+                    answer_all.""timestamp"",
+                    answer_all.year,
+                    answer_all.level,
+                    answer_all.department,
+                    answer_all.degree,
+                    answer_all.""group"",
+                    answer_all.subject_code,
+                    answer_all.subject_name,
+                    answer_all.trainer,
+                    answer_all.topic,
+                    answer_all.question_sort,
+                    answer_all.question_type,
+                    answer_all.question_statement,
+                    answer_all.value
+                FROM reports.answer_all
+                WHERE answer_all.department::text = 'Informàtica i comunicacions'::text;", this.Connection, trans)){
+                
+                cmd.ExecuteNonQuery();                
+            }
+
+            using (NpgsqlCommand cmd = new NpgsqlCommand(@"
+                CREATE OR REPLACE VIEW reports.answer_dept_inf_mp
+                AS SELECT answer_all.evaluation_id,
+                    answer_all.""timestamp"",
+                    answer_all.year,
+                    answer_all.level,
+                    answer_all.department,
+                    answer_all.degree,
+                    answer_all.""group"",
+                    answer_all.subject_code,
+                    answer_all.subject_name,
+                    answer_all.trainer,
+                    answer_all.topic,
+                    answer_all.question_sort,
+                    answer_all.question_type,
+                    answer_all.question_statement,
+                    answer_all.value
+                FROM reports.answer_all
+                WHERE answer_all.department::text = 'Informàtica i comunicacions'::text AND answer_all.topic::text = 'Assignatura'::text;", this.Connection, trans)){
+                
+                cmd.ExecuteNonQuery();                
+            }
+
+            trans.Commit();                
         }
         catch{
             if(trans != null) trans.Rollback();
