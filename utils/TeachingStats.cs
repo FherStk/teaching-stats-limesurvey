@@ -8,24 +8,7 @@ public class TeachingStats : System.IDisposable{
     public enum QuestionType{
         Numeric,
         Text
-    }
-
-    private class ImportData {
-        public string? TimeStamp {get; set;}   //keeps the original format (no reformating needed)
-        public int Year {get; set;}
-        public string? Level {get; set;}
-        public string? Departament {get; set;}
-        public string? Degree {get; set;}
-        public string? Group {get; set;}
-        public string? SubjectCode {get; set;}
-        public string? SubjectName {get; set;}
-        public string? Trainer {get; set;}
-        public string? Topic {get; set;}
-        public int QuestionSort {get; set;}
-        public QuestionType Type {get; set;}
-        public string? QuestionStatement {get; set;}
-        public object? Value {get; set;}
-    }
+    }   
 
     public TeachingStats(){
         var settings = Utils.Settings;  
@@ -37,10 +20,18 @@ public class TeachingStats : System.IDisposable{
     public void ImportFromLimeSurvey(JArray questions, JObject answers){
         var importData = ParseFromLimeSurveyToTeachingStats(questions, answers);
         
+        using(var context = new EF.TeachingStatsContext()){
+            var lastID = context.Answers.OrderByDescending(x => x.EvaluationId).Select(x => x.EvaluationId).FirstOrDefault() + 1;
+            importData.ForEach(x => x.EvaluationId = lastID++);
+
+            context.Answers.AddRange(importData);
+            context.SaveChanges();
+        }
+
         //TODO: import into the databse. It could be nice to use an EntityFramework.
     }
 
-    private List<ImportData> ParseFromLimeSurveyToTeachingStats(JArray questions, JObject answers){
+    private List<EF.Answer> ParseFromLimeSurveyToTeachingStats(JArray questions, JObject answers){
         //NOTE: the questions json is needed because the LimeSurvey API does not allow changing the 'equation' property.
         
         //Setup global data
@@ -66,7 +57,7 @@ public class TeachingStats : System.IDisposable{
         var list = answers["responses"];
         if(list == null) throw new Exception("Unable to parse, the 'responses' array seems to be missing.");
 
-        var importData = new List<ImportData>();
+        var importData = new List<EF.Answer>();
         foreach(var ans in list){
             //TODO: check this "1" for multiple responses
             var info = ans["1"];
@@ -84,7 +75,7 @@ public class TeachingStats : System.IDisposable{
             var year = parsedDateTime.Year;
         
             //Store the splitted answers            
-            int sort = 1;
+            short sort = 1;
             foreach(var n in numeric.OrderBy(x => x.Name))
                 importData.Add(ParseAnswer(statements, surveyData, n, sort++, timeStamp, year, QuestionType.Numeric));
 
@@ -96,18 +87,18 @@ public class TeachingStats : System.IDisposable{
         return importData;
     }
 
-    private ImportData ParseAnswer(Dictionary<string, string> statements, Dictionary<LimeSurvey.Question, string> surveyData, JProperty answer, int sort, string timeStamp, int year, QuestionType type){
-        var code = answer.Name.Split(new char[]{'[', ']'})[1];                
+    private EF.Answer ParseAnswer(Dictionary<string, string> statements, Dictionary<LimeSurvey.Question, string> surveyData, JProperty answer, short sort, string timeStamp, int year, QuestionType type){
+        var code = (type == QuestionType.Numeric ? answer.Name.Split(new char[]{'[', ']'})[1] : answer.Name);
 
-        return new ImportData(){
+        return new EF.Answer(){
             QuestionSort = sort,
-            TimeStamp = timeStamp,
+            Timestamp = DateTime.Parse(timeStamp),
             Year = year,
-            Value = int.Parse(answer.Value.ToString()),
+            Value = answer.Value.ToString(),
             QuestionStatement = statements[code],
-            Type = type,
+            QuestionType = type.ToString(),
             Degree = surveyData[LimeSurvey.Question.DEGREE],
-            Departament = surveyData[LimeSurvey.Question.DEPARTMENT],
+            Department = surveyData[LimeSurvey.Question.DEPARTMENT],
             Group = surveyData[LimeSurvey.Question.GROUP],
             Level = surveyData[LimeSurvey.Question.LEVEL],
             SubjectCode = surveyData[LimeSurvey.Question.SUBJECTCODE],
