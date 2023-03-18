@@ -5,10 +5,14 @@ public class LimeSurvey : IDisposable{
     public enum Question{
         DEGREE,
         DEPARTMENT,
-        SUBJECT_CODE,
-        SUBJECT_NAME,
+        SUBJECTCODE,
+        SUBJECTNAME,
         GROUP,
-        TRAINER
+        TRAINER,
+        QUESTIONS,
+        COMMENTS,
+        LEVEL,
+        TOPIC
     }
 
     public enum Type{
@@ -64,8 +68,8 @@ public class LimeSurvey : IDisposable{
         return int.Parse((response["newsid"] ?? "").ToString());
     }
 
-    public Dictionary<Question, int> GetQuestionIDs(int surveyID){
-        var IDs = new Dictionary<Question, int>();
+    public Dictionary<Question, List<int>> GetQuestionsIDsByType(int surveyID){
+        var IDs = new Dictionary<Question, List<int>>();
         
         this.Client.Method = "list_questions";
         this.Client.Parameters.Add("sSessionKey", this.SessionKey);
@@ -78,32 +82,18 @@ public class LimeSurvey : IDisposable{
 
         foreach(var q in response){
             var qID = int.Parse((q["qid"] ?? "").ToString());
+            var type = (Question)Enum.Parse(typeof(Question), (q["title"] ?? "").ToString().ToUpper());
 
-            switch((q["title"] ?? "").ToString().ToLower()){
-                case "degree":
-                    IDs.Add(Question.DEGREE, qID);
-                    break;
+            List<int> list;
+            try{
+                list = IDs[type];
+            }            
+            catch(KeyNotFoundException){
+                list = new List<int>();
+                IDs.Add(type, list);
+            }
 
-                case "department":
-                    IDs.Add(Question.DEPARTMENT, qID);
-                    break;
-
-                case "subjectcode":
-                    IDs.Add(Question.SUBJECT_CODE, qID);
-                    break;
-
-                case "subjectname":
-                    IDs.Add(Question.SUBJECT_NAME, qID);
-                    break;
-
-                case "group":
-                    IDs.Add(Question.GROUP, qID);
-                    break;
-
-                case "trainer":
-                    IDs.Add(Question.TRAINER, qID);
-                    break;
-            }          
+            list.Add(qID);                    
         }            
 
         return IDs;
@@ -118,6 +108,17 @@ public class LimeSurvey : IDisposable{
         this.Client.ClearParameters();
 
         return this.ReadClientResult() ?? "";
+    }
+
+    public string GetAllQuestionsProperties(int surveyID){
+        
+        this.Client.Method = "list_questions";
+        this.Client.Parameters.Add("sSessionKey", this.SessionKey);
+        this.Client.Parameters.Add("iSurveyID_org", surveyID);
+        this.Client.Post();
+        this.Client.ClearParameters();
+
+        return this.ReadClientResult() ?? "";        
     }
 
     public string SetQuestionProperties(int questionID, JObject properties){
@@ -166,6 +167,23 @@ public class LimeSurvey : IDisposable{
 
         var base64EncodedBytes = System.Convert.FromBase64String(this.ReadClientResult() ?? "");
         return System.Text.Encoding.UTF8.GetString(base64EncodedBytes);
+
+        //TODO: cook the json in order to help with the teaching-stats database import
+        //TODO: the questions json is needed because the LimeSurvey API does not allow changing the 'equation' property.
+        //1. Repeat the question block for each "questions[CODE] and comments"
+        //2. id -> evaluation_id (get the next participationID, the same for each repeated block))
+        //3. submitdate -> timestamp
+        //4. null -> year (extract from timestamp)
+        //5. level -> level
+        //6. department -> departament (get the 'question' value for the 'title=department' within questions json)
+        //7. degree -> degree (get the 'question' value for the 'title=degree' within questions json)
+        //8. group -> group (get the 'question' value for the 'title=group' within questions json)
+        //9. subjectcode -> subject_code (get the 'question' value for the 'title=subjectcode' within questions json)
+        //10. subjectname -> subject_name (get the 'question' value for the 'title=subjectname' within questions json)
+        //11. trainer -> trainer subject_name (get the 'question' value for the 'title=trainer' within questions json)
+        //12. topic -> topic
+        //13. null -> question_sort (get the order from 'questions[SQ00x]' and add the 'comments' at the end)
+        //14. aaa -> value (get it from 'questions[SQ00x]' and the 'comments' fields)
     }
 
     public void Dispose()

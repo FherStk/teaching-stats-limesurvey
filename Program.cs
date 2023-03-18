@@ -119,7 +119,7 @@ void CreateNewSurveyIntoLimeSurvey(int templateID, LimeSurvey.Type type){
     
 
     using(var ls = new LimeSurvey()){   
-        Console.WriteLine(ls.GetQuestionProperties(4142));
+        Console.WriteLine(ls.ExportSurveyResponses(272798));
         return;
 
         try{            
@@ -133,7 +133,7 @@ void CreateNewSurveyIntoLimeSurvey(int templateID, LimeSurvey.Type type){
 
             //Loading the question IDs in order to set the correct values
             Info("Loading the survey data... ", false);    
-            var qIDs = ls.GetQuestionIDs(newID);            
+            var qIDs = ls.GetQuestionsIDsByType(newID);            
             Success();
 
             //Changing the copied question data with the correct values
@@ -155,8 +155,8 @@ void CreateNewSurveyIntoLimeSurvey(int templateID, LimeSurvey.Type type){
 
             if(type == LimeSurvey.Type.SUBJECT_CCFF){
                 Info("Setting up the survey subject... ", false);
-                SetQuestionValue(ls, qIDs, LimeSurvey.Question.SUBJECT_CODE, subjectCode);                    
-                SetQuestionValue(ls, qIDs, LimeSurvey.Question.SUBJECT_NAME, subjectName);
+                SetQuestionValue(ls, qIDs, LimeSurvey.Question.SUBJECTCODE, subjectCode);                    
+                SetQuestionValue(ls, qIDs, LimeSurvey.Question.SUBJECTNAME, subjectName);
                 Success();
             }
         }
@@ -166,15 +166,15 @@ void CreateNewSurveyIntoLimeSurvey(int templateID, LimeSurvey.Type type){
     }
 }
 
-void SetQuestionValue(LimeSurvey ls, Dictionary<LimeSurvey.Question, int> questionIDs, LimeSurvey.Question question, string value){
-    ls.SetQuestionProperties(questionIDs[question], JObject.Parse(
+void SetQuestionValue(LimeSurvey ls, Dictionary<LimeSurvey.Question, List<int>> questionIDs, LimeSurvey.Question question, string value){
+    ls.SetQuestionProperties(questionIDs[question].FirstOrDefault(), JObject.Parse(
         @"{
             ""question"" : """ + question.ToString().ToLower() + ": {'" + value + @"'}""  
         }"
     ));           
 
     //TODO: this does not work!!!
-    ls.SetQuestionProperties(questionIDs[question], JObject.Parse(
+    ls.SetQuestionProperties(questionIDs[question].FirstOrDefault(), JObject.Parse(
         @"{
             ""attributes"" : {
                 ""equation"": ""{'" + value + @"'}"",
