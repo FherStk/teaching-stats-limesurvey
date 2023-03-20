@@ -16,7 +16,7 @@
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL.Design" Version="1.1.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.4" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Analyzers" Version="7.0.4" />
-    <PackageReference Include="Microsoft.CodeAnalysis" Version="4.5.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis" Version="4.2.0" />
   
   </ItemGroup>
 </Project>
