@@ -163,9 +163,27 @@ public class LimeSurvey : IDisposable{
         var template = $"{Path.Combine(Utils.TemplatesFolder, type.ToString().ToLower().Replace("_", "-"))}.txt";    
         var content = File.ReadAllText(template);       
 
+        //Setting up template values
+        var surveyName = $"{degreeName} {subjectCode}: {subjectName}";
+        if(!string.IsNullOrEmpty(trainerName)) surveyName += $" ({trainerName})";
+        
+        var description = string.Empty;
+
+        switch(type){
+            case Type.SUBJECT_CCFF:
+                description = @"<p><strong>Si us plau, abans de contestar l'enquesta, tingues en compte el següent:</strong></p>
+                                <ol style='text-align: left;'>
+                                    <li>Si no estàs matriculat d'aquest Mòdul Professional o en trobes a faltar enquestes sobre altres Mòduls que tens matriculats, posa't en contacte amb el teu tutor.</li>
+                                    <li>Aquesta enquesta és completament anònima, si us plau, sigues sincer.</li>
+                                    <li>Sigues constructiu, explica'ns quines coses fem bé i com podem millorar.</li>
+                                    <li>Sigues educat i respectuós, així ens ajudes a fer millor el nostre institut.</li>
+                                </ol>";
+            break;
+        }
+
         //Replacing template values
-        var surveyName = $"{degreeName} {subjectCode} - {subjectName}";
-        content = content.Replace("surveyls_title\t\t\"Assignatura CCFF - Template\"", $"surveyls_title\t\t\"{surveyName}\"");
+        content = content.Replace("{'TITLE'}", $"{surveyName}");
+        content = content.Replace("{'DESCRIPTION'}", $"{description}");
         content = content.Replace("{'DEPARTMENT'}", "{'" + departmentName + "'}");
         content = content.Replace("{'DEGREE'}", "{'" + degreeName + "'}");
         content = content.Replace("{'GROUP'}", "{'" + groupName + "'}");

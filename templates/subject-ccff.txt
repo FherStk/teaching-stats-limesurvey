@@ -49,10 +49,10 @@ id	related_id	class	type/scale	name	relevance	text	help	language	validation	mand
 		S		googleanalyticsapikey																																																																																																																																													
 		SL		surveyls_survey_id		195332		ca																																																																																																																																									
 		SL		surveyls_language		ca		ca																																																																																																																																									
-		SL		surveyls_title		"Assignatura CCFF - Template"		ca																																																																																																																																									
-		SL		surveyls_description		"Automatically imported from a CSV file using teaching-stats-limesurvey (https://github.com/FherStk/teaching-stats-limesurvey)"		ca																																																																																																																																									
+		SL		surveyls_title		"{'TITLE'}"		ca																																																																																																																																									
+		SL		surveyls_description		"{'DESCRIPTION'}"		ca																																																																																																																																									
 		SL		surveyls_welcometext				ca																																																																																																																																									
-		SL		surveyls_endtext				ca																																																																																																																																									
+		SL		surveyls_endtext		"<p style="text-align: center;">Moltes gràcies per les teves aportacions <img alt="smiley" height="23" src="https://limesurvey.elpuig.xeill.net/tmp/assets/b2bf72b0/plugins/smiley/images/regular_smile.png" title="smiley" width="23" /></p>"		ca																																																																																																																																									
 		SL		surveyls_url				ca																																																																																																																																									
 		SL		surveyls_urldescription				ca																																																																																																																																									
 		SL		surveyls_email_invite_subj		"Invitació a participar en una enquesta"		ca																																																																																																																																									
