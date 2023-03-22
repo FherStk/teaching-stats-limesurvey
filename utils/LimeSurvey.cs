@@ -197,6 +197,7 @@ public class LimeSurvey : IDisposable{
         this.Client.Parameters.Add("sSessionKey", this.SessionKey);
         this.Client.Parameters.Add("iSurveyID", surveyID);
         this.Client.Parameters.Add("sDocumentType", "json");
+        this.Client.Parameters.Add("sHeadingType", "full");
 
         this.Client.Post();
         this.Client.ClearParameters();
