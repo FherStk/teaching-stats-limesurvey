@@ -18,6 +18,8 @@ public class TeachingStats : System.IDisposable{
     }
 
     public void ImportFromLimeSurvey(JArray questions, JObject answers){
+        //TODO: with the new "import CSV survey" mechanism, no quesion data will be needed. Everything will come at answer level.
+        //      the only problem with the "import CSV mechanism" is that the "survey group/section" cannot be assigned automatically.
         var data = ParseFromLimeSurveyToTeachingStats(questions, answers);
         
         using(var context = new EF.TeachingStatsContext()){
