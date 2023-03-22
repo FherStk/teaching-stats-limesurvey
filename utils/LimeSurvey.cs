@@ -159,6 +159,39 @@ public class LimeSurvey : IDisposable{
         return JObject.Parse(this.ReadClientResult() ?? "");
     }
 
+    public int CreateSurveyFromCSV(Type type, string degreeName, string departmentName, string groupName, string trainerName, string subjectCode = "", string subjectName = ""){    
+        var template = $"{Path.Combine(Utils.TemplatesFolder, type.ToString().ToLower().Replace("_", "-"))}.txt";    
+        var content = File.ReadAllText(template);       
+
+        //Replacing template values
+        var surveyName = $"{degreeName} {subjectCode} - {subjectName}";
+        content = content.Replace("surveyls_title\t\t\"Assignatura CCFF - Template\"", $"surveyls_title\t\t\"{surveyName}\"");
+        content = content.Replace("{'DEPARTMENT'}", "{'" + departmentName + "'}");
+        content = content.Replace("{'DEGREE'}", "{'" + degreeName + "'}");
+        content = content.Replace("{'GROUP'}", "{'" + groupName + "'}");
+        content = content.Replace("{'TRAINER'}", "{'" + trainerName + "'}");
+        content = content.Replace("{'SUBJECT_CODE'}", "{'" + subjectCode + "'}");
+        content = content.Replace("{'SUBJECT_NAME'}", "{'" + subjectName + "'}");
+
+        //Encoding
+        var plainTextBytes = System.Text.Encoding.UTF8.GetBytes(content);
+        var base64EncodedBytes =  System.Convert.ToBase64String(plainTextBytes);
+        
+        //Import
+        this.Client.Method = "import_survey";
+        this.Client.Parameters.Add("sSessionKey", this.SessionKey);
+        this.Client.Parameters.Add("sImportData", base64EncodedBytes);
+        this.Client.Parameters.Add("sImportDataType", "txt");   
+        this.Client.Parameters.Add("sDocumentType", "json");
+        
+        //Post
+        this.Client.Post();
+        this.Client.ClearParameters();
+
+        //Returing the new survey's ID
+        return int.Parse(this.ReadClientResult() ?? "");
+    }
+
     public JObject GetSurveyResponses(int surveyID){
         this.Client.Method = "export_responses";
         this.Client.Parameters.Add("sSessionKey", this.SessionKey);

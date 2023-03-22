@@ -4,10 +4,13 @@ using Newtonsoft.Json.Linq;
 //Global vars
 var _VERSION = "0.0.1";
 
+Test();
+return;
+
 //Main
-DisplayInfo();
-if(!CheckConfig()) return;
-else Menu();
+// DisplayInfo();
+// if(!CheckConfig()) return;
+// else Menu();
 
 //Methods
 void Menu(){
@@ -297,4 +300,17 @@ void DisplayInfo(){
     Console.ResetColor();
     Console.WriteLine($"https://github.com/FherStk/teaching-stats-limesurvey/blob/main/LICENSE");
     Console.WriteLine();
+}
+
+void Test(){
+    using(var ls = new LimeSurvey()){   
+        var degreeName = "DAM";
+        var departmentName = "Informàtica";    
+        var groupName = "DAM2A";
+        var trainerName = "Fernando Porrino";
+        var subjectCode = "M05";
+        var subjectName = "Entorns de Desenvolupament";
+        
+        ls.CreateSurveyFromCSV(LimeSurvey.Type.SUBJECT_CCFF, degreeName, departmentName, groupName, trainerName, subjectCode, subjectName);
+    }
 }
