@@ -215,8 +215,10 @@ public class LimeSurvey : IDisposable{
         this.Client.Parameters.Add("sSessionKey", this.SessionKey);
         this.Client.Parameters.Add("iSurveyID", surveyID);
         this.Client.Parameters.Add("sDocumentType", "json");
-        this.Client.Parameters.Add("sHeadingType", "full");
-        this.Client.Parameters.Add("sResponseType", "long");
+        //TODO: The idea was to export also the question name so all the information neede came within a unique JSON but no question statement is beeing exportes... weird...
+        // this.Client.Parameters.Add("sLanguageCode", "");
+        // this.Client.Parameters.Add("sHeadingType", "full");
+        // this.Client.Parameters.Add("sResponseType", "long");
 
         this.Client.Post();
         this.Client.ClearParameters();

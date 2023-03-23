@@ -303,14 +303,30 @@ void DisplayInfo(){
 }
 
 void Test(){
-    using(var ls = new LimeSurvey()){   
-        var degreeName = "DAM";
-        var departmentName = "Informàtica";    
-        var groupName = "DAM2A";
-        var trainerName = "Fernando Porrino";
-        var subjectCode = "M05";
-        var subjectName = "Entorns de Desenvolupament";
+    //Create survey
+    // using(var ls = new LimeSurvey()){   
+    //     var degreeName = "DAM";
+    //     var departmentName = "Informàtica";    
+    //     var groupName = "DAM2A";
+    //     var trainerName = "Fernando Porrino";
+    //     var subjectCode = "M05";
+    //     var subjectName = "Entorns de Desenvolupament";
         
-        ls.CreateSurveyFromCSV(LimeSurvey.Type.SUBJECT_CCFF, degreeName, departmentName, groupName, trainerName, subjectCode, subjectName);
+    //     ls.CreateSurveyFromCSV(LimeSurvey.Type.SUBJECT_CCFF, degreeName, departmentName, groupName, trainerName, subjectCode, subjectName);
+    // }
+
+    //Export
+    using(var ls = new LimeSurvey()){
+        using(var ts = new TeachingStats()){
+            //TODO: chech for all the survey IDs...
+
+            var surveyID = 254973;
+            var answers = ls.GetSurveyResponses(surveyID);
+            var questions = ls.GetAllQuestionsProperties(surveyID);
+        
+            ts.ImportFromLimeSurvey(questions, answers);
+
+            //TODO: stop the LS surveys
+        }
     }
 }

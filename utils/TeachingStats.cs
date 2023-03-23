@@ -50,59 +50,48 @@ public class TeachingStats : System.IDisposable{
         //NOTE: the questions json is needed because the LimeSurvey API does not allow changing the 'equation' property.
         
         //Setup global data
-        var surveyData = new Dictionary<LimeSurvey.Question, string>();
         var statements = new Dictionary<string, string>();
         foreach(var q in questions){
-            //Load the global question value
-            var val = (q["question"] ?? "").ToString();
-            if(string.IsNullOrEmpty(val)) continue;
+            //TODO: if q["title"] starts with SQ -> add statement
+            statements.Add((q["title"] ?? "").ToString(), (q["question"] ?? "").ToString());
+        }
             
-            LimeSurvey.Question type;            
-            if(!Enum.TryParse<LimeSurvey.Question>((q["title"] ?? "").ToString(), true, out type))
-                type = LimeSurvey.Question.QUESTIONS;    
-
-            if(type != LimeSurvey.Question.QUESTIONS && type != LimeSurvey.Question.COMMENTS) surveyData.Add(type, val.Split("'")[1]);            
-            else{
-                statements.Add((q["title"] ?? "").ToString(), (q["question"] ?? "").ToString());
-                continue;
-            }
-        } 
 
         //Setting up responses
         var list = answers["responses"];
         if(list == null) throw new Exception("Unable to parse, the 'responses' array seems to be missing.");
 
         var importData = new List<EF.Answer>();
-        foreach(var ans in list){
+        foreach(var item in list){
             //TODO: check this "1" for multiple responses
-            var info = ans["1"];
-            if(info == null) throw new Exception("Unable to parse, the 'responses' array seems to be empty.");
+            var data = item["1"];
+            if(data == null) throw new Exception("Unable to parse, the 'responses' array seems to be empty.");
 
             //Load the responses
-            var numeric = info.Children().Where(x => x.GetType() == typeof(JProperty)).Where(x => ((JProperty)x).Name.StartsWith("questions")).Cast<JProperty>().ToList();
-            var comments = info.Children().Where(x => x.GetType() == typeof(JProperty)).Where(x => ((JProperty)x).Name.StartsWith("comments")).Cast<JProperty>().ToList();
+            var numeric = data.Children().Where(x => x.GetType() == typeof(JProperty)).Where(x => ((JProperty)x).Name.StartsWith("questions")).Cast<JProperty>().ToList();
+            var comments = data.Children().Where(x => x.GetType() == typeof(JProperty)).Where(x => ((JProperty)x).Name.StartsWith("comments")).Cast<JProperty>().ToList();
             
             //Setup the question shared values            
             //Timestamp and year
-            var timeStamp = (info["submitdate"] ?? "").ToString();
+            var timeStamp = (data["submitdate"] ?? "").ToString();
             var parsedDateTime = DateTime.Now;
             DateTime.TryParse(timeStamp, out parsedDateTime);
             var year = parsedDateTime.Year;
         
             //Store the splitted answers            
             short sort = 1;
-            foreach(var n in numeric.OrderBy(x => x.Name))
-                importData.Add(ParseAnswer(statements, surveyData, n, sort++, timeStamp, year, QuestionType.Numeric));
+            foreach(var answer in numeric.OrderBy(x => x.Name))
+                importData.Add(ParseAnswer(statements, data, answer, sort++, timeStamp, year, QuestionType.Numeric));
 
-            foreach(var n in comments.OrderBy(x => x.Name))
-                importData.Add(ParseAnswer(statements, surveyData, n, sort++, timeStamp, year, QuestionType.Text));
+            foreach(var answer in comments.OrderBy(x => x.Name))
+                importData.Add(ParseAnswer(statements, data, answer, sort++, timeStamp, year, QuestionType.Text));
                       
         }
 
         return importData;
     }
 
-    private EF.Answer ParseAnswer(Dictionary<string, string> statements, Dictionary<LimeSurvey.Question, string> surveyData, JProperty answer, short sort, string timeStamp, int year, QuestionType type){
+    private EF.Answer ParseAnswer(Dictionary<string, string> statements, JToken data, JProperty answer, short sort, string timeStamp, int year, QuestionType type){
         var code = (type == QuestionType.Numeric ? answer.Name.Split(new char[]{'[', ']'})[1] : answer.Name);
 
         return new EF.Answer(){
@@ -112,14 +101,14 @@ public class TeachingStats : System.IDisposable{
             Value = answer.Value.ToString(),
             QuestionStatement = statements[code],
             QuestionType = type.ToString(),
-            Degree = surveyData[LimeSurvey.Question.DEGREE],
-            Department = surveyData[LimeSurvey.Question.DEPARTMENT],
-            Group = surveyData[LimeSurvey.Question.GROUP],
-            Level = surveyData[LimeSurvey.Question.LEVEL],
-            SubjectCode = surveyData[LimeSurvey.Question.SUBJECTCODE],
-            SubjectName = surveyData[LimeSurvey.Question.SUBJECTNAME],
-            Topic = surveyData[LimeSurvey.Question.TOPIC],
-            Trainer = surveyData[LimeSurvey.Question.TRAINER]
+            Degree = (data["degree"] ?? "").ToString(),
+            Department = (data["department"] ?? "").ToString(),
+            Group = (data["group"] ?? "").ToString(),
+            Level = (data["level"] ?? "").ToString(),
+            SubjectCode = (data["subjectcode"] ?? "").ToString(),
+            SubjectName = (data["subjectname"] ?? "").ToString(),
+            Topic = (data["topic"] ?? "").ToString(),
+            Trainer = (data["trainer"] ?? "").ToString()
         };
     }
 
