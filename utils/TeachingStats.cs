@@ -47,15 +47,14 @@ public class TeachingStats : System.IDisposable{
     }
 
     private List<EF.Answer> ParseFromLimeSurveyToTeachingStats(JArray questions, JObject answers){
-        //NOTE: the questions json is needed because the LimeSurvey API does not allow changing the 'equation' property.
+        //NOTE: the questions json is needed because the LimeSurvey API is not exporting the question statement even when requested for...
         
         //Setup global data
         var statements = new Dictionary<string, string>();
         foreach(var q in questions){
             //TODO: if q["title"] starts with SQ -> add statement
             statements.Add((q["title"] ?? "").ToString(), (q["question"] ?? "").ToString());
-        }
-            
+        }            
 
         //Setting up responses
         var list = answers["responses"];
