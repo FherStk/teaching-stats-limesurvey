@@ -55,14 +55,15 @@ public class LimeSurvey : IDisposable{
         SessionKey = String.Empty;
     }
 #region Survey
-    public JArray ListSurveys(){
-        //TODO: try to list only from our groups, this will avoid extra checks within "program".
-
+    public JArray ListSurveys(int groupID = 0){
         this.Client.Method = "list_surveys";
         this.Client.Parameters.Add("sSessionKey", this.SessionKey);        
         this.Client.Post();
         this.Client.ClearParameters();
-
+        
+        if(groupID > 0){
+            //TODO: filter by group
+        }
         return JArray.Parse(this.ReadClientResult() ?? "");
     }
 
