@@ -15,7 +15,7 @@ public class LimeSurvey : IDisposable{
         TOPIC
     }
 
-    public enum Type{
+    public enum Topic{
         SCHOOL,
         MENTORING_1_CCFF,
         MENTORING_2_CCFF,
@@ -99,7 +99,7 @@ public class LimeSurvey : IDisposable{
         return JObject.Parse(this.ReadClientResult() ?? "");
     }
 
-    public int CreateSurveyFromCSV(Type type, string degreeName, string departmentName, string groupName, string trainerName, string subjectCode = "", string subjectName = ""){    
+    public int CreateSurveyFromCSV(Topic type, string degreeName, string departmentName, string groupName, string trainerName, string subjectCode = "", string subjectName = ""){    
         var template = $"{Path.Combine(Utils.TemplatesFolder, type.ToString().ToLower().Replace("_", "-"))}.txt";    
         var content = File.ReadAllText(template);       
 
@@ -110,7 +110,7 @@ public class LimeSurvey : IDisposable{
         var description = string.Empty;
 
         switch(type){
-            case Type.SUBJECT_CCFF:
+            case Topic.SUBJECT_CCFF:
                 description = @"<p><strong>Si us plau, abans de contestar l'enquesta, tingues en compte el següent:</strong></p>
                                 <ol style='text-align: left;'>
                                     <li>Si no estàs matriculat d'aquest Mòdul Professional o en trobes a faltar enquestes sobre altres Mòduls que tens matriculats, posa't en contacte amb el teu tutor.</li>
@@ -150,6 +150,17 @@ public class LimeSurvey : IDisposable{
         return int.Parse(this.ReadClientResult() ?? "");
     }
 
+    public JArray GetSurveyQuestions(int surveyID){
+        
+        this.Client.Method = "list_questions";
+        this.Client.Parameters.Add("sSessionKey", this.SessionKey);
+        this.Client.Parameters.Add("iSurveyID_org", surveyID);
+        this.Client.Post();
+        this.Client.ClearParameters();
+
+        return JArray.Parse(this.ReadClientResult() ?? "");
+    }
+    
     public JObject GetSurveyResponses(int surveyID){
         this.Client.Method = "export_responses";
         this.Client.Parameters.Add("sSessionKey", this.SessionKey);
@@ -165,6 +176,23 @@ public class LimeSurvey : IDisposable{
 
         var base64EncodedBytes = System.Convert.FromBase64String(this.ReadClientResult() ?? "");
         return JObject.Parse(System.Text.Encoding.UTF8.GetString(base64EncodedBytes));
+    }
+
+    public Topic? GetSurveyTopic(int surveyID){      
+        var questions = GetSurveyQuestions(surveyID);
+        foreach(var item in questions.Children()){
+            if((item["title"] ?? "").ToString() == "topic"){
+                var value = (item["question"] ?? "").ToString();
+                
+                if(value.Contains("topic")){
+                    //Note: the question will come as the "Topic" enum needs, because has been setup like this within the 'question' property.
+                    var topic = value.ToString().Split(new char[]{'{', '}'})[1].Trim('\'');
+                    return (Topic)Enum.Parse(typeof(Topic), topic.Replace("-", "_"), true);    
+                }
+            }
+        }
+      
+        return null;
     }
 #endregion
 #region Questions
@@ -212,18 +240,7 @@ public class LimeSurvey : IDisposable{
 
         return JObject.Parse(this.ReadClientResult() ?? "");
     }
-
-    public JArray GetAllQuestionsProperties(int surveyID){
-        
-        this.Client.Method = "list_questions";
-        this.Client.Parameters.Add("sSessionKey", this.SessionKey);
-        this.Client.Parameters.Add("iSurveyID_org", surveyID);
-        this.Client.Post();
-        this.Client.ClearParameters();
-
-        return JArray.Parse(this.ReadClientResult() ?? "");
-    }
-
+    
     public JObject SetQuestionProperties(int questionID, JObject properties){
         this.Client.Method = "set_question_properties";
         this.Client.Parameters.Add("sSessionKey", this.SessionKey);

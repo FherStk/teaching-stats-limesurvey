@@ -93,6 +93,7 @@ public class TeachingStats : System.IDisposable{
     private EF.Answer ParseAnswer(Dictionary<string, string> statements, JToken data, JProperty answer, short sort, string timeStamp, int year, QuestionType type){
         var code = (type == QuestionType.Numeric ? answer.Name.Split(new char[]{'[', ']'})[1] : answer.Name);
 
+        //Note: the answers will come as teaching-stats database needs, because has been setup like this within the 'equation' property.
         return new EF.Answer(){
             QuestionSort = sort,
             Timestamp = DateTime.Parse(timeStamp),

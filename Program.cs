@@ -68,7 +68,7 @@ void CreateNewSurveyFromTemplate(){
         options.Add(i++, new {
             ID = t.Value.Id,
             Caption = t.Value.Name ?? "",
-            Type = (LimeSurvey.Type)Enum.Parse(typeof(LimeSurvey.Type), t.Key.Replace("-", "_").ToUpper())
+            Type = (LimeSurvey.Topic)Enum.Parse(typeof(LimeSurvey.Topic), t.Key.Replace("-", "_").ToUpper())
         });
     }
 
@@ -96,7 +96,7 @@ void CreateNewSurveyFromTemplate(){
     CreateNewSurveyIntoLimeSurvey(template.ID, template.Type);    
 }
 
-void CreateNewSurveyIntoLimeSurvey(int templateID, LimeSurvey.Type type){   
+void CreateNewSurveyIntoLimeSurvey(int templateID, LimeSurvey.Topic type){   
 
     var degreeName = Question("Please, write the DEGREE NAME:");
     var departmentName = Question("Please, write the DEPARTMENT NAME:");    
@@ -105,7 +105,7 @@ void CreateNewSurveyIntoLimeSurvey(int templateID, LimeSurvey.Type type){
     
     var subjectCode = string.Empty;
     var subjectName = string.Empty;
-    if(type == LimeSurvey.Type.SUBJECT_CCFF){
+    if(type == LimeSurvey.Topic.SUBJECT_CCFF){
         subjectCode = Question("Please, write the SUBJECT CODE:");
         subjectName = Question("Please, write the SUBJECT NAME:");
     }
@@ -150,7 +150,7 @@ void CreateNewSurveyIntoLimeSurvey(int templateID, LimeSurvey.Type type){
             SetQuestionValue(ls, qIDs, LimeSurvey.Question.TRAINER, trainerName);                    
             Success();                    
 
-            if(type == LimeSurvey.Type.SUBJECT_CCFF){
+            if(type == LimeSurvey.Topic.SUBJECT_CCFF){
                 Info("Setting up the survey subject... ", false);
                 SetQuestionValue(ls, qIDs, LimeSurvey.Question.SUBJECTCODE, subjectCode);                    
                 SetQuestionValue(ls, qIDs, LimeSurvey.Question.SUBJECTNAME, subjectName);
@@ -191,7 +191,7 @@ void LoadFromLimeSurvey(){
 
                 var surveyID = 272798;
                 var answers = ls.GetSurveyResponses(surveyID);
-                var questions = ls.GetAllQuestionsProperties(surveyID);
+                var questions = ls.GetSurveyQuestions(surveyID);
             
                 ts.ImportFromLimeSurvey(questions, answers);
 
@@ -312,30 +312,35 @@ void Test(){
     //     var subjectCode = "M05";
     //     var subjectName = "Entorns de Desenvolupament";
         
-    //     ls.CreateSurveyFromCSV(LimeSurvey.Type.SUBJECT_CCFF, degreeName, departmentName, groupName, trainerName, subjectCode, subjectName);
+    //     ls.CreateSurveyFromCSV(LimeSurvey.Topic.SUBJECT_CCFF, degreeName, departmentName, groupName, trainerName, subjectCode, subjectName);
     // }
 
     //Export
-    // using(var ls = new LimeSurvey()){
-    //     using(var ts = new TeachingStats()){
-    //         //TODO: chech for all the survey IDs...
-
-    //         var surveyID = 254973;
-    //         var answers = ls.GetSurveyResponses(surveyID);
-    //         var questions = ls.GetAllQuestionsProperties(surveyID);
-        
-    //         ts.ImportFromLimeSurvey(questions, answers);
-
-    //         //TODO: stop the LS surveys
-    //     }
-    // }
-
-    //List
     using(var ls = new LimeSurvey()){
         using(var ts = new TeachingStats()){
-           Console.WriteLine(ls.ListSurveys());
+            foreach(var s in ls.ListSurveys()){
+                if((s["active"] ?? "").ToString() == "N") continue;
+                int surveyID = int.Parse((s["sid"] ?? "").ToString());
+                var type = ls.GetSurveyTopic(surveyID);
+                
+                if(type != null){
+                    var answers = ls.GetSurveyResponses(surveyID);
+                    var questions = ls.GetSurveyQuestions(surveyID);
+
+                    ts.ImportFromLimeSurvey(questions, answers);
+                    
+                    //TODO: stop the LS surveys
+                }
+            }
         }
     }
+
+    //List
+    // using(var ls = new LimeSurvey()){
+    //     using(var ts = new TeachingStats()){
+    //        Console.WriteLine(ls.ListSurveys());
+    //     }
+    // }
 
     
 }
