@@ -230,6 +230,48 @@ public class LimeSurvey : IDisposable{
       
         return null;
     }
+
+    public JObject SetSurveyProperties(int surveyID, JObject properties){
+        this.Client.Method = "set_survey_properties";
+        this.Client.Parameters.Add("sSessionKey", this.SessionKey);
+        this.Client.Parameters.Add("iSurveyID", surveyID);
+
+        this.Client.Parameters.Add("aSurveyData", properties);
+        this.Client.Post();
+        this.Client.ClearParameters();
+
+        return JObject.Parse(this.ReadClientResult() ?? "");
+    }
+
+    public JObject ActivateSurvey(int surveyID){
+        //First must unexpire (mandatory to avoid incongruences) and setup a startdate (optional)
+        SetSurveyProperties(surveyID, JObject.Parse(@"{'expires': null}"));
+        SetSurveyProperties(surveyID, JObject.Parse(@"{'startdate': '" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + "'}"));
+
+        this.Client.Method = "activate_survey";
+        this.Client.Parameters.Add("sSessionKey", this.SessionKey);
+        this.Client.Parameters.Add("iSurveyID", surveyID);
+
+        this.Client.Post();
+        this.Client.ClearParameters();
+
+        return JObject.Parse(this.ReadClientResult() ?? "");
+    }
+
+    public JObject ExpireSurvey(int surveyID){
+        return SetSurveyProperties(surveyID, JObject.Parse(@"{'expires': '" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + "'}"));
+    }
+
+    public JObject DeleteSurvey(int surveyID){        
+        this.Client.Method = "delete_survey";
+        this.Client.Parameters.Add("sSessionKey", this.SessionKey);
+        this.Client.Parameters.Add("iSurveyID", surveyID);
+
+        this.Client.Post();
+        this.Client.ClearParameters();
+
+        return JObject.Parse(this.ReadClientResult() ?? "");
+    }
 #endregion
 #region Questions
     public Dictionary<Question, List<int>> GetQuestionsIDsByType(int surveyID){

@@ -42,9 +42,12 @@ void Menu(){
                     break;
 
                 //new cases:
+                //  activate all surveys
+                //  expire all surveys 
                 //  load participants into its surveys using CSV files and generate the passwords (limesurvey)
                 //  open the surveys and send the invitations (limesurvey)
                 //  create new surveys (limesurvey)
+                //  send reminders
 
                 default:
                     Error("Please, select a valid option.");
@@ -158,20 +161,25 @@ void SetQuestionValue(LimeSurvey ls, Dictionary<LimeSurvey.Question, List<int>> 
 }
 
 void LoadFromLimeSurvey(){
-    var response = Question("This option will load all the current 'limesurvey' responses into the report tables, closing and cleaning the original surveys. Do you want no continue? [Y/n]", "y");
+    var response = Question("This option will load all the 'limesurvey' responses (only for the surveys generated with this tool) into the report tables, closing and cleaning the original surveys. Do you want no continue? [Y/n]", "y");
     if(response == "n") Error("Operation cancelled.");
     else{
-        using(var ls = new LimeSurvey()){
+         using(var ls = new LimeSurvey()){
             using(var ts = new TeachingStats()){
-                //TODO: chech for all the survey IDs...
+                foreach(var s in ls.ListSurveys()){
+                    if((s["active"] ?? "").ToString() == "N") continue;
+                    int surveyID = int.Parse((s["sid"] ?? "").ToString());
+                    var type = ls.GetSurveyTopic(surveyID);
+                    
+                    if(type != null){
+                        var answers = ls.GetSurveyResponses(surveyID);
+                        var questions = ls.GetSurveyQuestions(surveyID);
 
-                var surveyID = 272798;
-                var answers = ls.GetSurveyResponses(surveyID);
-                var questions = ls.GetSurveyQuestions(surveyID);
-            
-                ts.ImportFromLimeSurvey(questions, answers);
-
-                //TODO: stop the LS surveys
+                        ts.ImportFromLimeSurvey(questions, answers);
+                        
+                        //TODO: stop the LS surveys
+                    }
+                }
             }
         }
     }
@@ -280,19 +288,19 @@ void DisplayInfo(){
 
 void Test(){
     //Create survey
-    using(var ls = new LimeSurvey()){   
-        var degreeName = "DAM";
-        var departmentName = "Informàtica";    
-        var groupName = "DAM2A";
-        var trainerName = "Fernando Porrino";
-        var subjectCode = "M05";
-        var subjectName = "Entorns de Desenvolupament";
+    // using(var ls = new LimeSurvey()){   
+    //     var degreeName = "DAM";
+    //     var departmentName = "Informàtica";    
+    //     var groupName = "DAM2A";
+    //     var trainerName = "Fernando Porrino";
+    //     var subjectCode = "M05";
+    //     var subjectName = "Entorns de Desenvolupament";
         
-        //ls.CreateSurveyFromCSV(LimeSurvey.Topic.SUBJECT_CCFF, degreeName, departmentName, groupName, trainerName, subjectCode, subjectName);
-        ls.CreateSurveyFromCSV(LimeSurvey.Topic.MENTORING_1_CCFF, degreeName, departmentName, groupName, trainerName);
-        ls.CreateSurveyFromCSV(LimeSurvey.Topic.MENTORING_2_CCFF, degreeName, departmentName, groupName, trainerName);
-        ls.CreateSurveyFromCSV(LimeSurvey.Topic.SCHOOL, degreeName, departmentName, groupName, trainerName);
-    }
+    //     //ls.CreateSurveyFromCSV(LimeSurvey.Topic.SUBJECT_CCFF, degreeName, departmentName, groupName, trainerName, subjectCode, subjectName);
+    //     ls.CreateSurveyFromCSV(LimeSurvey.Topic.MENTORING_1_CCFF, degreeName, departmentName, groupName, trainerName);
+    //     ls.CreateSurveyFromCSV(LimeSurvey.Topic.MENTORING_2_CCFF, degreeName, departmentName, groupName, trainerName);
+    //     ls.CreateSurveyFromCSV(LimeSurvey.Topic.SCHOOL, degreeName, departmentName, groupName, trainerName);
+    // }
 
     //Export
     // using(var ls = new LimeSurvey()){
@@ -314,10 +322,7 @@ void Test(){
     //     }
     // }
 
-    //TODO: develop and test:
-    //  1. Create from template (school, mentoring-1, mentoring-2)
-    //  2. Export to teaching-stats all the templates
-
+    
     //List
     // using(var ls = new LimeSurvey()){
     //     using(var ts = new TeachingStats()){
@@ -325,5 +330,11 @@ void Test(){
     //     }
     // }
 
+    //Actions
+    using(var ls = new LimeSurvey()){
+        //ls.ActivateSurvey(757244);
+        //ls.ExpireSurvey(952521);
+        //ls.DeleteSurvey(956875);  
+    }
     
 }
