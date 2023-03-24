@@ -288,19 +288,19 @@ void DisplayInfo(){
 
 void Test(){
     //Create survey
-    // using(var ls = new LimeSurvey()){   
-    //     var degreeName = "DAM";
-    //     var departmentName = "Informàtica";    
-    //     var groupName = "DAM2A";
-    //     var trainerName = "Fernando Porrino";
-    //     var subjectCode = "M05";
-    //     var subjectName = "Entorns de Desenvolupament";
+    using(var ls = new LimeSurvey()){   
+        var degreeName = "DAM";
+        var departmentName = "Informàtica";    
+        var groupName = "DAM2A";
+        var trainerName = "Fernando Porrino";
+        var subjectCode = "M05";
+        var subjectName = "Entorns de Desenvolupament";
         
-    //     //ls.CreateSurveyFromCSV(LimeSurvey.Topic.SUBJECT_CCFF, degreeName, departmentName, groupName, trainerName, subjectCode, subjectName);
-    //     ls.CreateSurveyFromCSV(LimeSurvey.Topic.MENTORING_1_CCFF, degreeName, departmentName, groupName, trainerName);
-    //     ls.CreateSurveyFromCSV(LimeSurvey.Topic.MENTORING_2_CCFF, degreeName, departmentName, groupName, trainerName);
-    //     ls.CreateSurveyFromCSV(LimeSurvey.Topic.SCHOOL, degreeName, departmentName, groupName, trainerName);
-    // }
+        //ls.CreateSurveyFromCSV(LimeSurvey.Topic.SUBJECT_CCFF, degreeName, departmentName, groupName, trainerName, subjectCode, subjectName);
+        ls.CreateSurveyFromCSV(LimeSurvey.Topic.MENTORING_1_CCFF, degreeName, departmentName, groupName, trainerName);
+        //ls.CreateSurveyFromCSV(LimeSurvey.Topic.MENTORING_2_CCFF, degreeName, departmentName, groupName, trainerName);
+        //ls.CreateSurveyFromCSV(LimeSurvey.Topic.SCHOOL, degreeName, departmentName, groupName, trainerName);
+    }
 
     //Export
     // using(var ls = new LimeSurvey()){
@@ -331,10 +331,10 @@ void Test(){
     // }
 
     //Actions
-    using(var ls = new LimeSurvey()){
-        //ls.ActivateSurvey(757244);
-        //ls.ExpireSurvey(952521);
-        //ls.DeleteSurvey(956875);  
-    }
+    // using(var ls = new LimeSurvey()){
+    //     //ls.ActivateSurvey(757244);
+    //     //ls.ExpireSurvey(952521);
+    //     //ls.DeleteSurvey(956875);  
+    // }
     
 }

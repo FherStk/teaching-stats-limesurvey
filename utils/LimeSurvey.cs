@@ -183,7 +183,11 @@ public class LimeSurvey : IDisposable{
         this.Client.ClearParameters();
 
         //Returing the new survey's ID
-        return int.Parse(this.ReadClientResult() ?? "");
+        int neWID = int.Parse(this.ReadClientResult() ?? "");
+
+        //TODO: read this ID from the CSV file
+        SetSurveyProperties(neWID, JObject.Parse(@"{'gsid': 12}"));
+        return neWID;
     }
 
     public JArray GetSurveyQuestions(int surveyID){
