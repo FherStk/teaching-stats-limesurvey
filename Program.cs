@@ -38,7 +38,7 @@ void Menu(){
                     break;
 
                 case 3:
-                    CreateNewSurveyFromTemplate();
+                    ReadNewSurveyData();
                     break;
 
                 //new cases:
@@ -53,35 +53,20 @@ void Menu(){
         }
 
         Console.WriteLine();
-    }
-    
+    }   
 }
 
-void CreateNewSurveyFromTemplate(){   
-    var settings = Utils.Settings;
-    if(settings == null || settings.Templates == null) throw new IncorrectSettingsException();
+void ReadNewSurveyData(){       
+    var option = -1;
+    var values = Enum.GetValues(typeof(LimeSurvey.Topic)).Cast<LimeSurvey.Topic>().ToDictionary(t => (int)t, t => t.ToString() );
 
-    int i = 1;
-  
-    var options = new Dictionary<int, object>();    
-    foreach(var t in settings.Templates){  
-        options.Add(i++, new {
-            ID = t.Value.Id,
-            Caption = t.Value.Name ?? "",
-            Type = (LimeSurvey.Topic)Enum.Parse(typeof(LimeSurvey.Topic), t.Key.Replace("-", "_").ToUpper())
-        });
-    }
-
-    int option = -1;
     //int option = 1;
     while(option == -1){        
         Info("Please, select the template ID to create a new survey:");
-
-        foreach(var e in options){
-            dynamic v = e.Value;
-            Info($"   {e.Key}: {v.Caption}");            
-        }
-
+        
+        foreach(var id in values.Keys)
+            Info($"   {id}: {values[id]}");            
+        
         Info("   0: Exit");                        
         Console.WriteLine();
 
@@ -91,13 +76,8 @@ void CreateNewSurveyFromTemplate(){
             Console.WriteLine();
         }        
     }
-
-    dynamic template = options[option];
-    CreateNewSurveyIntoLimeSurvey(template.ID, template.Type);    
-}
-
-void CreateNewSurveyIntoLimeSurvey(int templateID, LimeSurvey.Topic type){   
-
+    
+    var topic = (LimeSurvey.Topic)option;
     var degreeName = Question("Please, write the DEGREE NAME:");
     var departmentName = Question("Please, write the DEPARTMENT NAME:");    
     var groupName = Question("Please, write the GROUP NAME:");
@@ -105,19 +85,15 @@ void CreateNewSurveyIntoLimeSurvey(int templateID, LimeSurvey.Topic type){
     
     var subjectCode = string.Empty;
     var subjectName = string.Empty;
-    if(type == LimeSurvey.Topic.SUBJECT_CCFF){
+    if(topic == LimeSurvey.Topic.SUBJECT_CCFF){
         subjectCode = Question("Please, write the SUBJECT CODE:");
         subjectName = Question("Please, write the SUBJECT NAME:");
     }
+   
+    CreateNewSurveyFromTemplate(topic, degreeName, departmentName, groupName, trainerName, subjectCode, subjectName);
+}
 
-    // var degreeName = "DAM";
-    // var departmentName = "Informàtica";    
-    // var groupName = "DAM2A";
-    // var trainerName = "Fernando Porrino";
-    // subjectCode = "M10";
-    // subjectName = "Sistemes de gestió empresarial";
-    
-
+void CreateNewSurveyFromTemplate(LimeSurvey.Topic topic, string degreeName, string departmentName, string groupName, string trainerName, string subjectCode = "", string subjectName = ""){
     using(var ls = new LimeSurvey()){   
         try{            
             Info("Creating a new survey... ", false);    
@@ -125,7 +101,7 @@ void CreateNewSurveyIntoLimeSurvey(int templateID, LimeSurvey.Topic type){
             if(!string.IsNullOrEmpty(trainerName)) surveyName += $" ({trainerName})";
 
             //Copying the survey with the correct name
-            int newID = ls.CopySurvey(templateID, surveyName);            
+            int newID = ls.CreateSurveyFromCSV(topic, degreeName, departmentName, groupName, trainerName, subjectCode, subjectName);    
             Success();
 
             //Loading the question IDs in order to set the correct values
@@ -150,7 +126,7 @@ void CreateNewSurveyIntoLimeSurvey(int templateID, LimeSurvey.Topic type){
             SetQuestionValue(ls, qIDs, LimeSurvey.Question.TRAINER, trainerName);                    
             Success();                    
 
-            if(type == LimeSurvey.Topic.SUBJECT_CCFF){
+            if(topic == LimeSurvey.Topic.SUBJECT_CCFF){
                 Info("Setting up the survey subject... ", false);
                 SetQuestionValue(ls, qIDs, LimeSurvey.Question.SUBJECTCODE, subjectCode);                    
                 SetQuestionValue(ls, qIDs, LimeSurvey.Question.SUBJECTNAME, subjectName);
@@ -316,24 +292,28 @@ void Test(){
     // }
 
     //Export
-    using(var ls = new LimeSurvey()){
-        using(var ts = new TeachingStats()){
-            foreach(var s in ls.ListSurveys()){
-                if((s["active"] ?? "").ToString() == "N") continue;
-                int surveyID = int.Parse((s["sid"] ?? "").ToString());
-                var type = ls.GetSurveyTopic(surveyID);
+    // using(var ls = new LimeSurvey()){
+    //     using(var ts = new TeachingStats()){
+    //         foreach(var s in ls.ListSurveys()){
+    //             if((s["active"] ?? "").ToString() == "N") continue;
+    //             int surveyID = int.Parse((s["sid"] ?? "").ToString());
+    //             var type = ls.GetSurveyTopic(surveyID);
                 
-                if(type != null){
-                    var answers = ls.GetSurveyResponses(surveyID);
-                    var questions = ls.GetSurveyQuestions(surveyID);
+    //             if(type != null){
+    //                 var answers = ls.GetSurveyResponses(surveyID);
+    //                 var questions = ls.GetSurveyQuestions(surveyID);
 
-                    ts.ImportFromLimeSurvey(questions, answers);
+    //                 ts.ImportFromLimeSurvey(questions, answers);
                     
-                    //TODO: stop the LS surveys
-                }
-            }
-        }
-    }
+    //                 //TODO: stop the LS surveys
+    //             }
+    //         }
+    //     }
+    // }
+
+    //TODO: develop and test:
+    //  1. Create from template (school, mentoring-1, mentoring-2)
+    //  2. Export to teaching-stats all the templates
 
     //List
     // using(var ls = new LimeSurvey()){

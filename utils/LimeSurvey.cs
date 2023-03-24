@@ -99,8 +99,8 @@ public class LimeSurvey : IDisposable{
         return JObject.Parse(this.ReadClientResult() ?? "");
     }
 
-    public int CreateSurveyFromCSV(Topic type, string degreeName, string departmentName, string groupName, string trainerName, string subjectCode = "", string subjectName = ""){    
-        var template = $"{Path.Combine(Utils.TemplatesFolder, type.ToString().ToLower().Replace("_", "-"))}.txt";    
+    public int CreateSurveyFromCSV(Topic topic, string degreeName, string departmentName, string groupName, string trainerName, string subjectCode = "", string subjectName = ""){    
+        var template = $"{Path.Combine(Utils.TemplatesFolder, topic.ToString().ToLower().Replace("_", "-"))}.txt";    
         var content = File.ReadAllText(template);       
 
         //Setting up template values
@@ -109,7 +109,7 @@ public class LimeSurvey : IDisposable{
         
         var description = string.Empty;
 
-        switch(type){
+        switch(topic){
             case Topic.SUBJECT_CCFF:
                 description = @"<p><strong>Si us plau, abans de contestar l'enquesta, tingues en compte el següent:</strong></p>
                                 <ol style='text-align: left;'>

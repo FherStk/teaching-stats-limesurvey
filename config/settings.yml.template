@@ -7,20 +7,3 @@ limeSurvey:
   host: https://limesurvey.elpuig.xeill.net
   username: admin
   password: admin
-
-templates:
-  subject-ccff:
-    name: Subject (CCFF)
-    id: 123456
-
-  mentoring-1-ccff:
-    name: Mentoring 1st (CCFF)
-    id: 123457
-
-  mentoring-2-ccff:
-    name: Mentoring 2nd (CCFF)
-    id: 123458
-    
-  school:
-    name: School (General)
-    id: 123459
