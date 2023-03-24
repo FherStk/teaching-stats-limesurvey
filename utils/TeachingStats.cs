@@ -52,8 +52,8 @@ public class TeachingStats : System.IDisposable{
         //Setup global data
         var statements = new Dictionary<string, string>();
         foreach(var q in questions){
-            //TODO: if q["title"] starts with SQ -> add statement
-            statements.Add((q["title"] ?? "").ToString(), (q["question"] ?? "").ToString());
+            var title = (q["title"] ?? "").ToString();
+            if(title.StartsWith("SQ") || title == "comments") statements.Add(title, (q["question"] ?? "").ToString());
         }            
 
         //Setting up responses

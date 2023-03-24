@@ -26,7 +26,6 @@ public class LimeSurvey : IDisposable{
 
     public JsonRPCclient Client {get; private set;}    
 
-
     public LimeSurvey(){
         var settings = Utils.Settings;  
         if(settings == null || settings.LimeSurvey == null) throw new IncorrectSettingsException();      
@@ -44,16 +43,25 @@ public class LimeSurvey : IDisposable{
         else this.SessionKey = Client.Response.result.ToString();
     }
 
-    private static string GetSessionKey(){
-        var executionFolder = Path.TrimEndingDirectorySeparator(AppContext.BaseDirectory);
-        var appFolder = executionFolder.Substring(0, executionFolder.IndexOf("bin"));
-        appFolder = Path.TrimEndingDirectorySeparator(appFolder);
-        return Path.Combine(appFolder, "config");
-    }
+    public void Dispose()
+    {
+        if(Client == null || string.IsNullOrEmpty(SessionKey)) return;
+        
+        Client.Method = "release_session_key";
+        Client.Parameters.Add("sSessionKey", SessionKey);
+        Client.Post();
+        Client.ClearParameters();
 
-    private string? ReadClientResult(){
-        if(this.Client.Response != null && this.Client.Response.result != null) return this.Client.Response.result.ToString();
-        else return null;
+        SessionKey = String.Empty;
+    }
+#region Survey
+    public JArray ListSurveys(){
+        this.Client.Method = "list_surveys";
+        this.Client.Parameters.Add("sSessionKey", this.SessionKey);        
+        this.Client.Post();
+        this.Client.ClearParameters();
+
+        return JArray.Parse(this.ReadClientResult() ?? "");
     }
 
     public int CopySurvey(int templateID, string newName){
@@ -66,74 +74,6 @@ public class LimeSurvey : IDisposable{
 
         var response = JObject.Parse(this.ReadClientResult() ?? "");
         return int.Parse((response["newsid"] ?? "").ToString());
-    }
-
-    public Dictionary<Question, List<int>> GetQuestionsIDsByType(int surveyID){
-        var IDs = new Dictionary<Question, List<int>>();
-        
-        this.Client.Method = "list_questions";
-        this.Client.Parameters.Add("sSessionKey", this.SessionKey);
-        this.Client.Parameters.Add("iSurveyID_org", surveyID);
-        this.Client.Post();
-        this.Client.ClearParameters();
-
-        var response = JArray.Parse(this.ReadClientResult() ?? "");
-        if(response == null) throw new Exception($"Unable to read properties from the survey ID '{surveyID}'");
-
-        foreach(var q in response){
-            var qID = int.Parse((q["qid"] ?? "").ToString());
-            
-            Question type;            
-            if(!Enum.TryParse<Question>((q["title"] ?? "").ToString(), true, out type))
-                type = Question.QUESTIONS;           
-
-            List<int> list;
-            try{
-                list = IDs[type];
-            }            
-            catch(KeyNotFoundException){
-                list = new List<int>();
-                IDs.Add(type, list);
-            }
-
-            list.Add(qID);                    
-        }            
-
-        return IDs;
-    }
-
-    public JObject GetQuestionProperties(int questionID){
-        this.Client.Method = "get_question_properties";
-        this.Client.Parameters.Add("sSessionKey", this.SessionKey);
-        this.Client.Parameters.Add("iQuestionID", questionID);
-
-        this.Client.Post();
-        this.Client.ClearParameters();
-
-        return JObject.Parse(this.ReadClientResult() ?? "");
-    }
-
-    public JArray GetAllQuestionsProperties(int surveyID){
-        
-        this.Client.Method = "list_questions";
-        this.Client.Parameters.Add("sSessionKey", this.SessionKey);
-        this.Client.Parameters.Add("iSurveyID_org", surveyID);
-        this.Client.Post();
-        this.Client.ClearParameters();
-
-        return JArray.Parse(this.ReadClientResult() ?? "");
-    }
-
-    public JObject SetQuestionProperties(int questionID, JObject properties){
-        this.Client.Method = "set_question_properties";
-        this.Client.Parameters.Add("sSessionKey", this.SessionKey);
-        this.Client.Parameters.Add("iQuestionID", questionID);
-
-        this.Client.Parameters.Add("aQuestionData", properties);
-        this.Client.Post();
-        this.Client.ClearParameters();
-
-        return JObject.Parse(this.ReadClientResult() ?? "");
     }
 
     public JObject GetSurveySummary(int surveyID){
@@ -226,16 +166,89 @@ public class LimeSurvey : IDisposable{
         var base64EncodedBytes = System.Convert.FromBase64String(this.ReadClientResult() ?? "");
         return JObject.Parse(System.Text.Encoding.UTF8.GetString(base64EncodedBytes));
     }
-
-    public void Dispose()
-    {
-        if(Client == null || string.IsNullOrEmpty(SessionKey)) return;
+#endregion
+#region Questions
+    public Dictionary<Question, List<int>> GetQuestionsIDsByType(int surveyID){
+        var IDs = new Dictionary<Question, List<int>>();
         
-        Client.Method = "release_session_key";
-        Client.Parameters.Add("sSessionKey", SessionKey);
-        Client.Post();
-        Client.ClearParameters();
+        this.Client.Method = "list_questions";
+        this.Client.Parameters.Add("sSessionKey", this.SessionKey);
+        this.Client.Parameters.Add("iSurveyID_org", surveyID);
+        this.Client.Post();
+        this.Client.ClearParameters();
 
-        SessionKey = String.Empty;
+        var response = JArray.Parse(this.ReadClientResult() ?? "");
+        if(response == null) throw new Exception($"Unable to read properties from the survey ID '{surveyID}'");
+
+        foreach(var q in response){
+            var qID = int.Parse((q["qid"] ?? "").ToString());
+            
+            Question type;            
+            if(!Enum.TryParse<Question>((q["title"] ?? "").ToString(), true, out type))
+                type = Question.QUESTIONS;           
+
+            List<int> list;
+            try{
+                list = IDs[type];
+            }            
+            catch(KeyNotFoundException){
+                list = new List<int>();
+                IDs.Add(type, list);
+            }
+
+            list.Add(qID);                    
+        }            
+
+        return IDs;
     }
+
+    public JObject GetQuestionProperties(int questionID){
+        this.Client.Method = "get_question_properties";
+        this.Client.Parameters.Add("sSessionKey", this.SessionKey);
+        this.Client.Parameters.Add("iQuestionID", questionID);
+
+        this.Client.Post();
+        this.Client.ClearParameters();
+
+        return JObject.Parse(this.ReadClientResult() ?? "");
+    }
+
+    public JArray GetAllQuestionsProperties(int surveyID){
+        
+        this.Client.Method = "list_questions";
+        this.Client.Parameters.Add("sSessionKey", this.SessionKey);
+        this.Client.Parameters.Add("iSurveyID_org", surveyID);
+        this.Client.Post();
+        this.Client.ClearParameters();
+
+        return JArray.Parse(this.ReadClientResult() ?? "");
+    }
+
+    public JObject SetQuestionProperties(int questionID, JObject properties){
+        this.Client.Method = "set_question_properties";
+        this.Client.Parameters.Add("sSessionKey", this.SessionKey);
+        this.Client.Parameters.Add("iQuestionID", questionID);
+
+        this.Client.Parameters.Add("aQuestionData", properties);
+        this.Client.Post();
+        this.Client.ClearParameters();
+
+        return JObject.Parse(this.ReadClientResult() ?? "");
+    }
+
+    
+#endregion
+#region Private
+    private static string GetSessionKey(){
+        var executionFolder = Path.TrimEndingDirectorySeparator(AppContext.BaseDirectory);
+        var appFolder = executionFolder.Substring(0, executionFolder.IndexOf("bin"));
+        appFolder = Path.TrimEndingDirectorySeparator(appFolder);
+        return Path.Combine(appFolder, "config");
+    }
+
+    private string? ReadClientResult(){
+        if(this.Client.Response != null && this.Client.Response.result != null) return this.Client.Response.result.ToString();
+        else return null;
+    }
+#endregion 
 }

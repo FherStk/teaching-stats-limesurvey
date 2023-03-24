@@ -316,17 +316,26 @@ void Test(){
     // }
 
     //Export
+    // using(var ls = new LimeSurvey()){
+    //     using(var ts = new TeachingStats()){
+    //         //TODO: chech for all the survey IDs...
+
+    //         var surveyID = 254973;
+    //         var answers = ls.GetSurveyResponses(surveyID);
+    //         var questions = ls.GetAllQuestionsProperties(surveyID);
+        
+    //         ts.ImportFromLimeSurvey(questions, answers);
+
+    //         //TODO: stop the LS surveys
+    //     }
+    // }
+
+    //List
     using(var ls = new LimeSurvey()){
         using(var ts = new TeachingStats()){
-            //TODO: chech for all the survey IDs...
-
-            var surveyID = 254973;
-            var answers = ls.GetSurveyResponses(surveyID);
-            var questions = ls.GetAllQuestionsProperties(surveyID);
-        
-            ts.ImportFromLimeSurvey(questions, answers);
-
-            //TODO: stop the LS surveys
+           Console.WriteLine(ls.ListSurveys());
         }
     }
+
+    
 }
