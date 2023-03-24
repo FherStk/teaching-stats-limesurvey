@@ -187,8 +187,7 @@ public class LimeSurvey : IDisposable{
         //Returing the new survey's ID
         int neWID = int.Parse(this.ReadClientResult() ?? "");
 
-        //TODO: read this ID from the CSV file
-        SetSurveyProperties(neWID, JObject.Parse(@"{'gsid': 12}"));
+        SetSurveyProperties(neWID, JObject.Parse(@"{'gsid': " + (Utils.Settings.LimeSurvey == null ? 1 : Utils.Settings.LimeSurvey.Group) + "}"));
         return neWID;
     }
 

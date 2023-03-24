@@ -7,3 +7,4 @@ limeSurvey:
   host: https://limesurvey.elpuig.xeill.net
   username: admin
   password: admin
+  group: 1 
