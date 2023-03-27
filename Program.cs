@@ -277,7 +277,7 @@ void DisplayInfo(){
     Console.ForegroundColor = ConsoleColor.Yellow;
     Console.Write("Copyright © 2023: ");
     Console.ResetColor();
-    Console.WriteLine($"Fernando Porrino Serrano");
+    Console.WriteLine($"Coordinació de Qualitat Serrano");
 
     Console.ForegroundColor = ConsoleColor.Yellow;
     Console.Write("Under the AGPL license: ");
@@ -292,14 +292,14 @@ void Test(){
         var degreeName = "DAM";
         var departmentName = "Informàtica";    
         var groupName = "DAM2A";
-        var trainerName = "Fernando Porrino";
+        var trainerName = "Coordinació de Qualitat";
         var subjectCode = "M05";
         var subjectName = "Entorns de Desenvolupament";
         
-        //ls.CreateSurveyFromCSV(LimeSurvey.Topic.SUBJECT_CCFF, degreeName, departmentName, groupName, trainerName, subjectCode, subjectName);
+        ls.CreateSurveyFromCSV(LimeSurvey.Topic.SUBJECT_CCFF, degreeName, departmentName, groupName, trainerName, subjectCode, subjectName);
         ls.CreateSurveyFromCSV(LimeSurvey.Topic.MENTORING_1_CCFF, degreeName, departmentName, groupName, trainerName);
-        //ls.CreateSurveyFromCSV(LimeSurvey.Topic.MENTORING_2_CCFF, degreeName, departmentName, groupName, trainerName);
-        //ls.CreateSurveyFromCSV(LimeSurvey.Topic.SCHOOL, degreeName, departmentName, groupName, trainerName);
+        ls.CreateSurveyFromCSV(LimeSurvey.Topic.MENTORING_2_CCFF, degreeName, departmentName, groupName, trainerName);
+        ls.CreateSurveyFromCSV(LimeSurvey.Topic.SCHOOL, degreeName, departmentName, groupName);
     }
 
     //Export

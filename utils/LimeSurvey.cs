@@ -102,7 +102,7 @@ public class LimeSurvey : IDisposable{
         return JObject.Parse(this.ReadClientResult() ?? "");
     }
 
-    public int CreateSurveyFromCSV(Topic topic, string degreeName, string departmentName, string groupName, string trainerName, string subjectCode = "", string subjectName = ""){    
+    public int CreateSurveyFromCSV(Topic topic, string degreeName, string departmentName, string groupName, string trainerName = "", string subjectCode = "", string subjectName = ""){    
         var template = $"{Path.Combine(Utils.TemplatesFolder, topic.ToString().ToLower().Replace("_", "-"))}.txt";    
         var content = File.ReadAllText(template);       
 
@@ -154,7 +154,7 @@ public class LimeSurvey : IDisposable{
         }
 
         var surveyName = $"{degreeName} {subjectCode}: {subjectName}";
-        if(!string.IsNullOrEmpty(trainerName)) surveyName += $" ({trainerName})";
+        if(!string.IsNullOrEmpty(trainerName) && topic != Topic.SCHOOL) surveyName += $" ({trainerName})";
                 
 
         //Replacing template values
