@@ -5,28 +5,27 @@ using Newtonsoft.Json.Linq;
 var _VERSION = "0.0.1";
 
 DisplayInfo();
+if(!CheckConfig()) return;
 
 //CLI arguments
 var action = string.Empty;
 var file = string.Empty;
 
-int i = 0;
-foreach(var arg in args){
-    switch(arg){        
-        case "--create-survey":
-        case "-cs":
-            CreateNewSurveyFromFile(args[i+1]);
-            break;       
-    }  
+//Load the interactive menu or the unatended opps
+if(args == null || args.Length == 0) Menu();
+else{
+    int i = 0;
+    foreach(var arg in args){
+        switch(arg){        
+            case "--create-survey":
+            case "-cs":
+                CreateNewSurveyFromFile(args[i+1]);
+                break;       
+        }  
 
-    i++;
+        i++;
+    }
 }
-
-//Test();
-
-//Main
-// if(!CheckConfig()) return;
-// else Menu();
 
 //Methods
 void Menu(){
@@ -76,8 +75,15 @@ void Menu(){
 }
 
 void CreateNewSurveyFromFile(string filePath){
-    var importData = Utils.DeserializeYamlFile<Import>(filePath);
-    
+    var importData = Utils.DeserializeYamlFile<Survey>(filePath);
+    if(importData.Data == null) return;
+
+    using(var ls = new LimeSurvey()){   
+        foreach(var data in importData.Data){
+            var topic = (LimeSurvey.Topic)Enum.Parse(typeof(LimeSurvey.Topic), (data.Topic ?? "").Replace("-", "_"), true);
+            ls.CreateSurveyFromCSV(topic, data.DegreeName ?? "", data.DepartmentName ?? "", data.GroupName ?? "", data.TrainerName ?? "", data.SubjectCode ?? "", data.SubjectName ?? "");
+        }
+    }
 }
 
 void CreateNewSurveyFromTerminal(){       
@@ -233,12 +239,12 @@ bool CheckConfig(){
                     Error("The program cannot continue, becasue the 'teaching-stats' database has not been upgraded.");
                     return false;
                 }
-            }
 
-            Info("Upgrading the teaching-stats' database... ", false);
-            ts.PerformDataDaseUpgrade();
-            Success();
-            Console.WriteLine();
+                Info("Upgrading the teaching-stats' database... ", false);
+                ts.PerformDataDaseUpgrade();
+                Success();
+                Console.WriteLine();
+            }
         }
 
         //Testing LimeSurvey config
@@ -305,57 +311,4 @@ void DisplayInfo(){
     Console.ResetColor();
     Console.WriteLine($"https://github.com/FherStk/teaching-stats-limesurvey/blob/main/LICENSE");
     Console.WriteLine();
-}
-
-void Test(){
-    //Create survey
-    using(var ls = new LimeSurvey()){   
-        var degreeName = "DAM";
-        var departmentName = "Informàtica";    
-        var groupName = "DAM2A";
-        var trainerName = "Coordinació de Qualitat";
-        var subjectCode = "M05";
-        var subjectName = "Entorns de Desenvolupament";
-        
-        ls.CreateSurveyFromCSV(LimeSurvey.Topic.SUBJECT_CCFF, degreeName, departmentName, groupName, trainerName, subjectCode, subjectName);
-        ls.CreateSurveyFromCSV(LimeSurvey.Topic.MENTORING_1_CCFF, degreeName, departmentName, groupName, trainerName);
-        ls.CreateSurveyFromCSV(LimeSurvey.Topic.MENTORING_2_CCFF, degreeName, departmentName, groupName, trainerName);
-        ls.CreateSurveyFromCSV(LimeSurvey.Topic.SCHOOL, degreeName, departmentName, groupName);
-    }
-
-    //Export
-    // using(var ls = new LimeSurvey()){
-    //     using(var ts = new TeachingStats()){
-    //         foreach(var s in ls.ListSurveys()){
-    //             if((s["active"] ?? "").ToString() == "N") continue;
-    //             int surveyID = int.Parse((s["sid"] ?? "").ToString());
-    //             var type = ls.GetSurveyTopic(surveyID);
-                
-    //             if(type != null){
-    //                 var answers = ls.GetSurveyResponses(surveyID);
-    //                 var questions = ls.GetSurveyQuestions(surveyID);
-
-    //                 ts.ImportFromLimeSurvey(questions, answers);
-                    
-    //                 //TODO: stop the LS surveys
-    //             }
-    //         }
-    //     }
-    // }
-
-    
-    //List
-    // using(var ls = new LimeSurvey()){
-    //     using(var ts = new TeachingStats()){
-    //        Console.WriteLine(ls.ListSurveys());
-    //     }
-    // }
-
-    //Actions
-    // using(var ls = new LimeSurvey()){
-    //     //ls.ActivateSurvey(757244);
-    //     //ls.ExpireSurvey(952521);
-    //     //ls.DeleteSurvey(956875);  
-    // }
-    
 }

@@ -62,10 +62,10 @@ public static class Utils{
     public static void SerializeImportTemplateAsYamlFile(){
         //This is just a test method
         //Source: https://github.com/aaubry/YamlDotNet
-        var import = new Import
+        var import = new Survey
         {
-            Data = new List<Import.ImportData>(){
-                new Import.ImportData(){
+            Data = new List<Survey.SurveyData>(){
+                new Survey.SurveyData(){
                     Topic = "SUBJECT-CCFF",
                     DegreeName = "DEGREE",
                     DepartmentName = "DEPTARTMENT",
@@ -75,7 +75,7 @@ public static class Utils{
                     TrainerName = "TRAINER"
                 },
 
-                new Import.ImportData(){
+                new Survey.SurveyData(){
                     Topic = "SUBJECT-CCFF",
                     DegreeName = "DEGREE",
                     DepartmentName = "DEPTARTMENT",

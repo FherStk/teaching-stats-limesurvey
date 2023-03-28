@@ -1,0 +1,14 @@
+data:
+- topic: "SUBJECT-CCFF"
+  degreeName: "DAM"
+  departmentName: "Informàtica"
+  groupName: "DAM2B"
+  trainerName: "Fernando Porrino"
+  subjectCode: "M05"
+  subjectName: "Entorns de Desenvolupament"
+
+- topic: "MENTORING-1-CCFF"
+  degreeName: "DAM"
+  departmentName: "Informàtica"
+  groupName: "DAM2A"
+  trainerName: "Fernando Porrino"

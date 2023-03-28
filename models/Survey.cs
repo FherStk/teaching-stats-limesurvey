@@ -1,8 +1,8 @@
-public class Import
+public class Survey
 {
-    public List<ImportData>? Data {get; set;}    
+    public List<SurveyData>? Data {get; set;}    
 
-    public class ImportData{
+    public class SurveyData{
         public string? Topic {get; set;}
         public string? DegreeName {get; set;}
         public string? DepartmentName {get; set;}
