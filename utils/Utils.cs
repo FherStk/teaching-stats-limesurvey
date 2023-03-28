@@ -38,14 +38,18 @@ public static class Utils{
         }
     }
 
-    private static Settings LoadSettings(){
+    private static Settings LoadSettings(){        
+        return DeserializeYamlFile<Settings>(Path.Combine(ConfigFolder, "settings.yml"));
+    }
+
+    public static T DeserializeYamlFile<T>(string filePath){
         //Source: https://github.com/aaubry/YamlDotNet
         var deserializer = new DeserializerBuilder()
         .WithNamingConvention(CamelCaseNamingConvention.Instance)  // see height_in_inches in sample yml 
         .Build();
 
-        var yml = File.ReadAllText(Path.Combine(ConfigFolder, "settings.yml"));
-        return deserializer.Deserialize<Settings>(yml);
+        var yml = File.ReadAllText(filePath);
+        return deserializer.Deserialize<T>(yml);
     }
 
     private static string GetConfigFolder(){
@@ -55,28 +59,39 @@ public static class Utils{
         return Path.Combine(appFolder, "config");
     }
     
-    public static void SerializeSettingsTemplateAsYamlFile(){
+    public static void SerializeImportTemplateAsYamlFile(){
         //This is just a test method
         //Source: https://github.com/aaubry/YamlDotNet
-        var settings = new Settings
+        var import = new Import
         {
-            TeachingStats = new Settings.TeachingStatsSettings(){
-                Host = "localhost",
-                Username = "postgres",
-                Password = "postgres"
-            },
-            LimeSurvey = new Settings.LimeSurveySettings(){
-                Host = "https://limesurvey.elpuig.xeill.net",
-                Username = "admin",
-                Password = "admin"
-            }            
+            Data = new List<Import.ImportData>(){
+                new Import.ImportData(){
+                    Topic = "SUBJECT-CCFF",
+                    DegreeName = "DEGREE",
+                    DepartmentName = "DEPTARTMENT",
+                    GroupName = "GROUP",
+                    SubjectCode = "MPxx",
+                    SubjectName = "SUBJECT 1",                    
+                    TrainerName = "TRAINER"
+                },
+
+                new Import.ImportData(){
+                    Topic = "SUBJECT-CCFF",
+                    DegreeName = "DEGREE",
+                    DepartmentName = "DEPTARTMENT",
+                    GroupName = "GROUP",
+                    SubjectCode = "MPyy",
+                    SubjectName = "SUBJECT 2",                    
+                    TrainerName = "TRAINER"
+                }
+            }
         };
 
         var serializer = new SerializerBuilder()
             .WithNamingConvention(CamelCaseNamingConvention.Instance)
             .Build();
     
-        var yaml = serializer.Serialize(settings);
+        var yaml = serializer.Serialize(import);
         System.Console.WriteLine(yaml);
     } 
 }

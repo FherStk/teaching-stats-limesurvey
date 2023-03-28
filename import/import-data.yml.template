@@ -1,0 +1,16 @@
+data:
+- topic: "SCHOOL / MENTORING-1-CCFF / MENTORING-2-CCFF / SUBJECT-CCFF"
+  degreeName: "DEGREE NAME"
+  departmentName: "DEPARTMENT NAME"
+  groupName: = "GROUP NAME"
+  trainerName: = "TRAINER NAME"
+  subjectCode: = "MPxx"
+  subjectName: = "SUBJECT"
+
+- topic: "SCHOOL / MENTORING-1-CCFF / MENTORING-2-CCFF / SUBJECT-CCFF"
+  degreeName: "DEGREE NAME"
+  departmentName: "DEPARTMENT NAME"
+  groupName: = "GROUP NAME"
+  trainerName: = "TRAINER NAME"
+  subjectCode: = "MPxx"
+  subjectName: = "SUBJECT"

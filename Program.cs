@@ -15,7 +15,7 @@ foreach(var arg in args){
     switch(arg){        
         case "--create-survey":
         case "-cs":
-            //Create survey using arg[i+1] as searchpath
+            CreateNewSurveyFromFile(args[i+1]);
             break;       
     }  
 
@@ -54,7 +54,7 @@ void Menu(){
                     break;
 
                 case 3:
-                    ReadNewSurveyData();
+                    CreateNewSurveyFromTerminal();
                     break;
 
                 //new cases:
@@ -75,7 +75,12 @@ void Menu(){
     }   
 }
 
-void ReadNewSurveyData(){       
+void CreateNewSurveyFromFile(string filePath){
+    var importData = Utils.DeserializeYamlFile<Import>(filePath);
+    
+}
+
+void CreateNewSurveyFromTerminal(){       
     var option = -1;
     var values = Enum.GetValues(typeof(LimeSurvey.Topic)).Cast<LimeSurvey.Topic>().ToDictionary(t => (int)t, t => t.ToString() );
 
