@@ -4,11 +4,27 @@ using Newtonsoft.Json.Linq;
 //Global vars
 var _VERSION = "0.0.1";
 
-Test();
-return;
+DisplayInfo();
+
+//CLI arguments
+var action = string.Empty;
+var file = string.Empty;
+
+int i = 0;
+foreach(var arg in args){
+    switch(arg){        
+        case "--create-survey":
+        case "-cs":
+            //Create survey using arg[i+1] as searchpath
+            break;       
+    }  
+
+    i++;
+}
+
+//Test();
 
 //Main
-// DisplayInfo();
 // if(!CheckConfig()) return;
 // else Menu();
 

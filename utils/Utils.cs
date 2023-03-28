@@ -1,7 +1,7 @@
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 
-public static class Utils{    
+public static class Utils{        
     private static string? _configFolder;
     private static string? _templatesFolder;
     public static string ConfigFolder {
