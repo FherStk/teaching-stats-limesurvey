@@ -201,19 +201,8 @@ public class LimeSurvey : IDisposable{
     }
 
     public JArray AddSurveyParticipants(int surveyID, List<Survey.Participant> parts){
-        //TODO: this does not work. No participants are being added... WHY???
-
-        // Define the token params
-        //   $tokenParams = array("email"=>"example@example.com","lastname"=>"LastName","firstname"=>"FirstName","token"=>$token,"language"=>'en',"emailstatus"=>"OK");
-        //   $aParticipantData=array($tokenParams);
-        //   $bCreateToken = false;
- 
-        // Create the tokens
-        //$newToken = $myJSONRPCClient->add_participants( $sSessionKey, $iSurveyID, $aParticipantData, $bCreateToken);
-
-        //var data = "[{\"email\":\"me@example.com\",\"lastname\":\"Bond\",\"firstname\":\"James\"},{\"email\":\"me2@example.com\",\"attribute_1\":\"example\"}]";
-        var data = "[{\"email\":\"me@example.com\",\"lastname\":\"Bond\",\"firstname\":\"James\", \"language\": \"en\", \"emailstatus\": \"OK\"}]";
-        //var data = JsonConvert.SerializeObject(parts);
+        //TODO: this does not work. No participants are being added... WHY???        
+        var data = JsonConvert.SerializeObject(parts);
 
         //Encoding
         var plainTextBytes = System.Text.Encoding.UTF8.GetBytes(data);
@@ -225,8 +214,8 @@ public class LimeSurvey : IDisposable{
         this.Client.Parameters.Add("iSurveyID", surveyID);        
         //this.Client.Parameters.Add("sDocumentType", "json");
         //this.Client.Parameters.Add("aParticipantData", base64EncodedBytes);           
-        //this.Client.Parameters.Add("aParticipantData", data);   
-        this.Client.Parameters.Add("bCreateToken", false);
+        this.Client.Parameters.Add("aParticipantData", data);   
+        //this.Client.Parameters.Add("bCreateToken", false);
         this.Client.Post();
         this.Client.ClearParameters();
 
