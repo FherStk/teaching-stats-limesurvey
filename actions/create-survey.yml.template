@@ -8,12 +8,12 @@ data:
   subjectName: "SUBJECT"
   participants:
     - email: "me@example.com"
-      lastname: "Name"
-      firstname: "Surname"
+      firstname: "Name"
+      lastname: "Surname"
 
     - email: "me@example.com"
-      lastname: "Another Name"
-      firstname: "Another Surname"
+      firstname: "Another Name"
+      lastname: "Another Surname"
 
 - topic: "MENTORING-1-CCFF"
   degreeName: "DEGREE NAME"
@@ -22,12 +22,12 @@ data:
   trainerName: "TRAINER NAME"
   participants:
     - email: "me@example.com"
-      lastname: "Name"
-      firstname: "Surname"
+      firstname: "Name"
+      lastname: "Surname"
 
     - email: "me@example.com"
-      lastname: "Another Name"
-      firstname: "Another Surname"
+      firstname: "Another Name"
+      lastname: "Another Surname"
 
 - topic: "MENTORING-2-CCFF"
   degreeName: "DEGREE NAME"
@@ -36,12 +36,12 @@ data:
   trainerName: "TRAINER NAME"
   participants:
     - email: "me@example.com"
-      lastname: "Name"
-      firstname: "Surname"
+      firstname: "Name"
+      lastname: "Surname"
 
     - email: "me@example.com"
-      lastname: "Another Name"
-      firstname: "Another Surname"
+      firstname: "Another Name"
+      lastname: "Another Surname"
 
 - topic: "SCHOOL"
   degreeName: "DEGREE NAME"
@@ -49,9 +49,9 @@ data:
   groupName: "GROUP NAME"  
   participants:
     - email: "me@example.com"
-      lastname: "Name"
-      firstname: "Surname"
+      firstname: "Name"
+      lastname: "Surname"
 
     - email: "me@example.com"
-      lastname: "Another Name"
-      firstname: "Another Surname"
+      firstname: "Another Name"
+      lastname: "Another Surname"

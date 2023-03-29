@@ -8,16 +8,16 @@ data:
   subjectName: "Programació Bàsica"
   participants:
     - email: "porrino.fernando@elpuig.xeill.net"
-      lastname: "Fernando"
-      firstname: "Porrino Serrano"
+      firstname: "Fernando"
+      lastname: "Porrino Serrano"
 
     - email: "acanal8@elpuig.xeill.net"
-      lastname: "Dori"
-      firstname: "Cañal"
+      firstname: "Dori"
+      lastname: "Cañal"
 
     - email: "mperez13@elpuig.xeill.net"
-      lastname: "Montse"
-      firstname: "Pérez"
+      firstname: "Montse"
+      lastname: "Pérez"
 
 - topic: "MENTORING-1-CCFF"
   degreeName: "ASIX"
@@ -26,16 +26,16 @@ data:
   trainerName: "Fernando Porrino"
   participants:
     - email: "porrino.fernando@elpuig.xeill.net"
-      lastname: "Fernando"
-      firstname: "Porrino Serrano"
+      firstname: "Fernando"
+      lastname: "Porrino Serrano"
 
     - email: "acanal8@elpuig.xeill.net"
-      lastname: "Dori"
-      firstname: "Cañal"
+      firstname: "Dori"
+      lastname: "Cañal"
 
     - email: "mperez13@elpuig.xeill.net"
-      lastname: "Montse"
-      firstname: "Pérez"
+      firstname: "Montse"
+      lastname: "Pérez"
 
 - topic: "MENTORING-2-CCFF"
   degreeName: "DAM2"
@@ -44,16 +44,16 @@ data:
   trainerName: "Fernando Porrino"
   participants:
     - email: "porrino.fernando@elpuig.xeill.net"
-      lastname: "Fernando"
-      firstname: "Porrino Serrano"
+      firstname: "Fernando"
+      lastname: "Porrino Serrano"
 
     - email: "acanal8@elpuig.xeill.net"
-      lastname: "Dori"
-      firstname: "Cañal"
+      firstname: "Dori"
+      lastname: "Cañal"
 
     - email: "mperez13@elpuig.xeill.net"
-      lastname: "Montse"
-      firstname: "Pérez"
+      firstname: "Montse"
+      lastname: "Pérez"
 
 - topic: "SCHOOL"
   degreeName: "SMX"
@@ -61,14 +61,14 @@ data:
   groupName: "SMX2C"
   participants:
     - email: "porrino.fernando@elpuig.xeill.net"
-      lastname: "Fernando"
-      firstname: "Porrino Serrano"
+      firstname: "Fernando"
+      lastname: "Porrino Serrano"
 
     - email: "acanal8@elpuig.xeill.net"
-      lastname: "Dori"
-      firstname: "Cañal"
+      firstname: "Dori"
+      lastname: "Cañal"
 
     - email: "mperez13@elpuig.xeill.net"
-      lastname: "Montse"
-      firstname: "Pérez"
+      firstname: "Montse"
+      lastname: "Pérez"
 
