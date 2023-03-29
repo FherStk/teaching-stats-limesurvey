@@ -1,5 +1,7 @@
 using JsonRPC;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+
 
 public class LimeSurvey : IDisposable{
     public enum Question{
@@ -102,7 +104,12 @@ public class LimeSurvey : IDisposable{
         return JObject.Parse(this.ReadClientResult() ?? "");
     }
 
-    public int CreateSurveyFromCSV(Topic topic, string degreeName, string departmentName, string groupName, string trainerName = "", string subjectCode = "", string subjectName = ""){    
+    public int CreateSurvey(Survey.SurveyData data){    
+        var topic = (LimeSurvey.Topic)Enum.Parse(typeof(LimeSurvey.Topic), (data.Topic ?? "").Replace("-", "_"), true);
+        return CreateSurvey(topic, data.Participants, data.DegreeName ?? "", data.DepartmentName ?? "", data.GroupName ?? "", data.TrainerName ?? "", data.SubjectCode ?? "", data.SubjectName ?? "");
+    }
+
+    public int CreateSurvey(Topic topic, List<Survey.Participant>? participants, string degreeName, string departmentName, string groupName, string trainerName = "", string subjectCode = "", string subjectName = ""){    
         var template = $"{Path.Combine(Utils.TemplatesFolder, topic.ToString().ToLower().Replace("_", "-"))}.txt";    
         var content = File.ReadAllText(template);       
 
@@ -187,9 +194,27 @@ public class LimeSurvey : IDisposable{
 
         //Returing the new survey's ID
         int neWID = int.Parse(this.ReadClientResult() ?? "");
-
         SetSurveyProperties(neWID, JObject.Parse(@"{'gsid': " + (Utils.Settings.LimeSurvey == null ? 1 : Utils.Settings.LimeSurvey.Group) + "}"));
+
+        //Adding participants
+        if(participants != null && participants.Count > 0) AddSurveyParticipants(neWID, participants);
+
         return neWID;
+    }
+
+    public JArray AddSurveyParticipants(int surveyID, List<Survey.Participant> parts){
+        this.Client.Method = "add_participants";
+        this.Client.Parameters.Add("sSessionKey", this.SessionKey);
+        this.Client.Parameters.Add("iSurveyID", surveyID);
+        this.Client.Parameters.Add("aParticipantData", JsonConvert.SerializeObject(parts, Formatting.Indented));   
+        this.Client.Parameters.Add("sDocumentType", "json");
+
+        //Post
+        this.Client.Post();
+        this.Client.ClearParameters();
+
+        //Returns a collection with the added values
+        return JArray.Parse(this.ReadClientResult() ?? "");
     }
 
     public JArray GetSurveyQuestions(int surveyID){

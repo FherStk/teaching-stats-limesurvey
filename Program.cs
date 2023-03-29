@@ -79,112 +79,21 @@ void CreateNewSurveyFromFile(string filePath){
     if(importData.Data == null) return;
 
     using(var ls = new LimeSurvey()){   
-        foreach(var data in importData.Data){
-            var topic = (LimeSurvey.Topic)Enum.Parse(typeof(LimeSurvey.Topic), (data.Topic ?? "").Replace("-", "_"), true);
-            ls.CreateSurveyFromCSV(topic, data.DegreeName ?? "", data.DepartmentName ?? "", data.GroupName ?? "", data.TrainerName ?? "", data.SubjectCode ?? "", data.SubjectName ?? "");
+        foreach(var data in importData.Data){ 
+            Info("Creating a new survey... ", false);           
+            int id = ls.CreateSurvey(data);
+
+            Success($"OK: id={id}");
         }
+
+        if(importData.Data.Count == 0) Warning($"There is no new survey info within the '{filePath}' YAML file.");
+        else Success("Process finished, all the surveys have been created.");
     }
 }
 
 void CreateNewSurveyFromTerminal(){       
-    var option = -1;
-    var values = Enum.GetValues(typeof(LimeSurvey.Topic)).Cast<LimeSurvey.Topic>().ToDictionary(t => (int)t, t => t.ToString() );
-
-    //int option = 1;
-    while(option == -1){        
-        Info("Please, select the template ID to create a new survey:");
-        
-        foreach(var id in values.Keys)
-            Info($"   {id}: {values[id]}");            
-        
-        Info("   0: Exit");                        
-        Console.WriteLine();
-
-        
-        if(!int.TryParse(Console.ReadLine(), out option)){
-            Error("Please, select a valid option.");
-            Console.WriteLine();
-        }        
-    }
-    
-    var topic = (LimeSurvey.Topic)option;
-    var degreeName = Question("Please, write the DEGREE NAME:");
-    var departmentName = Question("Please, write the DEPARTMENT NAME:");    
-    var groupName = Question("Please, write the GROUP NAME:");
-    var trainerName = Question("Please, write the TRAINER NAME:");    
-    
-    var subjectCode = string.Empty;
-    var subjectName = string.Empty;
-    if(topic == LimeSurvey.Topic.SUBJECT_CCFF){
-        subjectCode = Question("Please, write the SUBJECT CODE:");
-        subjectName = Question("Please, write the SUBJECT NAME:");
-    }
-   
-    CreateNewSurveyFromTemplate(topic, degreeName, departmentName, groupName, trainerName, subjectCode, subjectName);
-}
-
-void CreateNewSurveyFromTemplate(LimeSurvey.Topic topic, string degreeName, string departmentName, string groupName, string trainerName, string subjectCode = "", string subjectName = ""){
-    using(var ls = new LimeSurvey()){   
-        try{            
-            Info("Creating a new survey... ", false);    
-            var surveyName = $"{degreeName} {subjectCode} - {subjectName}";
-            if(!string.IsNullOrEmpty(trainerName)) surveyName += $" ({trainerName})";
-
-            //Copying the survey with the correct name
-            int newID = ls.CreateSurveyFromCSV(topic, degreeName, departmentName, groupName, trainerName, subjectCode, subjectName);    
-            Success();
-
-            //Loading the question IDs in order to set the correct values
-            Info("Loading the survey data... ", false);    
-            var qIDs = ls.GetQuestionsIDsByType(newID);            
-            Success();
-
-            //Changing the copied question data with the correct values
-            Info("Setting up the survey degree... ", false);
-            SetQuestionValue(ls, qIDs, LimeSurvey.Question.DEGREE, degreeName);                    
-            Success();
-
-            Info("Setting up the survey department... ", false);
-            SetQuestionValue(ls, qIDs, LimeSurvey.Question.DEPARTMENT, departmentName);                    
-            Success();
-
-            Info("Setting up the survey group... ", false);
-            SetQuestionValue(ls, qIDs, LimeSurvey.Question.GROUP, groupName);                    
-            Success();
-
-            Info("Setting up the survey trainer... ", false);
-            SetQuestionValue(ls, qIDs, LimeSurvey.Question.TRAINER, trainerName);                    
-            Success();                    
-
-            if(topic == LimeSurvey.Topic.SUBJECT_CCFF){
-                Info("Setting up the survey subject... ", false);
-                SetQuestionValue(ls, qIDs, LimeSurvey.Question.SUBJECTCODE, subjectCode);                    
-                SetQuestionValue(ls, qIDs, LimeSurvey.Question.SUBJECTNAME, subjectName);
-                Success();
-            }
-        }
-        catch(Exception ex){
-            Error("Error: " + ex.ToString());
-        }
-    }
-}
-
-void SetQuestionValue(LimeSurvey ls, Dictionary<LimeSurvey.Question, List<int>> questionIDs, LimeSurvey.Question question, string value){
-    ls.SetQuestionProperties(questionIDs[question].FirstOrDefault(), JObject.Parse(
-        @"{
-            ""question"" : """ + question.ToString().ToLower() + ": {'" + value + @"'}""  
-        }"
-    ));           
-
-    //TODO: this does not work!!!
-    ls.SetQuestionProperties(questionIDs[question].FirstOrDefault(), JObject.Parse(
-        @"{
-            ""attributes"" : {
-                ""equation"": ""{'" + value + @"'}"",
-                ""hidden"": ""1""
-            } 
-        }"
-    ));  
+    var path = Question("Please, write the path to the 'create-survey' YML file, which contains all the neede data to create a new survey:");
+    CreateNewSurveyFromFile(path);
 }
 
 void LoadFromLimeSurvey(){
@@ -271,6 +180,12 @@ void Info(string text, bool newLine = true){
 
 void Success(string text = "OK"){
     Console.ForegroundColor = ConsoleColor.Green;
+    Console.WriteLine(text);
+    Console.ResetColor();    
+}
+
+void Warning(string text, bool newLine = true){
+    Console.ForegroundColor = ConsoleColor.DarkYellow;
     Console.WriteLine(text);
     Console.ResetColor();    
 }
