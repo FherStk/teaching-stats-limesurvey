@@ -202,7 +202,8 @@ public class LimeSurvey : IDisposable{
 
     public JArray AddSurveyParticipants(int surveyID, List<Survey.Participant> parts){
         //TODO: this does not work. No participants are being added... WHY???        
-        var data = JsonConvert.SerializeObject(parts);
+        var data = "[[{'email':'me@example.com','lastname':'Bond','firstname':'James', 'language': 'en', 'emailstatus': 'OK'}]]";
+        //var data = JsonConvert.SerializeObject(parts);
 
         //Encoding
         var plainTextBytes = System.Text.Encoding.UTF8.GetBytes(data);
