@@ -12,15 +12,28 @@ var action = string.Empty;
 var file = string.Empty;
 
 //Load the interactive menu or the unatended opps
-if(args == null || args.Length == 0) Menu();
+if(args == null || args.Length == 0) Help();
 else{
     int i = 0;
+
+    //TODO: check for invalid arguments
     foreach(var arg in args){
         switch(arg){        
             case "--create-survey":
             case "-cs":
+                //TODO: check there is a filepath
                 CreateNewSurveyFromFile(args[i+1]);
-                break;       
+                break;    
+
+            case "--load-teachingstats":
+            case "-lt":
+                LoadFromTeachingStats();
+                break;  
+
+            case "--load-limesurvey":
+            case "-ll":
+                LoadFromLimeSurvey();
+                break;     
         }  
 
         i++;
@@ -28,50 +41,14 @@ else{
 }
 
 //Methods
-void Menu(){
-    while(true){        
-        Info("Please, select an option:");
-        Info("   1: Load reporting data from 'teaching-stats'");
-        Info("   2: Load reporting data from 'limesurvey'");
-        Info("   3: Create a new survey into 'limesurvey'");
-        Info("   0: Exit");
-        Console.WriteLine();
-
-        int option = -1;
-        if(!int.TryParse(Console.ReadLine(), out option)) Error("Please, select a valid option.");
-        else {
-            switch (option){
-                case 0:
-                    return;
-
-                case 1:
-                    LoadFromTeachingStats();
-                    break;
-
-                 case 2:
-                    LoadFromLimeSurvey();
-                    break;
-
-                case 3:
-                    CreateNewSurveyFromTerminal();
-                    break;
-
-                //new cases:
-                //  activate all surveys
-                //  expire all surveys 
-                //  load participants into its surveys using CSV files and generate the passwords (limesurvey)
-                //  open the surveys and send the invitations (limesurvey)
-                //  create new surveys (limesurvey)
-                //  send reminders
-
-                default:
-                    Error("Please, select a valid option.");
-                    break;
-            }
-        }
-
-        Console.WriteLine();
-    }   
+void Help(){
+    Console.WriteLine();
+    Info("dotnet run [arguments] <FILE_PATH>: ");
+    Info("Allowed arguments: ");
+    Info("  -cs <FILE_PATH>, --create-survey <FILE_PATH>: creates a new survey, a YML file must be provided.");    
+    Info("  -lt, --load-teachingstats: loads all pending reporting data from 'teaching-stats'.");
+    Info("  -ll, --load-limesurvey: loads all pending reporting data from 'lime-survey'.");
+    Console.WriteLine();    
 }
 
 void CreateNewSurveyFromFile(string filePath){
@@ -89,11 +66,6 @@ void CreateNewSurveyFromFile(string filePath){
         if(importData.Data.Count == 0) Warning($"There is no new survey info within the '{filePath}' YAML file.");
         else Success("Process finished, all the surveys have been created.");
     }
-}
-
-void CreateNewSurveyFromTerminal(){       
-    var path = Question("Please, write the path to the 'create-survey' YML file, which contains all the neede data to create a new survey:");
-    CreateNewSurveyFromFile(path);
 }
 
 void LoadFromLimeSurvey(){

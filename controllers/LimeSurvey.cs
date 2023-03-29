@@ -105,11 +105,7 @@ public class LimeSurvey : IDisposable{
     }
 
     public int CreateSurvey(Survey.SurveyData data){    
-        var topic = (LimeSurvey.Topic)Enum.Parse(typeof(LimeSurvey.Topic), (data.Topic ?? "").Replace("-", "_"), true);
-        return CreateSurvey(topic, data.Participants, data.DegreeName ?? "", data.DepartmentName ?? "", data.GroupName ?? "", data.TrainerName ?? "", data.SubjectCode ?? "", data.SubjectName ?? "");
-    }
-
-    public int CreateSurvey(Topic topic, List<Survey.Participant>? participants, string degreeName, string departmentName, string groupName, string trainerName = "", string subjectCode = "", string subjectName = ""){    
+        var topic = (LimeSurvey.Topic)Enum.Parse(typeof(LimeSurvey.Topic), (data.Topic ?? "").Replace("-", "_"), true);        
         var template = $"{Path.Combine(Utils.TemplatesFolder, topic.ToString().ToLower().Replace("_", "-"))}.txt";    
         var content = File.ReadAllText(template);       
 
@@ -117,8 +113,8 @@ public class LimeSurvey : IDisposable{
         var description = string.Empty;
         switch(topic){
             case Topic.SCHOOL:
-                subjectCode = "Centre";
-                subjectName = "Instal·lacions i estada";
+                data.SubjectCode = "Centre";
+                data.SubjectName = "Instal·lacions i estada";
                 description = @"<p><strong>Si us plau, abans de contestar l'enquesta, tingues en compte el següent:</strong></p>
                                 <ol style='text-align: left;'>
                                     <li>Aquesta enquesta és completament anònima, si us plau, sigues sincer.</li>
@@ -128,8 +124,8 @@ public class LimeSurvey : IDisposable{
                 break;
 
             case Topic.MENTORING_1_CCFF:
-                subjectCode = "Tutoria";
-                subjectName = "1er Curs";
+                data.SubjectCode = "Tutoria";
+                data.SubjectName = "1er Curs";
                 description = @"<p><strong>Si us plau, abans de contestar l'enquesta, tingues en compte el següent:</strong></p>
                                 <ol style='text-align: left;'>
                                     <li>Aquesta enquesta és completament anònima, si us plau, sigues sincer.</li>
@@ -139,8 +135,8 @@ public class LimeSurvey : IDisposable{
                 break;
 
             case Topic.MENTORING_2_CCFF:
-                subjectCode = "Tutoria";
-                subjectName = "2n Curs";
+                data.SubjectCode = "Tutoria";
+                data.SubjectName = "2n Curs";
                 description = @"<p><strong>Si us plau, abans de contestar l'enquesta, tingues en compte el següent:</strong></p>
                                 <ol style='text-align: left;'>
                                     <li>Aquesta enquesta és completament anònima, si us plau, sigues sincer.</li>
@@ -160,21 +156,21 @@ public class LimeSurvey : IDisposable{
             break;
         }
 
-        var surveyName = $"{groupName} {subjectCode}: {subjectName}";
-        if(!string.IsNullOrEmpty(trainerName) && topic != Topic.SCHOOL) surveyName += $" ({trainerName})";
+        var surveyName = $"{data.GroupName} {data.SubjectCode}: {data.SubjectName}";
+        if(!string.IsNullOrEmpty(data.TrainerName) && topic != Topic.SCHOOL) surveyName += $" ({data.TrainerName})";
                 
 
         //Replacing template values
         content = content.Replace("{'TITLE'}", $"{surveyName}");
         content = content.Replace("{'DESCRIPTION'}", $"{description}");
-        content = content.Replace("{'DEPARTMENT'}", "{'" + departmentName + "'}");
-        content = content.Replace("{'DEGREE'}", "{'" + degreeName + "'}");
-        content = content.Replace("{'GROUP'}", "{'" + groupName + "'}");
-        content = content.Replace("{'TRAINER'}", "{'" + trainerName + "'}");
+        content = content.Replace("{'DEPARTMENT'}", "{'" + data.DepartmentName + "'}");
+        content = content.Replace("{'DEGREE'}", "{'" + data.DegreeName + "'}");
+        content = content.Replace("{'GROUP'}", "{'" + data.GroupName + "'}");
+        content = content.Replace("{'TRAINER'}", "{'" + data.TrainerName + "'}");
 
         if(topic == Topic.SUBJECT_CCFF){
-            content = content.Replace("{'SUBJECT_CODE'}", "{'" + subjectCode + "'}");
-            content = content.Replace("{'SUBJECT_NAME'}", "{'" + subjectName + "'}");
+            content = content.Replace("{'SUBJECT_CODE'}", "{'" + data.SubjectCode + "'}");
+            content = content.Replace("{'SUBJECT_NAME'}", "{'" + data.SubjectName + "'}");
         }
 
         //Encoding
@@ -197,7 +193,7 @@ public class LimeSurvey : IDisposable{
         SetSurveyProperties(neWID, JObject.Parse(@"{'gsid': " + (Utils.Settings.LimeSurvey == null ? 1 : Utils.Settings.LimeSurvey.Group) + "}"));
 
         //Adding participants
-        if(participants != null && participants.Count > 0) AddSurveyParticipants(neWID, participants);
+        if(data.Participants != null && data.Participants.Count > 0) AddSurveyParticipants(neWID, data.Participants);
 
         return neWID;
     }
