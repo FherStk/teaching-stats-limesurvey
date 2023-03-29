@@ -153,7 +153,7 @@ public class LimeSurvey : IDisposable{
             break;
         }
 
-        var surveyName = $"{degreeName} {subjectCode}: {subjectName}";
+        var surveyName = $"{groupName} {subjectCode}: {subjectName}";
         if(!string.IsNullOrEmpty(trainerName) && topic != Topic.SCHOOL) surveyName += $" ({trainerName})";
                 
 
