@@ -10,5 +10,12 @@ public class Survey
         public string? TrainerName {get; set;}
         public string? SubjectCode {get; set;}
         public string? SubjectName {get; set;}
+         public List<Participant>? Participants {get; set;}    
+    }
+
+    public class Participant{
+        public string? Name {get; set;}
+        public string? Surname {get; set;}
+        public string? Email {get; set;}
     }
 }

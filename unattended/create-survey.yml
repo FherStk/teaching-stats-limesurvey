@@ -2,13 +2,73 @@ data:
 - topic: "SUBJECT-CCFF"
   degreeName: "DAM"
   departmentName: "Informàtica"
-  groupName: "DAM2B"
+  groupName: "ASIX1"
   trainerName: "Fernando Porrino"
-  subjectCode: "M05"
-  subjectName: "Entorns de Desenvolupament"
+  subjectCode: "M03"
+  subjectName: "Programació Bàsica"
+  participants:
+    - email: "porrino.fernando@elpuig.xeill.net"
+      lastname: "Fernando"
+      firstname: "Porrino Serrano"
+
+    - email: "acanal8@elpuig.xeill.net"
+      lastname: "Dori"
+      firstname: "Cañal"
+
+    - email: "mperez13@elpuig.xeill.net"
+      lastname: "Montse"
+      firstname: "Pérez"
 
 - topic: "MENTORING-1-CCFF"
-  degreeName: "DAM"
+  degreeName: "ASIX"
+  departmentName: "Informàtica"
+  groupName: "ASIX1"
+  trainerName: "Fernando Porrino"
+  participants:
+    - email: "porrino.fernando@elpuig.xeill.net"
+      lastname: "Fernando"
+      firstname: "Porrino Serrano"
+
+    - email: "acanal8@elpuig.xeill.net"
+      lastname: "Dori"
+      firstname: "Cañal"
+
+    - email: "mperez13@elpuig.xeill.net"
+      lastname: "Montse"
+      firstname: "Pérez"
+
+- topic: "MENTORING-2-CCFF"
+  degreeName: "DAM2"
   departmentName: "Informàtica"
   groupName: "DAM2A"
   trainerName: "Fernando Porrino"
+  participants:
+    - email: "porrino.fernando@elpuig.xeill.net"
+      lastname: "Fernando"
+      firstname: "Porrino Serrano"
+
+    - email: "acanal8@elpuig.xeill.net"
+      lastname: "Dori"
+      firstname: "Cañal"
+
+    - email: "mperez13@elpuig.xeill.net"
+      lastname: "Montse"
+      firstname: "Pérez"
+
+- topic: "SCHOOL"
+  degreeName: "SMX"
+  departmentName: "Informàtica"
+  groupName: "SMX2C"
+  participants:
+    - email: "porrino.fernando@elpuig.xeill.net"
+      lastname: "Fernando"
+      firstname: "Porrino Serrano"
+
+    - email: "acanal8@elpuig.xeill.net"
+      lastname: "Dori"
+      firstname: "Cañal"
+
+    - email: "mperez13@elpuig.xeill.net"
+      lastname: "Montse"
+      firstname: "Pérez"
+

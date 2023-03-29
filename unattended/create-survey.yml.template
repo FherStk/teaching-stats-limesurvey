@@ -1,16 +1,57 @@
 data:
-- topic: "SCHOOL / MENTORING-1-CCFF / MENTORING-2-CCFF / SUBJECT-CCFF"
+- topic: "SUBJECT-CCFF"
   degreeName: "DEGREE NAME"
   departmentName: "DEPARTMENT NAME"
   groupName: "GROUP NAME"
   trainerName: "TRAINER NAME"
   subjectCode: "MPxx"
   subjectName: "SUBJECT"
+  participants:
+    - email: "me@example.com"
+      lastname: "Name"
+      firstname: "Surname"
 
-- topic: "SCHOOL / MENTORING-1-CCFF / MENTORING-2-CCFF / SUBJECT-CCFF"
+    - email: "me@example.com"
+      lastname: "Another Name"
+      firstname: "Another Surname"
+
+- topic: "MENTORING-1-CCFF"
   degreeName: "DEGREE NAME"
   departmentName: "DEPARTMENT NAME"
   groupName: "GROUP NAME"
   trainerName: "TRAINER NAME"
-  subjectCode: "MPxx"
-  subjectName: "SUBJECT"
+  participants:
+    - email: "me@example.com"
+      lastname: "Name"
+      firstname: "Surname"
+
+    - email: "me@example.com"
+      lastname: "Another Name"
+      firstname: "Another Surname"
+
+- topic: "MENTORING-2-CCFF"
+  degreeName: "DEGREE NAME"
+  departmentName: "DEPARTMENT NAME"
+  groupName: "GROUP NAME"
+  trainerName: "TRAINER NAME"
+  participants:
+    - email: "me@example.com"
+      lastname: "Name"
+      firstname: "Surname"
+
+    - email: "me@example.com"
+      lastname: "Another Name"
+      firstname: "Another Surname"
+
+- topic: "SCHOOL"
+  degreeName: "DEGREE NAME"
+  departmentName: "DEPARTMENT NAME"
+  groupName: "GROUP NAME"  
+  participants:
+    - email: "me@example.com"
+      lastname: "Name"
+      firstname: "Surname"
+
+    - email: "me@example.com"
+      lastname: "Another Name"
+      firstname: "Another Surname"
