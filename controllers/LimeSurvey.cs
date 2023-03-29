@@ -86,7 +86,6 @@ public class LimeSurvey : IDisposable{
         this.Client.Parameters.Add("sSessionKey", this.SessionKey);
         this.Client.Parameters.Add("iSurveyID", surveyID);
         this.Client.Parameters.Add("sStatName", "all");
-
         this.Client.Post();
         this.Client.ClearParameters();
 
@@ -97,7 +96,6 @@ public class LimeSurvey : IDisposable{
         this.Client.Method = "get_survey_properties";
         this.Client.Parameters.Add("sSessionKey", this.SessionKey);
         this.Client.Parameters.Add("iSurveyID", surveyID);
-
         this.Client.Post();
         this.Client.ClearParameters();
 
@@ -182,32 +180,45 @@ public class LimeSurvey : IDisposable{
         this.Client.Parameters.Add("sSessionKey", this.SessionKey);
         this.Client.Parameters.Add("sImportData", base64EncodedBytes);
         this.Client.Parameters.Add("sImportDataType", "txt");   
-        this.Client.Parameters.Add("sDocumentType", "json");
-        
-        //Post
         this.Client.Post();
         this.Client.ClearParameters();
 
         //Returing the new survey's ID
-        int neWID = int.Parse(this.ReadClientResult() ?? "");
-        SetSurveyProperties(neWID, JObject.Parse(@"{'gsid': " + (Utils.Settings.LimeSurvey == null ? 1 : Utils.Settings.LimeSurvey.Group) + "}"));
+        int newID = int.Parse(this.ReadClientResult() ?? "");
+        SetSurveyProperties(newID, JObject.Parse(@"{'gsid': " + (Utils.Settings.LimeSurvey == null ? 1 : Utils.Settings.LimeSurvey.Group) + "}"));
+
+        //Creating the participants table
+        this.Client.Method = "activate_tokens";
+        this.Client.Parameters.Add("sSessionKey", this.SessionKey);
+        this.Client.Parameters.Add("iSurveyID", newID);        
+        this.Client.Post();
+        this.Client.ClearParameters();
 
         //Adding participants
-        if(data.Participants != null && data.Participants.Count > 0) AddSurveyParticipants(neWID, data.Participants);
+        if(data.Participants != null && data.Participants.Count > 0) AddSurveyParticipants(newID, data.Participants);
 
-        return neWID;
+        return newID;
     }
 
     public JArray AddSurveyParticipants(int surveyID, List<Survey.Participant> parts){
+        //TODO: this does not work. No participants are being added... WHY???
         this.Client.Method = "add_participants";
         this.Client.Parameters.Add("sSessionKey", this.SessionKey);
         this.Client.Parameters.Add("iSurveyID", surveyID);
-        this.Client.Parameters.Add("aParticipantData", JsonConvert.SerializeObject(parts, Formatting.Indented));   
-        this.Client.Parameters.Add("sDocumentType", "json");
-
-        //Post
+        this.Client.Parameters.Add("aParticipantData", @"[
+  {
+    ""email"": ""porrino.fernando@elpuig.xeill.net"",
+    ""firstname"": ""Fernando"",
+    ""lastname"": ""Porrino Serrano"",    
+    ""language"": ""en"",    
+    ""emailstatus"": ""OK""
+  }
+]");   
         this.Client.Post();
         this.Client.ClearParameters();
+
+        //Console.WriteLine(JsonConvert.SerializeObject(parts, Formatting.Indented));
+        Console.WriteLine(this.ReadClientResult());
 
         //Returns a collection with the added values
         return JArray.Parse(this.ReadClientResult() ?? "");
@@ -233,7 +244,6 @@ public class LimeSurvey : IDisposable{
         // this.Client.Parameters.Add("sLanguageCode", "");
         // this.Client.Parameters.Add("sHeadingType", "full");
         // this.Client.Parameters.Add("sResponseType", "long");
-
         this.Client.Post();
         this.Client.ClearParameters();
 
@@ -262,7 +272,6 @@ public class LimeSurvey : IDisposable{
         this.Client.Method = "set_survey_properties";
         this.Client.Parameters.Add("sSessionKey", this.SessionKey);
         this.Client.Parameters.Add("iSurveyID", surveyID);
-
         this.Client.Parameters.Add("aSurveyData", properties);
         this.Client.Post();
         this.Client.ClearParameters();
@@ -278,7 +287,6 @@ public class LimeSurvey : IDisposable{
         this.Client.Method = "activate_survey";
         this.Client.Parameters.Add("sSessionKey", this.SessionKey);
         this.Client.Parameters.Add("iSurveyID", surveyID);
-
         this.Client.Post();
         this.Client.ClearParameters();
 
@@ -293,7 +301,6 @@ public class LimeSurvey : IDisposable{
         this.Client.Method = "delete_survey";
         this.Client.Parameters.Add("sSessionKey", this.SessionKey);
         this.Client.Parameters.Add("iSurveyID", surveyID);
-
         this.Client.Post();
         this.Client.ClearParameters();
 
@@ -339,7 +346,6 @@ public class LimeSurvey : IDisposable{
         this.Client.Method = "get_question_properties";
         this.Client.Parameters.Add("sSessionKey", this.SessionKey);
         this.Client.Parameters.Add("iQuestionID", questionID);
-
         this.Client.Post();
         this.Client.ClearParameters();
 
@@ -350,7 +356,6 @@ public class LimeSurvey : IDisposable{
         this.Client.Method = "set_question_properties";
         this.Client.Parameters.Add("sSessionKey", this.SessionKey);
         this.Client.Parameters.Add("iQuestionID", questionID);
-
         this.Client.Parameters.Add("aQuestionData", properties);
         this.Client.Post();
         this.Client.ClearParameters();
