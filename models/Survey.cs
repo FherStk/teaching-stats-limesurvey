@@ -1,3 +1,5 @@
+using Newtonsoft.Json;
+
 public class Survey
 {
     public List<SurveyData>? Data {get; set;}    
@@ -14,8 +16,13 @@ public class Survey
     }
 
     public class Participant{
+        [JsonProperty("firstname")]
         public string? Firstname {get; set;}
+        
+        [JsonProperty("lastname")]
         public string? Lastname {get; set;}
+
+        [JsonProperty("email")]
         public string? Email {get; set;}
     }
 }
