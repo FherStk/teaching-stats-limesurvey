@@ -56,17 +56,29 @@ public class LimeSurvey : IDisposable{
 
         SessionKey = String.Empty;
     }
-#region Survey
-    public JArray ListSurveys(int groupID = 0){
+#region Survey        
+    public JArray ListSurveys(char activeValue = ' '){
         this.Client.Method = "list_surveys";
         this.Client.Parameters.Add("sSessionKey", this.SessionKey);        
         this.Client.Post();
         this.Client.ClearParameters();
         
-        if(groupID > 0){
-            //TODO: filter by group
+        var group = (Utils.Settings.LimeSurvey == null ? 0 : Utils.Settings.LimeSurvey.Group);
+        var list = JArray.Parse(this.ReadClientResult() ?? "");
+        
+        var filtered = new JArray();
+        foreach(var survey in list){
+            var id = int.Parse((survey["sid"] ?? "").ToString());
+            var props = GetSurveyProperties(id);
+            var gsid = int.Parse((props["gsid"] ?? "").ToString());
+
+            if(gsid == group){
+                var active = char.Parse((props["active"] ?? "").ToString());
+                if(activeValue == ' ' || activeValue == active) filtered.Add(survey);
+            } 
         }
-        return JArray.Parse(this.ReadClientResult() ?? "");
+        
+        return filtered;  
     }
 
     public int CopySurvey(int templateID, string newName){
@@ -103,9 +115,6 @@ public class LimeSurvey : IDisposable{
     }
 
     public int CreateSurvey(Survey.SurveyData data){    
-        // if(data.Participants != null && data.Participants.Count > 0) AddSurveyParticipants(0, data.Participants);
-        // return 0;
-
         var topic = (LimeSurvey.Topic)Enum.Parse(typeof(LimeSurvey.Topic), (data.Topic ?? "").Replace("-", "_"), true);        
         var template = $"{Path.Combine(Utils.TemplatesFolder, topic.ToString().ToLower().Replace("_", "-"))}.txt";    
         var content = File.ReadAllText(template);       
@@ -215,6 +224,17 @@ public class LimeSurvey : IDisposable{
 
         //Returns a collection with the added values
         return JArray.Parse(this.ReadClientResult() ?? "");
+    }
+
+    public JObject SendInvitationsToParticipants(int surveyID){
+        this.Client.Method = "invite_participants";        
+        this.Client.Parameters.Add("sSessionKey", this.SessionKey);
+        this.Client.Parameters.Add("iSurveyID", surveyID);               
+        this.Client.Post();
+        this.Client.ClearParameters();        
+
+        //Returns a collection with the added values
+        return JObject.Parse(this.ReadClientResult() ?? "");
     }
 
     public JArray GetSurveyQuestions(int surveyID){
@@ -357,6 +377,9 @@ public class LimeSurvey : IDisposable{
     }
 
     
+#endregion
+#region Participants
+
 #endregion
 #region Private
     private static string GetSessionKey(){

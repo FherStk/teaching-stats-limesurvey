@@ -1,7 +1,4 @@
-﻿using Npgsql;
-using Newtonsoft.Json.Linq;
-
-//Global vars
+﻿//Global vars
 var _VERSION = "0.1.0";
 
 DisplayInfo();
@@ -25,6 +22,11 @@ else{
                 CreateNewSurveyFromFile(args[i+1]);
                 break;    
 
+            case "--start-survey":
+            case "-ss":
+                StartSurveys();
+                break;  
+
             case "--load-teachingstats":
             case "-lt":
                 LoadFromTeachingStats();
@@ -47,21 +49,29 @@ void Help(){
     Info("dotnet run [arguments] <FILE_PATH>: ");
     Info("Allowed arguments: ");
     Info("  -cs <FILE_PATH>, --create-survey <FILE_PATH>: creates a new survey, a YML file must be provided.");    
+    Info("  -ss, --start-survey: enables all the created surveys at limesurvey (just the created with this tool) and sends the invitations to the participants.");
     Info("  -lt, --load-teachingstats: loads all pending reporting data from 'teaching-stats'.");
     Info("  -ll, --load-limesurvey: loads all pending reporting data from 'lime-survey'.");
     Console.WriteLine();    
 }
 
 void CreateNewSurveyFromFile(string filePath){
+    //This option will create new 'limesurvey' surveyss using the provided YML file (template at 'actions/create-survey.yml.template')
+    
     var importData = Utils.DeserializeYamlFile<Survey>(filePath);
     if(importData.Data == null) return;
 
     using(var ls = new LimeSurvey()){   
         foreach(var data in importData.Data){ 
-            Info("Creating a new survey... ", false);           
-            int id = ls.CreateSurvey(data);
+            try{
+                Info("Creating a new survey... ", false);
+                int id = ls.CreateSurvey(data);
 
-            Success($"OK: id={id}");
+                Success($"OK: id={id}");
+            }
+            catch(Exception ex){
+                Error($"ERROR: {ex.ToString()}");
+            }
         }
 
         if(importData.Data.Count == 0) Warning($"There is no new survey info within the '{filePath}' YAML file.");
@@ -81,6 +91,7 @@ void LoadFromLimeSurvey(){
                     var type = ls.GetSurveyTopic(surveyID);
                     
                     if(type != null){
+                        //TODO: this will be not necessary once ListSurveys returns the surveys by group
                         var answers = ls.GetSurveyResponses(surveyID);
                         var questions = ls.GetSurveyQuestions(surveyID);
 
@@ -109,6 +120,39 @@ void LoadFromTeachingStats(){
             }        
 
         }     
+    }
+}
+
+void StartSurveys(){
+    //This option will start all the 'limesurvey' surveys (only for the surveys within the definded setting's group, which should be the surveys created with this tool) sending also the email invitations to the participants.
+    
+    using(var ls = new LimeSurvey()){    
+        var list = ls.ListSurveys('N');        
+        
+        foreach(var s in list){
+            //Just the non-active surveys (all within the current group, which should be the surveys created with this tool).
+            var id = int.Parse((s["sid"] ?? "").ToString());
+            Info($"Starting survey (id={id}): ", true);
+            
+            try{
+                Info($"   Activating... ", false);
+                ls.ActivateSurvey(id);
+                Success("OK");
+                
+                Info($"   Sending invitation... ", false);
+                ls.SendInvitationsToParticipants(id);
+                Success("OK");
+            }
+            catch(Exception ex){
+                Error($"ERROR: {ex.ToString()}");
+            }
+            finally{
+                Console.WriteLine();
+            }
+        }
+
+        if(list.Count == 0) Warning($"Unable to load any non-active survey from limesurvey (within the current survey group).");
+        else Success("Process finished, all the surveys have been created.");        
     }
 }
 
