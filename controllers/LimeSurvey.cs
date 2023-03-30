@@ -169,8 +169,6 @@ public class LimeSurvey : IDisposable{
         var surveyName = $"{data.GroupName} {data.SubjectCode}: {data.SubjectName}";
         if(!string.IsNullOrEmpty(data.TrainerName) && topic != Topic.SCHOOL) surveyName += $" ({data.TrainerName})";
         
-        //TODO: replace the "SUBJECT" group title within the template using the survey name
-
         //Replacing template values
         content = content.Replace("{'TITLE'}", $"{surveyName}");
         content = content.Replace("{'DESCRIPTION'}", $"{description}");
