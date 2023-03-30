@@ -117,7 +117,7 @@ public class LimeSurvey : IDisposable{
     public int CreateSurvey(Survey.SurveyData data){    
         var topic = (LimeSurvey.Topic)Enum.Parse(typeof(LimeSurvey.Topic), (data.Topic ?? "").Replace("-", "_"), true);        
         var template = $"{Path.Combine(Utils.TemplatesFolder, topic.ToString().ToLower().Replace("_", "-"))}.txt";    
-        var content = File.ReadAllText(template);       
+        var content = File.ReadAllText(template);               
 
         //Setting up template values
         var description = string.Empty;
@@ -168,7 +168,8 @@ public class LimeSurvey : IDisposable{
 
         var surveyName = $"{data.GroupName} {data.SubjectCode}: {data.SubjectName}";
         if(!string.IsNullOrEmpty(data.TrainerName) && topic != Topic.SCHOOL) surveyName += $" ({data.TrainerName})";
-                
+        
+        //TODO: replace the "SUBJECT" group title within the template using the survey name
 
         //Replacing template values
         content = content.Replace("{'TITLE'}", $"{surveyName}");
@@ -377,9 +378,6 @@ public class LimeSurvey : IDisposable{
     }
 
     
-#endregion
-#region Participants
-
 #endregion
 #region Private
     private static string GetSessionKey(){
