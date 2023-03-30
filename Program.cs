@@ -2,7 +2,7 @@
 using Newtonsoft.Json.Linq;
 
 //Global vars
-var _VERSION = "0.0.1";
+var _VERSION = "0.1.0";
 
 DisplayInfo();
 if(!CheckConfig()) return;
@@ -39,6 +39,7 @@ else{
         i++;
     }
 }
+Console.WriteLine();
 
 //Methods
 void Help(){
@@ -64,7 +65,7 @@ void CreateNewSurveyFromFile(string filePath){
         }
 
         if(importData.Data.Count == 0) Warning($"There is no new survey info within the '{filePath}' YAML file.");
-        else Success("Process finished, all the surveys have been created.");
+        else Success("Process finished, all the surveys have been created.");        
     }
 }
 

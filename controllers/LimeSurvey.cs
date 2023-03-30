@@ -103,6 +103,9 @@ public class LimeSurvey : IDisposable{
     }
 
     public int CreateSurvey(Survey.SurveyData data){    
+        // if(data.Participants != null && data.Participants.Count > 0) AddSurveyParticipants(0, data.Participants);
+        // return 0;
+
         var topic = (LimeSurvey.Topic)Enum.Parse(typeof(LimeSurvey.Topic), (data.Topic ?? "").Replace("-", "_"), true);        
         var template = $"{Path.Combine(Utils.TemplatesFolder, topic.ToString().ToLower().Replace("_", "-"))}.txt";    
         var content = File.ReadAllText(template);       
@@ -201,27 +204,14 @@ public class LimeSurvey : IDisposable{
     }
 
     public JArray AddSurveyParticipants(int surveyID, List<Survey.Participant> parts){
-        //TODO: this does not work. No participants are being added... WHY???        
-        var data = "[[{'email':'me@example.com','lastname':'Bond','firstname':'James', 'language': 'en', 'emailstatus': 'OK'}]]";
-        //var data = JsonConvert.SerializeObject(parts);
+        var data = JsonConvert.SerializeObject(parts);        
 
-        //Encoding
-        var plainTextBytes = System.Text.Encoding.UTF8.GetBytes(data);
-        var base64EncodedBytes =  System.Convert.ToBase64String(plainTextBytes);
-
-        //Send
-        this.Client.Method = "add_participants";
+        this.Client.Method = "add_participants";        
         this.Client.Parameters.Add("sSessionKey", this.SessionKey);
-        this.Client.Parameters.Add("iSurveyID", surveyID);        
-        //this.Client.Parameters.Add("sDocumentType", "json");
-        //this.Client.Parameters.Add("aParticipantData", base64EncodedBytes);           
-        this.Client.Parameters.Add("aParticipantData", data);   
-        //this.Client.Parameters.Add("bCreateToken", false);
+        this.Client.Parameters.Add("iSurveyID", surveyID);               
+        this.Client.Parameters.Add("aParticipantData", JArray.Parse(data));                   
         this.Client.Post();
-        this.Client.ClearParameters();
-
-        //Console.WriteLine(JsonConvert.SerializeObject(parts, Formatting.Indented));
-        Console.WriteLine(this.ReadClientResult());
+        this.Client.ClearParameters();        
 
         //Returns a collection with the added values
         return JArray.Parse(this.ReadClientResult() ?? "");
