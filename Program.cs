@@ -124,7 +124,7 @@ void LoadFromTeachingStats(){
 }
 
 void StartSurveys(){
-    //This option will start all the 'limesurvey' surveys (only for the surveys within the definded setting's group, which should be the surveys created with this tool) sending also the email invitations to the participants.
+    //This option will start all the 'limesurvey' surveys (only for the surveys within the definded app setting's group, which should be the surveys created with this tool) sending also the email invitations to the participants.
     
     using(var ls = new LimeSurvey()){    
         var list = ls.ListSurveys('N');        
@@ -151,8 +151,8 @@ void StartSurveys(){
             }
         }
 
-        if(list.Count == 0) Warning($"Unable to load any non-active survey from limesurvey (within the current survey group).");
-        else Success("Process finished, all the surveys have been created.");        
+        if(list.Count == 0) Warning($"Unable to load any non-active survey from limesurvey (within the current app group).");
+        else Success("Process finished, all the non-active surveys within the app group have been activated.");        
     }
 }
 
