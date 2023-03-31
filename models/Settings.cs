@@ -26,6 +26,7 @@ public class Settings
 
     public class DegreeData{
         public string? Name {get; set;}
+        public string? Department {get; set;}
         public List<SubjectData>? Subjects {get; set;}
     }
 

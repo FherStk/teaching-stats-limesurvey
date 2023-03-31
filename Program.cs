@@ -62,24 +62,69 @@ void Help(){
     Console.WriteLine();    
 }
 
-void ConvertSagaCSVtoImportYML(string filePath){
-    //Setting up survey data
-    var sd = new Survey.SurveyData();
-    var fileName = Path.GetFileName(filePath);
+void ConvertSagaCSVtoImportYML(string filePath){    
+    var surveys = new List<Survey.SurveyData>();
+    var groupName = Path.GetFileNameWithoutExtension(filePath);  //Must be like ASIX2B
     
-    //Setting up participants
-    using (var reader = new StreamReader(filePath, true))
-    using (var csv = new CsvHelper.CsvReader(reader, System.Globalization.CultureInfo.InvariantCulture))
-    {        
-        var records = csv.GetRecords<dynamic>();
-
-        foreach (var r in records)
-        {
-            
+    var degreeName = string.Empty;
+    for(int i=0; i<groupName.Length; i++){
+        if(groupName.Substring(i, 1).All(char.IsNumber)){
+            degreeName = groupName.Substring(0, i);
+            break;
         }
-    }
+    }   
+    
+    if(Utils.Settings.Data == null || Utils.Settings.Data.Degrees == null) throw new IncorrectSettingsException();
+    var degree = Utils.Settings.Data.Degrees.Where(x => x.Name == degreeName).SingleOrDefault();
 
-    //TODO: ask for the teacher name 
+    //Setting up survey data
+    if(degree == null || degree.Subjects == null) throw new IncorrectSettingsException();
+    
+    //Fill the survey data using the settings info.
+    //NOTE: this will be filled from teaching-stats database, once integrated within the IMS (the lack of backoffice for teaching-stats does easier to define all the master data within a YML file).         
+    foreach(var s in degree.Subjects){
+        if(s.Trainers == null) throw new IncorrectSettingsException();
+        
+        foreach(var t in s.Trainers){
+            if(t.Groups == null) throw new IncorrectSettingsException();
+
+            var g = t.Groups.Where(x => x.Code == groupName).SingleOrDefault();
+            if(g == null) throw new IncorrectSettingsException();
+
+            //A survey must be generated for this group
+                var sd = new Survey.SurveyData(){
+                Topic = "SUBJECT-CCFF",
+                DegreeName = degree.Name,
+                DepartmentName = degree.Department ,
+                GroupName = groupName,
+                TrainerName = t.Name,
+                SubjectCode = s.Code,
+                SubjectName = s.Name
+            };
+            
+            //TODO: read participants from CSV file
+            sd.Participants = new List<Survey.Participant>();
+            sd.Participants.Add(new Survey.Participant(){
+
+            });
+
+            surveys.Add(sd);                
+        }
+    }    
+
+    //TODO: Setting up participants
+    // using (var reader = new StreamReader(filePath, true))
+    // using (var csv = new CsvHelper.CsvReader(reader, System.Globalization.CultureInfo.InvariantCulture))
+    // {        
+    //     var records = csv.GetRecords<dynamic>();
+
+    //     foreach (var r in records)
+    //     {
+            
+    //     }
+    // }
+
+    //TODO: Generate the JSON files (crate the Survey object with the SurveyData within).
 }
 
 void CreateNewSurveyFromFile(string filePath){
