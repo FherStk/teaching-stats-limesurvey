@@ -3,6 +3,8 @@ public class Settings
     public TeachingStatsSettings? TeachingStats {get; set;}
     
     public LimeSurveySettings? LimeSurvey {get; set;}    
+
+    public MasterData? Data {get; set;}    
     
 
     public class TeachingStatsSettings{
@@ -16,5 +18,29 @@ public class Settings
         public string? Username {get; set;}
         public string? Password {get; set;}
         public int Group {get; set;}
+    }
+
+    public class MasterData{
+        public List<DegreeData>? Degrees {get; set;}
+    }
+
+    public class DegreeData{
+        public string? Name {get; set;}
+        public List<SubjectData>? Subjects {get; set;}
+    }
+
+    public class SubjectData{
+        public string? Code {get; set;}
+        public string? Name {get; set;}
+        public List<TrainerData>? Trainers {get; set;}
+    }
+
+    public class TrainerData{        
+        public string? Name {get; set;}
+        public List<GroupsData>? Groups {get; set;}
+    }
+
+    public class GroupsData{        
+        public string? Code {get; set;}
     }
 }

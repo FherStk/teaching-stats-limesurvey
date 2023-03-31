@@ -8,3 +8,23 @@ limeSurvey:
   username: admin
   password: admin
   group: 1 
+
+data:
+  degrees:
+    - name: "SMX"
+      subjects:
+        - code: "M01"
+          name: "Muntatge i manteniment d’equips"
+          trainers:
+            - name: "Teacher 1"
+              groups:
+                - code: "SMX1A"
+
+            - name: "Teacher 2"
+              groups:
+                - code: "SMX1B"
+              
+            - name: "Teacher 3"
+              groups:
+                - code: "SMX1C"
+                - code: "SMX1D"  

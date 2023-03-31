@@ -11,8 +11,9 @@
             "preLaunchTask": "build",
             // If you have changed target frameworks, make sure to update the program path.
             "program": "${workspaceFolder}/bin/Debug/net6.0/teaching-stats-limesurvey.dll",
+            "args": ["-sc", "~/Descargas/reenquestes/22-23 1ASIX.yml"],
             //"args": ["-cs", "actions/create-survey.yml"],
-            "args": ["-ss"],
+            //"args": ["-ss"],
             "cwd": "${workspaceFolder}",
             // For more information about the 'console' field, see https://aka.ms/VSCode-CS-LaunchJson-Console
             "console": "integratedTerminal",

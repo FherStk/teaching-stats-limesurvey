@@ -15,7 +15,13 @@ else{
 
     //TODO: check for invalid arguments
     foreach(var arg in args){
-        switch(arg){        
+        switch(arg){    
+            case "--saga-convert":
+            case "-sc":
+                //TODO: check there is a filepath
+                ConvertSagaCSVtoImportYML(args[i+1]);
+                break;  
+
             case "--create-survey":
             case "-cs":
                 //TODO: check there is a filepath
@@ -49,10 +55,31 @@ void Help(){
     Info("dotnet run [arguments] <FILE_PATH>: ");
     Info("Allowed arguments: ");
     Info("  -cs <FILE_PATH>, --create-survey <FILE_PATH>: creates a new survey, a YML file must be provided.");    
+    Info("  -sc <FILE_PATH>, --saga-convert <FILE_PATH>: parses a SAGA's CSV file and creates a new import action YML file, a CSV file must be provided.");    
     Info("  -ss, --start-survey: enables all the created surveys at limesurvey (just the created with this tool) and sends the invitations to the participants.");
     Info("  -lt, --load-teachingstats: loads all pending reporting data from 'teaching-stats'.");
     Info("  -ll, --load-limesurvey: loads all pending reporting data from 'lime-survey'.");
     Console.WriteLine();    
+}
+
+void ConvertSagaCSVtoImportYML(string filePath){
+    //Setting up survey data
+    var sd = new Survey.SurveyData();
+    var fileName = Path.GetFileName(filePath);
+    
+    //Setting up participants
+    using (var reader = new StreamReader(filePath, true))
+    using (var csv = new CsvHelper.CsvReader(reader, System.Globalization.CultureInfo.InvariantCulture))
+    {        
+        var records = csv.GetRecords<dynamic>();
+
+        foreach (var r in records)
+        {
+            
+        }
+    }
+
+    //TODO: ask for the teacher name 
 }
 
 void CreateNewSurveyFromFile(string filePath){
