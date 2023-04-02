@@ -69,7 +69,7 @@ public static class Utils{
             .Build();
     
         var yaml = serializer.Serialize(data);
-        File.WriteAllText(outputPath, yaml);
+        File.WriteAllText(outputPath, yaml, System.Text.Encoding.UTF8);
     }
 
     private static string GetConfigFolder(){

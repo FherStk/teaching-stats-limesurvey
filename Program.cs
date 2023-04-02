@@ -109,7 +109,7 @@ void ConvertSagaCSVtoImportYML(string filePath){
     }    
 
     //TODO: the CSV column names must be edited (with no spaces, numers, etc.)
-    using (var reader = new StreamReader(filePath, true))
+    using (var reader = new StreamReader(filePath, System.Text.Encoding.Latin1))
     using (var csv = new CsvHelper.CsvReader(reader, System.Globalization.CultureInfo.InvariantCulture))
     {        
         var records = csv.GetRecords<dynamic>();
@@ -139,7 +139,7 @@ void ConvertSagaCSVtoImportYML(string filePath){
     }
 
     var data = new Survey(){Data = surveys.Values.ToList()};
-    Utils.SerializeYamlFile(data, Path.Combine(Utils.ActionsFolder, $"create-surveys-{DateTime.Now.Ticks}.yml"));
+    Utils.SerializeYamlFile(data, Path.Combine(Utils.ActionsFolder, $"create-surveys-{groupName}.yml"));
 }
 
 void CreateNewSurveyFromFile(string filePath){
