@@ -236,6 +236,17 @@ public class LimeSurvey : IDisposable{
         return JObject.Parse(this.ReadClientResult() ?? "");
     }
 
+    public JObject SendRemindersToParticipants(int surveyID){
+        this.Client.Method = "remind_participants";        
+        this.Client.Parameters.Add("sSessionKey", this.SessionKey);
+        this.Client.Parameters.Add("iSurveyID", surveyID);               
+        this.Client.Post();
+        this.Client.ClearParameters();        
+
+        //Returns a collection with the added values
+        return JObject.Parse(this.ReadClientResult() ?? "");
+    }
+
     public JArray GetSurveyQuestions(int surveyID){
         
         this.Client.Method = "list_questions";

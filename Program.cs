@@ -33,6 +33,11 @@ else{
                 StartSurveys();
                 break;  
 
+            case "--send-reminders":
+            case "-sr":
+                SendReminders();
+                break; 
+
             case "--load-teachingstats":
             case "-lt":
                 LoadFromTeachingStats();
@@ -57,6 +62,7 @@ void Help(){
     Info("  -cs <FILE_PATH>, --create-survey <FILE_PATH>: creates a new survey, a YML file must be provided.");    
     Info("  -sc <FILE_PATH>, --saga-convert <FILE_PATH>: parses a SAGA's CSV file and creates a new import action YML file, a CSV file must be provided.");    
     Info("  -ss, --start-survey: enables all the created surveys at limesurvey (just the created with this tool) and sends the invitations to the participants.");
+    Info("  -sr, --send-reminders: send survey reminders to all the participants (just the created with this tool) that still has not responded the surveys.");
     Info("  -lt, --load-teachingstats: loads all pending reporting data from 'teaching-stats'.");
     Info("  -ll, --load-limesurvey: loads all pending reporting data from 'lime-survey'.");
     Console.WriteLine();    
@@ -149,20 +155,24 @@ void CreateNewSurveyFromFile(string filePath){
     if(importData.Data == null) return;
 
     using(var ls = new LimeSurvey()){   
+        Info($"Creating new surveys:");
         foreach(var data in importData.Data){ 
             try{
-                Info("Creating a new survey... ", false);
+                Info("   Creating... ", false);
                 int id = ls.CreateSurvey(data);
 
-                Success($"OK: id={id}");
+                Success($"OK (id={id})");
             }
             catch(Exception ex){
                 Error($"ERROR: {ex.ToString()}");
             }
         }
-
+        
         if(importData.Data.Count == 0) Warning($"There is no new survey info within the '{filePath}' YAML file.");
-        else Success("Process finished, all the surveys have been created.");        
+        else{
+            Console.WriteLine();
+            Success("Process finished, all the surveys have been created.");        
+        } 
     }
 }
 
@@ -213,7 +223,7 @@ void LoadFromTeachingStats(){
 void StartSurveys(){
     //This option will start all the 'limesurvey' surveys (only for the surveys within the definded app setting's group, which should be the surveys created with this tool) sending also the email invitations to the participants.
     
-    using(var ls = new LimeSurvey()){    
+    using(var ls = new LimeSurvey()){            
         var list = ls.ListSurveys('N');        
         
         foreach(var s in list){
@@ -239,7 +249,42 @@ void StartSurveys(){
         }
 
         if(list.Count == 0) Warning($"Unable to load any non-active survey from limesurvey (within the current app group).");
-        else Success("Process finished, all the non-active surveys within the app group have been activated.");        
+        else{
+            Console.WriteLine();
+            Success("Process finished, all the non-active surveys within the app group have been activated.");  
+        }  
+    }
+}
+
+void SendReminders(){
+    //This option will start all the 'limesurvey' surveys (only for the surveys within the definded app setting's group, which should be the surveys created with this tool) sending also the email invitations to the participants.
+    
+    using(var ls = new LimeSurvey()){   
+        Info($"Sending reminders for all open surveys:"); 
+        var list = ls.ListSurveys('N');        
+        
+        foreach(var s in list){
+            //Just the non-active surveys (all within the current group, which should be the surveys created with this tool).
+            var id = int.Parse((s["sid"] ?? "").ToString());
+                        
+            try{               
+                Info($"   Sending reminders for the survey with id={id}... ", false);
+                ls.SendRemindersToParticipants(id);
+                Success("OK");
+            }
+            catch(Exception ex){
+                Error($"ERROR: {ex.ToString()}");
+            }
+            finally{
+                Console.WriteLine();
+            }
+        }
+
+        if(list.Count == 0) Warning($"Unable to load any non-active survey from limesurvey (within the current app group).");
+        else{
+            Console.WriteLine();
+            Success("Process finished, all the reminders has been sent.");  
+        }   
     }
 }
 
