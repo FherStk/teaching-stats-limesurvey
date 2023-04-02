@@ -26,6 +26,17 @@ public static class Utils{
         }
     }
 
+    public static string ActionsFolder {
+        get{
+            if(string.IsNullOrEmpty(_templatesFolder)) _templatesFolder = GetConfigFolder().Replace("config", "actions");
+            return _templatesFolder;
+        }
+        
+        private set{
+            _templatesFolder = value;
+        }
+    }
+
     private static Settings? _settings;
     public static Settings Settings{
         get{
@@ -50,6 +61,15 @@ public static class Utils{
 
         var yml = File.ReadAllText(filePath);
         return deserializer.Deserialize<T>(yml);
+    }
+
+    public static void SerializeYamlFile<T>(T data, string outputPath){
+         var serializer = new SerializerBuilder()
+            .WithNamingConvention(CamelCaseNamingConvention.Instance)
+            .Build();
+    
+        var yaml = serializer.Serialize(data);
+        File.WriteAllText(outputPath, yaml);
     }
 
     private static string GetConfigFolder(){
@@ -86,7 +106,7 @@ public static class Utils{
                 }
             }
         };
-
+        
         var serializer = new SerializerBuilder()
             .WithNamingConvention(CamelCaseNamingConvention.Instance)
             .Build();

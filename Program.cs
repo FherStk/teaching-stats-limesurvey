@@ -63,7 +63,7 @@ void Help(){
 }
 
 void ConvertSagaCSVtoImportYML(string filePath){    
-    var surveys = new List<Survey.SurveyData>();
+    var surveys = new Dictionary<int, Survey.SurveyData>();
     var groupName = Path.GetFileNameWithoutExtension(filePath);  //Must be like ASIX2B
     
     var degreeName = string.Empty;
@@ -81,7 +81,7 @@ void ConvertSagaCSVtoImportYML(string filePath){
     if(degree == null || degree.Subjects == null) throw new IncorrectSettingsException();
     
     //Fill the survey data using the settings info.
-    //NOTE: this will be filled from teaching-stats database, once integrated within the IMS (the lack of backoffice for teaching-stats does easier to define all the master data within a YML file).         
+    //NOTE: this will be filled from teaching-stats database, once integrated within the IMS (the lack of backoffice for teaching-stats does easier to define all the master data within a YML file).             
     foreach(var s in degree.Subjects){
         if(s.Trainers == null) throw new IncorrectSettingsException();
         
@@ -89,7 +89,7 @@ void ConvertSagaCSVtoImportYML(string filePath){
             if(t.Groups == null) throw new IncorrectSettingsException();
 
             var g = t.Groups.Where(x => x.Code == groupName).SingleOrDefault();
-            if(g == null) throw new IncorrectSettingsException();
+            if(g == null) continue; //the current trainer does not teach the current group
 
             //A survey must be generated for this group
                 var sd = new Survey.SurveyData(){
@@ -99,32 +99,47 @@ void ConvertSagaCSVtoImportYML(string filePath){
                 GroupName = groupName,
                 TrainerName = t.Name,
                 SubjectCode = s.Code,
-                SubjectName = s.Name
+                SubjectName = s.Name,
+                Participants = new List<Survey.Participant>()
             };
-            
-            //TODO: read participants from CSV file
-            sd.Participants = new List<Survey.Participant>();
-            sd.Participants.Add(new Survey.Participant(){
 
-            });
-
-            surveys.Add(sd);                
+            int id = int.Parse((sd.SubjectCode ?? "M00").Substring(1));
+            surveys.Add(id, sd);                
         }
     }    
 
-    //TODO: Setting up participants
-    // using (var reader = new StreamReader(filePath, true))
-    // using (var csv = new CsvHelper.CsvReader(reader, System.Globalization.CultureInfo.InvariantCulture))
-    // {        
-    //     var records = csv.GetRecords<dynamic>();
+    //TODO: the CSV column names must be edited (with no spaces, numers, etc.)
+    using (var reader = new StreamReader(filePath, true))
+    using (var csv = new CsvHelper.CsvReader(reader, System.Globalization.CultureInfo.InvariantCulture))
+    {        
+        var records = csv.GetRecords<dynamic>();
 
-    //     foreach (var r in records)
-    //     {
-            
-    //     }
-    // }
+        foreach (var r in records)
+        {
+            string completeName = r.NOM;
+            var coma = completeName.IndexOf(",");           
 
-    //TODO: Generate the JSON files (crate the Survey object with the SurveyData within).
+            var p = new Survey.Participant(){
+                Firstname = completeName.Substring(coma+1).Trim(),
+                Lastname = completeName.Substring(0, coma).Trim(),
+                Email = r.EMAIL
+            };
+
+            var subjects = ((string)r.MATRICULADES).Split(",").Select(x => x.Substring(0,3).Trim()).Distinct().ToList(); //only MPs wanted. 10102 = 101 = MP01
+            foreach(var s in subjects){
+                var id = 0;
+                if(int.TryParse(s, out id)){
+                    //Some subjects start with a letter, only numbers are needed
+                    var parts = surveys[id-100].Participants;
+                    if(parts == null) parts = new List<Survey.Participant>();
+                    parts.Add(p);
+                }
+            }
+        }
+    }
+
+    var data = new Survey(){Data = surveys.Values.ToList()};
+    Utils.SerializeYamlFile(data, Path.Combine(Utils.ActionsFolder, $"create-surveys-{DateTime.Now.Ticks}.yml"));
 }
 
 void CreateNewSurveyFromFile(string filePath){
