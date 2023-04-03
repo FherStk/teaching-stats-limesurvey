@@ -8,7 +8,7 @@ if(!CheckConfig()) return;
 var action = string.Empty;
 var file = string.Empty;
 
-//Load the interactive menu or the unatended opps
+//Run action or display help
 if(args == null || args.Length == 0) Help();
 else{
     int i = 0;
