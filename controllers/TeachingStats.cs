@@ -180,6 +180,18 @@ public class TeachingStats : System.IDisposable{
             }
 
             using (NpgsqlCommand cmd = new NpgsqlCommand(@"
+                UPDATE reports.answer SET ""group""='AIF1A' WHERE ""group""='AIF1';
+                UPDATE reports.answer SET ""group""='AIF2A' WHERE ""group""='AIF2';
+                UPDATE reports.answer SET ""group""='ASIX1A' WHERE ""group""='ASIX1';
+                UPDATE reports.answer SET ""group""='ASIX2A' WHERE ""group""='ASIX2';
+                UPDATE reports.answer SET ""group""='DAM1A' WHERE ""group""='DAM1';
+                UPDATE reports.answer SET ""group""='GA2A' WHERE ""group""='GA2';
+                CREATE INDEX answer_year_idx ON reports.answer (""year"");", this.Connection, trans)){
+                
+                cmd.ExecuteNonQuery();                
+            }
+
+            using (NpgsqlCommand cmd = new NpgsqlCommand(@"
                 DROP VIEW public.forms_subject;
                 DROP VIEW public.forms_student;
                 DROP VIEW reports.participation;
