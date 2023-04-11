@@ -1,5 +1,5 @@
 ﻿//Global vars
-var _VERSION = "0.2.1";
+var _VERSION = "0.2.2";
 
 DisplayInfo();
 if(!CheckConfig()) return;
@@ -261,7 +261,7 @@ void SendReminders(){
     
     using(var ls = new LimeSurvey()){   
         Info($"Sending reminders for all open surveys:"); 
-        var list = ls.ListSurveys('N');        
+        var list = ls.ListSurveys('Y');        
         
         foreach(var s in list){
             //Just the non-active surveys (all within the current group, which should be the surveys created with this tool).
@@ -274,13 +274,11 @@ void SendReminders(){
             }
             catch(Exception ex){
                 Error($"ERROR: {ex.ToString()}");
-            }
-            finally{
                 Console.WriteLine();
-            }
+            }            
         }
 
-        if(list.Count == 0) Warning($"Unable to load any non-active survey from limesurvey (within the current app group).");
+        if(list.Count == 0) Warning($"Unable to load any active survey from limesurvey (within the current app group).");
         else{
             Console.WriteLine();
             Success("Process finished, all the reminders has been sent.");  

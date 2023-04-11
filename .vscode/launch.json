@@ -11,9 +11,10 @@
             "preLaunchTask": "build",
             // If you have changed target frameworks, make sure to update the program path.
             "program": "${workspaceFolder}/bin/Debug/net6.0/teaching-stats-limesurvey.dll",
-            "args": ["-sc", "/home/fher/Descargas/reenquestes/SMX1A.csv"],    //--saga-create
-            //"args": ["-cs", "actions/create-surveys-SMX1A.yml"],                //--create-survey
-            //"args": ["-ss"],                                                  //--start-surveys
+            //"args": ["-sc", "/home/fher/Descargas/reenquestes/SMX1A.csv"],        //--saga-create
+            //"args": ["-cs", "actions/create-surveys-SMX1A.yml"],                  //--create-survey
+            //"args": ["-ss"],                                                      //--start-surveys
+            "args": ["-sr"],                                                        //--send-reminders
             "cwd": "${workspaceFolder}",
             // For more information about the 'console' field, see https://aka.ms/VSCode-CS-LaunchJson-Console
             "console": "integratedTerminal",
