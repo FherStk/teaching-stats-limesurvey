@@ -134,18 +134,73 @@ void ConvertSagaCSVtoImportYML(string filePath){
             var subjects = ((string)r.MATRICULADES).Split(",").Select(x => x.Substring(0,3).Trim()).Distinct().ToList(); //only MPs wanted. 10102 = 101 = MP01
             foreach(var s in subjects){
                 var id = 0;
-                if(int.TryParse(s, out id)){
-                    //Some subjects start with a letter, only numbers are needed
-                    var parts = surveys[id-100].Participants;
-                    if(parts == null) parts = new List<Survey.Participant>();
-                    parts.Add(p);
-                }
+                if(int.TryParse(s, out id)) id -= 100;  //old codes like 101 (means MP01)
+                else id = NewCurriculumCodeToOldCurriculumCode(degreeName, s); //new codes like AOC (could mean anything... those codes are the worst!)
+
+                var parts = surveys[id].Participants;
+                if(parts == null) parts = new List<Survey.Participant>();
+                parts.Add(p);
             }
         }
     }
 
     var data = new Survey(){Data = surveys.Values.ToList()};
     Utils.SerializeYamlFile(data, Path.Combine(Utils.ActionsFolder, $"create-surveys-{groupName}.yml"));
+}
+
+int NewCurriculumCodeToOldCurriculumCode(string degreeName, string oldCode){
+    switch(degreeName){
+        case "SMX":
+            if(oldCode == "AOE") return 5;
+            else if(oldCode  == "AOF") return 6;
+            else if(oldCode  == "AOG") return 7;
+            else if(oldCode  == "AOH") return 8;
+            else if(oldCode  == "AOI") return 9;
+            else if(oldCode  == "AOJ") return 13;
+            else if(oldCode  == "BOB") return 14;
+            break;
+
+        case "ASIX":
+            if(oldCode == "AOC") return 3;
+            else if(oldCode  == "AOF") return 6;
+            else if(oldCode  == "AAO") return 10;
+            else if(oldCode  == "AAP") return 12;
+            else if(oldCode  == "AAQ") return 15;
+            else if(oldCode  == "BOA") return 16;
+            else if(oldCode  == "BOB") return 17;
+            break;
+
+        case "DAM":
+            if(oldCode == "AOC") return 3;
+            else if(oldCode  == "AOF") return 6;
+            else if(oldCode  == "AOH") return 8;
+            else if(oldCode  == "AAO") return 10;
+            else if(oldCode  == "AAP") return 11;
+            else if(oldCode  == "AAQ") return 14;
+            else if(oldCode  == "BOA") return 15;
+            else if(oldCode  == "BOB") return 16;
+            break;
+
+        case "GA":
+            if(oldCode == "AOA") return 1;
+            else if(oldCode  == "AOB") return 2;
+            else if(oldCode  == "AOF") return 6;
+            else if(oldCode  == "AOG") return 11;
+            else if(oldCode  == "AOH") return 13;
+            else if(oldCode  == "AOI") return 12;
+            else if(oldCode  == "AOJ") return 14;
+            break;
+
+        case "AIF":
+            if(oldCode == "AOC") return 3;
+            else if(oldCode  == "AAO") return 10;
+            else if(oldCode  == "AAA") return 11;
+            else if(oldCode  == "AAB") return 12;
+            else if(oldCode  == "AAC") return 14;
+            break;
+    }
+
+    return 0;
 }
 
 void CreateNewSurveyFromFile(string filePath){
