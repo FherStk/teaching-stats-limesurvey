@@ -341,9 +341,12 @@ void SendReminders(){
     }
 }
 
-bool CheckConfig(){            
+bool CheckConfig(){    
     try{    
+        Info("Checking the 'teaching-stats' configuration... ", false);            
         using(var ts = new TeachingStats()){    
+            Success();
+            
             if(!ts.CheckIfUpgraded()){
                 var response = Question("The current 'teaching-stats' database has not been upgraded, do you want to perform the necessary changes to use this program? [Y/n]", "y");
                 if(response.ToLower() != "y"){
@@ -359,7 +362,9 @@ bool CheckConfig(){
         }
 
         //Testing LimeSurvey config
+        Info("Checking the 'lime-survey' configuration... ", false);            
         using(var ls = new LimeSurvey()){}
+        Success();
 
         //All tests clear
         return true;
@@ -370,6 +375,8 @@ bool CheckConfig(){
     catch(Exception ex){
         Error("Error: " + ex.ToString());
     }
+    
+    Console.WriteLine();
 
     return false;   
 }
