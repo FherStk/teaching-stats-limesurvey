@@ -109,13 +109,13 @@ void ConvertSagaCSVtoImportYML(string filePath){
                 Participants = new List<Survey.Participant>()
             };
 
-            int id = int.Parse((sd.SubjectCode ?? "M00").Substring(1));
+            int id = int.Parse((sd.SubjectCode ?? "MP00").Substring(2));
             surveys.Add(id, sd);                
         }
     }    
 
     //TODO: the CSV column names must be edited (with no spaces, numers, etc.)
-    using (var reader = new StreamReader(filePath, System.Text.Encoding.Latin1))
+    using (var reader = new StreamReader(filePath, System.Text.Encoding.UTF8))
     using (var csv = new CsvHelper.CsvReader(reader, System.Globalization.CultureInfo.InvariantCulture))
     {        
         var records = csv.GetRecords<dynamic>();
