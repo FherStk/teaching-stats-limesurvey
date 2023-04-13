@@ -1,6 +1,9 @@
+# Ignore
 obj
 bin
-config/settings.yml
-import/import-data.yml
-actions/create-surveys.yml
-actions/create-surveys-*.*
+config/*
+actions/*
+
+# Allow
+!config/settings.yml.template
+!actions/create-surveys.yml.template
