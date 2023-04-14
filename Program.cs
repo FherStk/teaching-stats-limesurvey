@@ -69,7 +69,7 @@ void Help(){
 }
 
 void ConvertSagaCSVtoImportYML(string filePath){    
-    var surveys = new Dictionary<int, Survey.SurveyData>();
+    var surveys = new Dictionary<int, List<Survey.SurveyData>>();    
     var groupName = Path.GetFileNameWithoutExtension(filePath);  //Must be like ASIX2B
     
     Info("Converting from CSV to a lime-survey compatible YAML file:");
@@ -102,7 +102,7 @@ void ConvertSagaCSVtoImportYML(string filePath){
             var g = t.Groups.Where(x => x.Code == groupName).SingleOrDefault();
             if(g == null) continue; //the current trainer does not teach the current group
 
-            //A survey must be generated for this group
+                //A survey must be generated for this group
                 var sd = new Survey.SurveyData(){
                 Topic = "SUBJECT-CCFF",
                 DegreeName = degree.Name,
@@ -114,8 +114,12 @@ void ConvertSagaCSVtoImportYML(string filePath){
                 Participants = new List<Survey.Participant>()
             };
 
+            //The same MP can be teached by different trainers.
             int id = int.Parse((sd.SubjectCode ?? "MP00").Substring(2));
-            surveys.Add(id, sd);                
+            if(!surveys.ContainsKey(id)) surveys.Add(id, new List<Survey.SurveyData>());
+
+            var mpSurveys = surveys[id];
+            mpSurveys.Add(sd);                
         }
     }
     Success();    
@@ -144,17 +148,25 @@ void ConvertSagaCSVtoImportYML(string filePath){
                 if(int.TryParse(s, out id)) id -= 100;  //old codes like 101 (means MP01)
                 else id = NewCurriculumCodeToOldCurriculumCode(degreeName, s); //new codes like AOC (could mean anything... those codes are the worst!)
 
-                var parts = surveys[id].Participants;
-                if(parts == null) parts = new List<Survey.Participant>();
-                parts.Add(p);
+                //The same MP can be teached by different trainers.
+                var mpSurveys = surveys[id];
+                foreach(var survey in mpSurveys){
+                    var parts = survey.Participants;
+                    if(parts == null) parts = new List<Survey.Participant>();
+                    parts.Add(p);
+                }                
             }
         }
     }
     Success();    
 
     Info("   Generating the YAML file...", false);
-    var data = new Survey(){Data = surveys.Values.ToList()};
-    Utils.SerializeYamlFile(data, Path.Combine(Utils.ActionsFolder, $"create-surveys-{groupName}.yml"));
+    foreach(var mpSurvey in surveys.Values.ToList()){
+        var data = new Survey(){Data = mpSurvey};
+        Utils.SerializeYamlFile(data, Path.Combine(Utils.ActionsFolder, $"create-surveys-{groupName}.yml"));
+    }
+
+    
     Success();    
 }
 
