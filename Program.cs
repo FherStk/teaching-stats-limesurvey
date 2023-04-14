@@ -72,6 +72,9 @@ void ConvertSagaCSVtoImportYML(string filePath){
     var surveys = new Dictionary<int, Survey.SurveyData>();
     var groupName = Path.GetFileNameWithoutExtension(filePath);  //Must be like ASIX2B
     
+    Info("Converting from CSV to a lime-survey compatible YAML file:");
+    
+    Info("   Loading degree name...", false);
     var degreeName = string.Empty;
     for(int i=0; i<groupName.Length; i++){
         if(groupName.Substring(i, 1).All(char.IsNumber)){
@@ -81,13 +84,15 @@ void ConvertSagaCSVtoImportYML(string filePath){
     }   
     
     if(Utils.Settings.Data == null || Utils.Settings.Data.Degrees == null) throw new IncorrectSettingsException();
-    var degree = Utils.Settings.Data.Degrees.Where(x => x.Name == degreeName).SingleOrDefault();
+    var degree = Utils.Settings.Data.Degrees.Where(x => x.Name == degreeName).SingleOrDefault();    
 
     //Setting up survey data
     if(degree == null || degree.Subjects == null) throw new IncorrectSettingsException();
+    Success();
     
     //Fill the survey data using the settings info.
     //NOTE: this will be filled from teaching-stats database, once integrated within the IMS (the lack of backoffice for teaching-stats does easier to define all the master data within a YML file).             
+    Info("   Loading subjects data...", false);
     foreach(var s in degree.Subjects){
         if(s.Trainers == null) throw new IncorrectSettingsException();
         
@@ -112,9 +117,11 @@ void ConvertSagaCSVtoImportYML(string filePath){
             int id = int.Parse((sd.SubjectCode ?? "MP00").Substring(2));
             surveys.Add(id, sd);                
         }
-    }    
+    }
+    Success();    
 
     //TODO: the CSV column names must be edited (with no spaces, numers, etc.)
+    Info("   Loading participants data...", false);
     using (var reader = new StreamReader(filePath, System.Text.Encoding.UTF8))
     using (var csv = new CsvHelper.CsvReader(reader, System.Globalization.CultureInfo.InvariantCulture))
     {        
@@ -143,9 +150,12 @@ void ConvertSagaCSVtoImportYML(string filePath){
             }
         }
     }
+    Success();    
 
+    Info("   Generating the YAML file...", false);
     var data = new Survey(){Data = surveys.Values.ToList()};
     Utils.SerializeYamlFile(data, Path.Combine(Utils.ActionsFolder, $"create-surveys-{groupName}.yml"));
+    Success();    
 }
 
 int NewCurriculumCodeToOldCurriculumCode(string degreeName, string oldCode){
