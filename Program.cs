@@ -17,9 +17,13 @@ else{
     foreach(var arg in args){
         switch(arg){    
             case "--saga-convert":
-            case "-sc":
-                //TODO: check there is a filepath
-                ConvertSagaCSVtoImportYML(args[i+1]);
+            case "-sc":                
+                var files = Directory.GetFiles(Path.GetDirectoryName(args[i+1]) ?? "", Path.GetFileName(args[i+1]));
+                foreach (var f in files)
+                {
+                    if(!File.Exists(f)) throw new FileNotFoundException("File not found!", f);
+                    ConvertSagaCSVtoImportYML(f);                    
+                }                
                 break;  
 
             case "--create-survey":
@@ -72,7 +76,7 @@ void ConvertSagaCSVtoImportYML(string filePath){
     var surveys = new Dictionary<string, List<Survey.SurveyData>>();    
     var groupName = Path.GetFileNameWithoutExtension(filePath);  //Must be like ASIX2B
     
-    Info("Converting from CSV to a lime-survey compatible YAML file:");
+    Info($"Converting from CSV to a LimeSurvey compatible YAML file ({Path.GetFileName(filePath)}):");
     
     Info("   Loading degree data... ", false);
     var degreeName = string.Empty;
@@ -232,8 +236,9 @@ void ConvertSagaCSVtoImportYML(string filePath){
         //Storing the updated file
         Utils.SerializeYamlFile(otherYamlData, Path.Combine(otherYamlPath));
     }
-
     Success();    
+
+    Console.WriteLine();
 }
 
 void CreateNewSurveyFromFile(string filePath){
