@@ -1,5 +1,5 @@
 ﻿//Global vars
-var _VERSION = "0.3.0";
+var _VERSION = "0.3.1";
 
 DisplayInfo();
 if(!CheckConfig()) return;
@@ -74,7 +74,7 @@ void ConvertSagaCSVtoImportYML(string filePath){
     
     Info("Converting from CSV to a lime-survey compatible YAML file:");
     
-    Info("   Loading degree data...", false);
+    Info("   Loading degree data... ", false);
     var degreeName = string.Empty;
     var degreeCourse = 0;
     for(int i=0; i<groupName.Length; i++){
@@ -92,7 +92,7 @@ void ConvertSagaCSVtoImportYML(string filePath){
     if(degree == null || degree.Subjects == null) throw new IncorrectSettingsException();
     Success();
     
-    Info("   Loading surveys data...", false);
+    Info("   Loading surveys data... ", false);
     //School surveys
     surveys.Add("SCHOOL", new List<Survey.SurveyData>(){
         new Survey.SurveyData(){
@@ -161,7 +161,7 @@ void ConvertSagaCSVtoImportYML(string filePath){
     Success();  
     
     //TODO: the CSV column names must be edited (with no spaces, numers, etc.)
-    Info("   Loading participants data...", false);
+    Info("   Loading participants data... ", false);
     var warnings = new List<string>();
 
     using (var reader = new StreamReader(filePath, System.Text.Encoding.UTF8))
@@ -214,13 +214,13 @@ void ConvertSagaCSVtoImportYML(string filePath){
     if(warnings.Count == 0) Success();    
     else Warning("WARNING: \n" + string.Join('\n', warnings));
     
-    Info("   Generating the YAML file for the current group...", false);
+    Info("   Generating the YAML file for the current group... ", false);
     var allGroupsData = surveys.Values.SelectMany(x => x).Where(x => x.Participants != null && x.Participants.Count > 0);    
     var currentGroupData = new Survey(){Data = allGroupsData.Where(x => x.GroupName == groupName).ToList()};
     Utils.SerializeYamlFile(currentGroupData, Path.Combine(Utils.ActionsFolder, $"create-surveys-{groupName}.yml"));
     Success();    
 
-    Info("   Updating existing YAML file for repeater studnets...", false);
+    Info("   Updating existing YAML file for repeater studnets... ", false);
     var otherGroupData = allGroupsData.Where(x => x.GroupName != groupName).GroupBy(x => x.GroupName).ToDictionary(x => x.Key ?? "", x => x.ToList());
     foreach(var otherGroupCode in otherGroupData.Keys){        
         var otherYamlPath = Path.Combine(Utils.ActionsFolder, $"create-surveys-{otherGroupCode}.yml");
