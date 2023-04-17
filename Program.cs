@@ -71,7 +71,6 @@ void Help(){
 void ConvertSagaCSVtoImportYML(string filePath){        
     var surveys = new Dictionary<string, List<Survey.SurveyData>>();    
     var groupName = Path.GetFileNameWithoutExtension(filePath);  //Must be like ASIX2B
-    var exportFileName = $"create-surveys-{groupName}.yml";
     
     Info("Converting from CSV to a lime-survey compatible YAML file:");
     
@@ -179,12 +178,26 @@ void ConvertSagaCSVtoImportYML(string filePath){
     
     if(warnings.Count == 0) Success();    
     else Warning("WARNING: \n" + string.Join('\n', warnings));
-
-    Info("   Generating the YAML file...", false);
+    
+    Info("   Generating the YAML file for the current group...", false);
     var allGroupsData = surveys.Values.SelectMany(x => x).Where(x => x.Participants != null && x.Participants.Count > 0);    
     var currentGroupData = new Survey(){Data = allGroupsData.Where(x => x.GroupName == groupName).ToList()};
-    Utils.SerializeYamlFile(currentGroupData, Path.Combine(Utils.ActionsFolder, exportFileName));
-    
+    Utils.SerializeYamlFile(currentGroupData, Path.Combine(Utils.ActionsFolder, $"create-surveys-{groupName}.yml"));
+    Success();    
+
+    Info("   Updating existing YAML file for repeater studnets...", false);
+    var otherGroupData = allGroupsData.Where(x => x.GroupName != groupName).GroupBy(x => x.GroupName).ToDictionary(x => x.Key ?? "", x => x.ToList());
+    foreach(var otherGroupCode in otherGroupData.Keys){        
+        var otherYamlPath = Path.Combine(Utils.ActionsFolder, $"create-surveys-{otherGroupCode}.yml");
+
+        //Loading the current file and adding new data
+        var otherYamlData = Utils.DeserializeYamlFile<Survey>(otherYamlPath);
+        if(otherYamlData.Data != null) otherYamlData.Data.AddRange(otherGroupData[otherGroupCode]);
+
+        //Storing the updated file
+        Utils.SerializeYamlFile(otherYamlData, Path.Combine(otherYamlPath));
+    }
+
     Success();    
 }
 
