@@ -31,6 +31,7 @@ public class Settings
     }
 
     public class SubjectData{
+        public string? Id {get; set;}
         public string? Code {get; set;}
         public string? Name {get; set;}
         public List<TrainerData>? Trainers {get; set;}

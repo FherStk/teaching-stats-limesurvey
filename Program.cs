@@ -68,9 +68,10 @@ void Help(){
     Console.WriteLine();    
 }
 
-void ConvertSagaCSVtoImportYML(string filePath){    
-    var surveys = new Dictionary<int, List<Survey.SurveyData>>();    
+void ConvertSagaCSVtoImportYML(string filePath){        
+    var surveys = new Dictionary<string, List<Survey.SurveyData>>();    
     var groupName = Path.GetFileNameWithoutExtension(filePath);  //Must be like ASIX2B
+    var exportFileName = $"create-surveys-{groupName}.yml";
     
     Info("Converting from CSV to a lime-survey compatible YAML file:");
     
@@ -90,47 +91,56 @@ void ConvertSagaCSVtoImportYML(string filePath){
     if(degree == null || degree.Subjects == null) throw new IncorrectSettingsException();
     Success();
     
-    //Fill the survey data using the settings info.
-    //NOTE: this will be filled from teaching-stats database, once integrated within the IMS (the lack of backoffice for teaching-stats does easier to define all the master data within a YML file).             
+    //Loading the subjects data for the given degree (ignoring group or level)
+    //NOTE: this will be filled from teaching-stats database, once integrated within the IMS (the lack of backoffice for teaching-stats does easier to define all the master data within a YML file).                 
     Info("   Loading subjects data...", false);
-    foreach(var s in degree.Subjects){
-        if(s.Trainers == null) throw new IncorrectSettingsException();
+    foreach(var s in degree.Subjects){  
+        string id = (s.Id ?? "");      
+        if(!surveys.ContainsKey(id)) surveys.Add(id, new List<Survey.SurveyData>());
         
-        foreach(var t in s.Trainers){
-            if(t.Groups == null) throw new IncorrectSettingsException();
-
-            var g = t.Groups.Where(x => x.Code == groupName).SingleOrDefault();
-            if(g == null) continue; //the current trainer does not teach the current group
-
-                //A survey must be generated for this group
-                var sd = new Survey.SurveyData(){
-                Topic = "SUBJECT-CCFF",
+        var mpSurveys = surveys[id];        
+        if(s.Name == "FCT") {
+            mpSurveys.Add(new Survey.SurveyData(){
+                Topic = "FCT",
                 DegreeName = degree.Name,
-                DepartmentName = degree.Department ,
+                DepartmentName = degree.Department,
                 GroupName = groupName,
-                TrainerName = t.Name,
                 SubjectCode = s.Code,
                 SubjectName = s.Name,
                 Participants = new List<Survey.Participant>()
-            };
-
-            //The same MP can be teached by different trainers.
-            int id = int.Parse((sd.SubjectCode ?? "MP00").Substring(2));
-            if(!surveys.ContainsKey(id)) surveys.Add(id, new List<Survey.SurveyData>());
-
-            var mpSurveys = surveys[id];
-            mpSurveys.Add(sd);                
+            }); 
+        }
+        else{
+            if(s.Trainers == null) throw new IncorrectSettingsException();        
+            foreach(var t in s.Trainers){
+                if(t.Groups == null) throw new IncorrectSettingsException();
+                
+                //The same MP can be teached by different trainers.
+                foreach(var g in t.Groups){                                           
+                    mpSurveys.Add(new Survey.SurveyData(){
+                        Topic = "SUBJECT-CCFF",
+                        DegreeName = degree.Name,
+                        DepartmentName = degree.Department ,
+                        GroupName = g.Code,
+                        TrainerName = t.Name,
+                        SubjectCode = s.Code,
+                        SubjectName = s.Name,
+                        Participants = new List<Survey.Participant>()
+                    });   
+                }             
+            }
         }
     }
     Success();    
 
     //TODO: the CSV column names must be edited (with no spaces, numers, etc.)
     Info("   Loading participants data...", false);
+    var warnings = new List<string>();
+
     using (var reader = new StreamReader(filePath, System.Text.Encoding.UTF8))
     using (var csv = new CsvHelper.CsvReader(reader, System.Globalization.CultureInfo.InvariantCulture))
-    {        
+    {                
         var records = csv.GetRecords<dynamic>();
-
         foreach (var r in records)
         {
             string completeName = r.NOM;
@@ -143,86 +153,39 @@ void ConvertSagaCSVtoImportYML(string filePath){
             };
 
             var subjects = ((string)r.MATRICULADES).Split(",").Select(x => x.Substring(0,3).Trim()).Distinct().ToList(); //only MPs wanted. 10102 = 101 = MP01
-            foreach(var s in subjects){
-                var id = 0;
-                if(int.TryParse(s, out id)) id -= 100;  //old codes like 101 (means MP01)
-                else id = NewCurriculumCodeToOldCurriculumCode(degreeName, s); //new codes like AOC (could mean anything... those codes are the worst!)
-
-                //The same MP can be teached by different trainers.
+            foreach(var id in subjects){                
                 var mpSurveys = surveys[id];
+                if(mpSurveys.Count > 1){
+                    //WARNING:  If the current subject can be done in more than one group, the student should be assigned to:
+                    //          1. It's own group (could be teached by more than one trainer).
+                    //          2. Another group (if it's repeating the subject)
+                    //          3. More than one group (WARNING) if it's repeating but it's impossible to know in which group.
+                    if(mpSurveys.Count(x => x.GroupName == groupName) == 0) warnings.Add($"   WARNING: the student '{r.NOM}' has been assigned to more than one group for 'MP{id}'. Please, fix it manually (possibly a repeater student).");
+                    else mpSurveys = mpSurveys.Where(x => x.GroupName == groupName).ToList();                    
+                }
+
                 foreach(var survey in mpSurveys){
+                    //The participant will be added to the survey, should be in:
+                    //  1. Its own group (this is the normal behaviour).
+                    //  2. A 1st course group if the it's a second course student repeating a 1st course subject (and there's only one 1st course group).
+                    //  3. More than one 1st course group if the it's a second course student repeating a 1st course subject  (and there's more than one 1st course group). This produces a WARNING.
                     var parts = survey.Participants;
                     if(parts == null) parts = new List<Survey.Participant>();
-                    parts.Add(p);
+                    parts.Add(p);                    
                 }                
             }
         }
     }
-    Success();    
+    
+    if(warnings.Count == 0) Success();    
+    else Warning("WARNING: \n" + string.Join('\n', warnings));
 
     Info("   Generating the YAML file...", false);
-    foreach(var mpSurvey in surveys.Values.ToList()){
-        var data = new Survey(){Data = mpSurvey};
-        Utils.SerializeYamlFile(data, Path.Combine(Utils.ActionsFolder, $"create-surveys-{groupName}.yml"));
-    }
-
+    var allGroupsData = surveys.Values.SelectMany(x => x).Where(x => x.Participants != null && x.Participants.Count > 0);    
+    var currentGroupData = new Survey(){Data = allGroupsData.Where(x => x.GroupName == groupName).ToList()};
+    Utils.SerializeYamlFile(currentGroupData, Path.Combine(Utils.ActionsFolder, exportFileName));
     
     Success();    
-}
-
-int NewCurriculumCodeToOldCurriculumCode(string degreeName, string oldCode){
-    switch(degreeName){
-        case "SMX":
-            if(oldCode == "AOE") return 5;
-            else if(oldCode  == "AOF") return 6;
-            else if(oldCode  == "AOG") return 7;
-            else if(oldCode  == "AOH") return 8;
-            else if(oldCode  == "AOI") return 9;
-            else if(oldCode  == "AOJ") return 13;
-            else if(oldCode  == "BOB") return 14;
-            break;
-
-        case "ASIX":
-            if(oldCode == "AOC") return 3;
-            else if(oldCode  == "AOF") return 6;
-            else if(oldCode  == "AAO") return 10;
-            else if(oldCode  == "AAP") return 12;
-            else if(oldCode  == "AAQ") return 15;
-            else if(oldCode  == "BOA") return 16;
-            else if(oldCode  == "BOB") return 17;
-            break;
-
-        case "DAM":
-            if(oldCode == "AOC") return 3;
-            else if(oldCode  == "AOF") return 6;
-            else if(oldCode  == "AOH") return 8;
-            else if(oldCode  == "AAO") return 10;
-            else if(oldCode  == "AAP") return 11;
-            else if(oldCode  == "AAQ") return 14;
-            else if(oldCode  == "BOA") return 15;
-            else if(oldCode  == "BOB") return 16;
-            break;
-
-        case "GA":
-            if(oldCode == "AOA") return 1;
-            else if(oldCode  == "AOB") return 2;
-            else if(oldCode  == "AOF") return 6;
-            else if(oldCode  == "AOG") return 11;
-            else if(oldCode  == "AOH") return 13;
-            else if(oldCode  == "AOI") return 12;
-            else if(oldCode  == "AOJ") return 14;
-            break;
-
-        case "AIF":
-            if(oldCode == "AOC") return 3;
-            else if(oldCode  == "AAO") return 10;
-            else if(oldCode  == "AAA") return 11;
-            else if(oldCode  == "AAB") return 12;
-            else if(oldCode  == "AAC") return 14;
-            break;
-    }
-
-    return 0;
 }
 
 void CreateNewSurveyFromFile(string filePath){
@@ -364,8 +327,9 @@ void SendReminders(){
 }
 
 bool CheckConfig(){    
-    try{    
-        Info("Checking the 'teaching-stats' configuration... ", false);            
+    try{
+        Info("Starting the app:");    
+        Info("   Checking the 'teaching-stats' configuration... ", false);            
         using(var ts = new TeachingStats()){    
             Success();
             
@@ -384,9 +348,10 @@ bool CheckConfig(){
         }
 
         //Testing LimeSurvey config
-        Info("Checking the 'lime-survey' configuration... ", false);            
+        Info("   Checking the 'lime-survey' configuration... ", false);            
         using(var ls = new LimeSurvey()){}
         Success();
+        Console.WriteLine();
 
         //All tests clear
         return true;
@@ -415,7 +380,7 @@ void Success(string text = "OK"){
     Console.ResetColor();    
 }
 
-void Warning(string text, bool newLine = true){
+void Warning(string text = "WARNING", bool newLine = true){
     Console.ForegroundColor = ConsoleColor.DarkYellow;
     Console.WriteLine(text);
     Console.ResetColor();    
