@@ -60,7 +60,7 @@ void Help(){
     Info("dotnet run [arguments] <FILE_PATH>: ");
     Info("Allowed arguments: ");
     Info("  -cs <FILE_PATH>, --create-survey <FILE_PATH>: creates a new survey, a YML file must be provided.");    
-    Info("  -sc <FILE_PATH>, --saga-convert <FILE_PATH>: parses a SAGA's CSV file and creates a new import action YML file, a CSV file must be provided.");    
+    Info("  -sc <FILE_PATH>, --saga-convert <FILE_PATH>: parses a SAGA's CSV file and creates a YML file which can be used to create new surveys (school, mentoring and subject) on LimeSurvey, a CSV file must be provided.");    
     Info("  -ss, --start-survey: enables all the created surveys at limesurvey (just the created with this tool) and sends the invitations to the participants.");
     Info("  -sr, --send-reminders: send survey reminders to all the participants (just the created with this tool) that still has not responded the surveys.");
     Info("  -lt, --load-teachingstats: loads all pending reporting data from 'teaching-stats'.");
