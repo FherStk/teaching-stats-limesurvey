@@ -74,11 +74,13 @@ void ConvertSagaCSVtoImportYML(string filePath){
     
     Info("Converting from CSV to a lime-survey compatible YAML file:");
     
-    Info("   Loading degree name...", false);
+    Info("   Loading degree data...", false);
     var degreeName = string.Empty;
+    var degreeCourse = 0;
     for(int i=0; i<groupName.Length; i++){
         if(groupName.Substring(i, 1).All(char.IsNumber)){
             degreeName = groupName.Substring(0, i);
+            degreeCourse = int.Parse(groupName.Substring(i, 1));
             break;
         }
     }   
@@ -90,16 +92,28 @@ void ConvertSagaCSVtoImportYML(string filePath){
     if(degree == null || degree.Subjects == null) throw new IncorrectSettingsException();
     Success();
     
+    Info("   Loading surveys data...", false);
+    //School surveys
+    surveys.Add("SCHOOL", new List<Survey.SurveyData>(){
+        new Survey.SurveyData(){
+            Topic = "SCHOOL",
+            DegreeName = degree.Name,
+            DepartmentName = degree.Department,
+            GroupName = groupName,           
+            Participants = new List<Survey.Participant>()
+        }
+    });
+
     //Loading the subjects data for the given degree (ignoring group or level)
-    //NOTE: this will be filled from teaching-stats database, once integrated within the IMS (the lack of backoffice for teaching-stats does easier to define all the master data within a YML file).                 
-    Info("   Loading subjects data...", false);
+    //NOTE: this will be filled from teaching-stats database, once integrated within the IMS (the lack of backoffice for teaching-stats does easier to define all the master data within a YML file).                     
     foreach(var s in degree.Subjects){  
         string id = (s.Id ?? "");      
-        if(!surveys.ContainsKey(id)) surveys.Add(id, new List<Survey.SurveyData>());
-        
-        var mpSurveys = surveys[id];        
+        if(!surveys.ContainsKey(id)) surveys.Add(id, new List<Survey.SurveyData>());               
+
+        var grpSurveys = surveys[id];        
         if(s.Name == "FCT") {
-            mpSurveys.Add(new Survey.SurveyData(){
+            //TODO: there is no FCT survey at the moment, but this is needed for the app to work with no extra complexity
+            grpSurveys.Add(new Survey.SurveyData(){
                 Topic = "FCT",
                 DegreeName = degree.Name,
                 DepartmentName = degree.Department,
@@ -111,27 +125,41 @@ void ConvertSagaCSVtoImportYML(string filePath){
         }
         else{
             if(s.Trainers == null) throw new IncorrectSettingsException();        
+            
             foreach(var t in s.Trainers){
                 if(t.Groups == null) throw new IncorrectSettingsException();
-                
-                //The same MP can be teached by different trainers.
-                foreach(var g in t.Groups){                                           
-                    mpSurveys.Add(new Survey.SurveyData(){
-                        Topic = "SUBJECT-CCFF",
-                        DegreeName = degree.Name,
-                        DepartmentName = degree.Department ,
-                        GroupName = g.Code,
-                        TrainerName = t.Name,
-                        SubjectCode = s.Code,
-                        SubjectName = s.Name,
-                        Participants = new List<Survey.Participant>()
-                    });   
+                                
+                foreach(var g in t.Groups){                      
+                    if(s.Name == "MENTORING-1-CCFF" || s.Name == "MENTORING-2-CCFF") {
+                        //Mentoring surveys
+                        grpSurveys.Add(new Survey.SurveyData(){
+                            Topic = s.Name,
+                            DegreeName = degree.Name,
+                            DepartmentName = degree.Department,
+                            GroupName = groupName, 
+                            TrainerName = t.Name,                          
+                            Participants = new List<Survey.Participant>()
+                        }); 
+                    }
+                    else{ 
+                        //Regular subject surveys                                        
+                        grpSurveys.Add(new Survey.SurveyData(){
+                            Topic = "SUBJECT-CCFF",
+                            DegreeName = degree.Name,
+                            DepartmentName = degree.Department ,
+                            GroupName = g.Code,
+                            TrainerName = t.Name,
+                            SubjectCode = s.Code,
+                            SubjectName = s.Name,
+                            Participants = new List<Survey.Participant>()
+                        });   
+                    }
                 }             
             }
         }
     }
-    Success();    
-
+    Success();  
+    
     //TODO: the CSV column names must be edited (with no spaces, numers, etc.)
     Info("   Loading participants data...", false);
     var warnings = new List<string>();
@@ -171,7 +199,14 @@ void ConvertSagaCSVtoImportYML(string filePath){
                     var parts = survey.Participants;
                     if(parts == null) parts = new List<Survey.Participant>();
                     parts.Add(p);                    
-                }                
+                }
+                
+                //Adding the participant to the school survey
+                var school = surveys["SCHOOL"].FirstOrDefault();
+                if(school != null && school.Participants != null) school.Participants.Add(p);
+
+                var mentoring = surveys[$"MENTORING-{degreeCourse}-CCFF"].FirstOrDefault();
+                if(mentoring != null && mentoring.Participants != null) mentoring.Participants.Add(p);
             }
         }
     }
