@@ -200,14 +200,14 @@ void ConvertSagaCSVtoImportYML(string filePath){
                     if(parts == null) parts = new List<Survey.Participant>();
                     parts.Add(p);                    
                 }
-                
-                //Adding the participant to the school survey
-                var school = surveys["SCHOOL"].FirstOrDefault();
-                if(school != null && school.Participants != null) school.Participants.Add(p);
-
-                var mentoring = surveys[$"MENTORING-{degreeCourse}-CCFF"].FirstOrDefault();
-                if(mentoring != null && mentoring.Participants != null) mentoring.Participants.Add(p);
             }
+
+            //Adding the participant to the school survey
+            var school = surveys["SCHOOL"].FirstOrDefault();
+            if(school != null && school.Participants != null) school.Participants.Add(p);
+
+            var mentoring = surveys[$"MENTORING-{degreeCourse}-CCFF"].FirstOrDefault();
+            if(mentoring != null && mentoring.Participants != null) mentoring.Participants.Add(p);
         }
     }
     
