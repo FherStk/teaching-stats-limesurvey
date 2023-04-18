@@ -221,7 +221,7 @@ void ConvertSagaCSVtoImportYML(string filePath){
                 }
                 else{
                     //The current student is in another group (repeater), it will be assigned to all groups and a warning will be displayed
-                    warnings.Add($"   WARNING: the student '{r.NOM}' has been assigned to more than one group for 'MP{id}'. Please, fix it manually (possibly a repeater student).");                    
+                    warnings.Add($"   WARNING: the student '{r.NOM}' is enrolled on '{currentGroupName}' but has been assigned to different groups for '{subject.Code}'. Please, fix it manually (possibly a repeater student).");                    
                 }
 
                 foreach(var survey in surveyByGroup){
