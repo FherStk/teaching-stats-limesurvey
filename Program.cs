@@ -1,5 +1,5 @@
 ﻿//Global vars
-var _VERSION = "0.3.0";
+var _VERSION = "0.4.0";
 
 DisplayInfo();
 if(!CheckConfig()) return;
@@ -17,9 +17,13 @@ else{
     foreach(var arg in args){
         switch(arg){    
             case "--saga-convert":
-            case "-sc":
-                //TODO: check there is a filepath
-                ConvertSagaCSVtoImportYML(args[i+1]);
+            case "-sc":                
+                var files = Directory.GetFiles(Path.GetDirectoryName(args[i+1]) ?? "", Path.GetFileName(args[i+1]));
+                foreach (var f in files)
+                {
+                    if(!File.Exists(f)) throw new FileNotFoundException("File not found!", f);
+                    ConvertSagaCSVtoImportYML(f);                    
+                }                
                 break;  
 
             case "--create-survey":
@@ -72,9 +76,9 @@ void ConvertSagaCSVtoImportYML(string filePath){
     var surveys = new Dictionary<string, List<Survey.SurveyData>>();    
     var currentGroupName = Path.GetFileNameWithoutExtension(filePath);  //Must be like ASIX2B
     
-    Info("Converting from CSV to a lime-survey compatible YAML file:");
+    Info($"Converting from CSV to a LimeSurvey compatible YAML file ({Path.GetFileName(filePath)}):");
     
-    Info("   Loading degree data...", false);
+    Info("   Loading degree data... ", false);
     var degreeName = string.Empty;
     var degreeCourse = 0;
     for(int i=0; i<currentGroupName.Length; i++){
@@ -92,7 +96,8 @@ void ConvertSagaCSVtoImportYML(string filePath){
     if(degree == null || degree.Subjects == null) throw new IncorrectSettingsException();
     Success();
     
-    Info("   Loading surveys data...", false);    
+    Info("   Loading surveys data... ", false);
+    //School surveys
     surveys.Add("SCHOOL", new List<Survey.SurveyData>(){
         //School surveys
         new Survey.SurveyData(){
@@ -163,8 +168,9 @@ void ConvertSagaCSVtoImportYML(string filePath){
         }
     }
     Success();  
-        
-    Info("   Loading participants data...", false);
+    
+    //TODO: the CSV column names must be edited (with no spaces, numers, etc.)
+    Info("   Loading participants data... ", false);
     var warnings = new List<string>();
 
     using (var reader = new StreamReader(filePath, System.Text.Encoding.UTF8))
@@ -247,13 +253,13 @@ void ConvertSagaCSVtoImportYML(string filePath){
     if(warnings.Count == 0) Success();    
     else Warning("WARNING: \n" + string.Join('\n', warnings));
     
-    Info("   Generating the YAML file for the current group...", false);
+    Info("   Generating the YAML file for the current group... ", false);
     var allGroupsData = surveys.Values.SelectMany(x => x).Where(x => x.Participants != null && x.Participants.Count > 0);    
     var currentGroupData = new Survey(){Data = allGroupsData.Where(x => x.GroupName == currentGroupName).ToList()};
     Utils.SerializeYamlFile(currentGroupData, Path.Combine(Utils.ActionsFolder, $"create-surveys-{currentGroupName}.yml"));
     Success();    
 
-    Info("   Updating existing YAML file for repeater studnets...", false);
+    Info("   Updating existing YAML file for repeater studnets... ", false);
     var otherGroupData = allGroupsData.Where(x => x.GroupName != currentGroupName).GroupBy(x => x.GroupName).ToDictionary(x => x.Key ?? "", x => x.ToList());
     foreach(var otherGroupCode in otherGroupData.Keys){        
         var otherYamlPath = Path.Combine(Utils.ActionsFolder, $"create-surveys-{otherGroupCode}.yml");
@@ -266,6 +272,8 @@ void ConvertSagaCSVtoImportYML(string filePath){
         Utils.SerializeYamlFile(otherYamlData, Path.Combine(otherYamlPath));
     }
     Success();    
+
+    Console.WriteLine();
 }
 
 void CreateNewSurveyFromFile(string filePath){
