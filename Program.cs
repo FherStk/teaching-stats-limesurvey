@@ -70,17 +70,17 @@ void Help(){
 
 void ConvertSagaCSVtoImportYML(string filePath){        
     var surveys = new Dictionary<string, List<Survey.SurveyData>>();    
-    var groupName = Path.GetFileNameWithoutExtension(filePath);  //Must be like ASIX2B
+    var currentGroupName = Path.GetFileNameWithoutExtension(filePath);  //Must be like ASIX2B
     
     Info("Converting from CSV to a lime-survey compatible YAML file:");
     
     Info("   Loading degree data...", false);
     var degreeName = string.Empty;
     var degreeCourse = 0;
-    for(int i=0; i<groupName.Length; i++){
-        if(groupName.Substring(i, 1).All(char.IsNumber)){
-            degreeName = groupName.Substring(0, i);
-            degreeCourse = int.Parse(groupName.Substring(i, 1));
+    for(int i=0; i<currentGroupName.Length; i++){
+        if(currentGroupName.Substring(i, 1).All(char.IsNumber)){
+            degreeName = currentGroupName.Substring(0, i);
+            degreeCourse = int.Parse(currentGroupName.Substring(i, 1));
             break;
         }
     }   
@@ -92,75 +92,78 @@ void ConvertSagaCSVtoImportYML(string filePath){
     if(degree == null || degree.Subjects == null) throw new IncorrectSettingsException();
     Success();
     
-    Info("   Loading surveys data...", false);
-    //School surveys
+    Info("   Loading surveys data...", false);    
     surveys.Add("SCHOOL", new List<Survey.SurveyData>(){
+        //School surveys
         new Survey.SurveyData(){
             Topic = "SCHOOL",
             DegreeName = degree.Name,
             DepartmentName = degree.Department,
-            GroupName = groupName,           
+            GroupName = currentGroupName,           
             Participants = new List<Survey.Participant>()
         }
     });
 
-    //Loading the subjects data for the given degree (ignoring group or level)
-    //NOTE: this will be filled from teaching-stats database, once integrated within the IMS (the lack of backoffice for teaching-stats does easier to define all the master data within a YML file).                     
+    //NOTE: this will be filled from teaching-stats database, once integrated within the IMS (the lack of backoffice for teaching-stats does easier to define all the master data within a YML file).
     foreach(var s in degree.Subjects){  
-        string id = (s.Id ?? "");      
-        if(!surveys.ContainsKey(id)) surveys.Add(id, new List<Survey.SurveyData>());               
+        if(s.Ids == null) continue;
 
-        var grpSurveys = surveys[id];        
-        if(s.Name == "FCT") {
-            //TODO: there is no FCT survey at the moment, but this is needed for the app to work with no extra complexity
-            grpSurveys.Add(new Survey.SurveyData(){
-                Topic = "FCT",
-                DegreeName = degree.Name,
-                DepartmentName = degree.Department,
-                GroupName = groupName,
-                SubjectCode = s.Code,
-                SubjectName = s.Name,
-                Participants = new List<Survey.Participant>()
-            }); 
-        }
-        else{
-            if(s.Trainers == null) throw new IncorrectSettingsException();        
+        foreach(var id in s.Ids){  
+            //All subject has different codes (old curriculum and new curriculum)
+            if(!surveys.ContainsKey(id)) surveys.Add(id, new List<Survey.SurveyData>());
             
-            foreach(var t in s.Trainers){
-                if(t.Groups == null) throw new IncorrectSettingsException();
-                                
-                foreach(var g in t.Groups){                      
-                    if(s.Name == "MENTORING-1-CCFF" || s.Name == "MENTORING-2-CCFF") {
-                        //Mentoring surveys
-                        grpSurveys.Add(new Survey.SurveyData(){
-                            Topic = s.Name,
-                            DegreeName = degree.Name,
-                            DepartmentName = degree.Department,
-                            GroupName = groupName, 
-                            TrainerName = t.Name,                          
-                            Participants = new List<Survey.Participant>()
-                        }); 
-                    }
-                    else{ 
-                        //Regular subject surveys                                        
-                        grpSurveys.Add(new Survey.SurveyData(){
-                            Topic = "SUBJECT-CCFF",
-                            DegreeName = degree.Name,
-                            DepartmentName = degree.Department ,
-                            GroupName = g.Code,
-                            TrainerName = t.Name,
-                            SubjectCode = s.Code,
-                            SubjectName = s.Name,
-                            Participants = new List<Survey.Participant>()
-                        });   
-                    }
-                }             
+            //The same subject can be teacher by different trainers
+            var surveyByTrainer = surveys[id];
+            if(s.Name == "FCT") {                
+                surveyByTrainer.Add(new Survey.SurveyData(){
+                    //TODO: there is no FCT survey at the moment, but this is needed for the app to work with no extra complexity
+                    Topic = "FCT",
+                    DegreeName = degree.Name,
+                    DepartmentName = degree.Department,
+                    GroupName = currentGroupName,
+                    SubjectCode = s.Code,
+                    SubjectName = s.Name,
+                    Participants = new List<Survey.Participant>()
+                }); 
+            }
+            else{
+                if(s.Trainers == null) throw new IncorrectSettingsException(); 
+
+                foreach(var t in s.Trainers){
+                    if(t.Groups == null) throw new IncorrectSettingsException();
+
+                    foreach(var groupName in t.Groups){
+                        if(s.Name == "MENTORING-1-CCFF" || s.Name == "MENTORING-2-CCFF") {
+                            //Mentoring surveys
+                            surveyByTrainer.Add(new Survey.SurveyData(){
+                                Topic = s.Name,
+                                DegreeName = degree.Name,
+                                DepartmentName = degree.Department,
+                                GroupName = currentGroupName, 
+                                TrainerName = t.Name,                          
+                                Participants = new List<Survey.Participant>()
+                            }); 
+                        }
+                        else{ 
+                            //Regular subject surveys                                        
+                            surveyByTrainer.Add(new Survey.SurveyData(){
+                                Topic = "SUBJECT-CCFF",
+                                DegreeName = degree.Name,
+                                DepartmentName = degree.Department ,
+                                GroupName = groupName,
+                                TrainerName = t.Name,
+                                SubjectCode = s.Code,
+                                SubjectName = s.Name,
+                                Participants = new List<Survey.Participant>()
+                            });   
+                        }
+                    }                
+                }
             }
         }
     }
     Success();  
-    
-    //TODO: the CSV column names must be edited (with no spaces, numers, etc.)
+        
     Info("   Loading participants data...", false);
     var warnings = new List<string>();
 
@@ -179,19 +182,51 @@ void ConvertSagaCSVtoImportYML(string filePath){
                 Email = r.EMAIL
             };
 
-            var subjects = ((string)r.MATRICULADES).Split(",").Select(x => x.Substring(0,3).Trim()).Distinct().ToList(); //only MPs wanted. 10102 = 101 = MP01
-            foreach(var id in subjects){                
-                var mpSurveys = surveys[id];
-                if(mpSurveys.Count > 1){
-                    //WARNING:  If the current subject can be done in more than one group, the student should be assigned to:
-                    //          1. It's own group (could be teached by more than one trainer).
-                    //          2. Another group (if it's repeating the subject)
-                    //          3. More than one group (WARNING) if it's repeating but it's impossible to know in which group.
-                    if(mpSurveys.Count(x => x.GroupName == groupName) == 0) warnings.Add($"   WARNING: the student '{r.NOM}' has been assigned to more than one group for 'MP{id}'. Please, fix it manually (possibly a repeater student).");
-                    else mpSurveys = mpSurveys.Where(x => x.GroupName == groupName).ToList();                    
+            //MPs (codes like 101) and UFs (codes like 10101), the UFs codes will be used when a subject is for 1st and 2nd course (like DAM M03).
+            var subjects = ((string)r.MATRICULADES).Split(",").ToList();
+
+            //Usually, a student is registered to course an MP in his own group, except if it's a 2nd course student repeating a 1st course subject.
+            var studentSubjects = new Dictionary<Settings.SubjectData, string>();
+            foreach(var id in subjects){
+                Settings.SubjectData? FindSubject(){     
+                    //Nested function, I love C# 7 :)               
+                    if(id.Length == 3) return degree.Subjects.Where(x => x.Ids != null && x.Ids.Contains(id)).SingleOrDefault();
+                    else{                    
+                        foreach(var sd in degree.Subjects){
+                            if(sd.Content == null) continue;
+
+                            foreach(var cd in sd.Content){
+                                if(cd.Ids == null) continue;
+                                if(cd.Ids.Contains(id)) return sd;
+                            }
+                        }                    
+                    } 
+
+                    return null;
+                }
+                                
+                var subjectData = FindSubject();  
+                //TODO: must be checked
+                // if(subjectData == null) throw new IncorrectSettingsException(); 
+                // else if(!studentSubjects.ContainsKey(subjectData)) studentSubjects.Add(subjectData, id.Substring(0, 3));
+                if(subjectData != null && !studentSubjects.ContainsKey(subjectData)) studentSubjects.Add(subjectData, id.Substring(0, 3));
+            }
+
+            //At this point, we got the subjects where the student is registered in, independant of the student's regular  group
+            foreach(var subject in studentSubjects.Keys){
+                var id = studentSubjects[subject];
+                var surveyByGroup = surveys[id];
+
+                if(subject.Content != null && subject.Content.SelectMany(x => x.Groups ?? new List<string>()).Contains(currentGroupName)){
+                    //The current student is in its same group                    
+                    surveyByGroup = surveyByGroup.Where(x => x.GroupName == currentGroupName).ToList();
+                }
+                else{
+                    //The current student is in another group (repeater), it will be assigned to all groups and a warning will be displayed
+                    warnings.Add($"   WARNING: the student '{r.NOM}' has been assigned to more than one group for 'MP{id}'. Please, fix it manually (possibly a repeater student).");                    
                 }
 
-                foreach(var survey in mpSurveys){
+                foreach(var survey in surveyByGroup){
                     //The participant will be added to the survey, should be in:
                     //  1. Its own group (this is the normal behaviour).
                     //  2. A 1st course group if the it's a second course student repeating a 1st course subject (and there's only one 1st course group).
@@ -200,14 +235,14 @@ void ConvertSagaCSVtoImportYML(string filePath){
                     if(parts == null) parts = new List<Survey.Participant>();
                     parts.Add(p);                    
                 }
-                
-                //Adding the participant to the school survey
-                var school = surveys["SCHOOL"].FirstOrDefault();
-                if(school != null && school.Participants != null) school.Participants.Add(p);
-
-                var mentoring = surveys[$"MENTORING-{degreeCourse}-CCFF"].FirstOrDefault();
-                if(mentoring != null && mentoring.Participants != null) mentoring.Participants.Add(p);
             }
+
+            //Adding the participant to the school survey
+            var school = surveys["SCHOOL"].FirstOrDefault();
+            if(school != null && school.Participants != null) school.Participants.Add(p);
+
+            var mentoring = surveys[$"MENTORING-{degreeCourse}-CCFF"].FirstOrDefault();
+            if(mentoring != null && mentoring.Participants != null) mentoring.Participants.Add(p);
         }
     }
     
@@ -216,12 +251,12 @@ void ConvertSagaCSVtoImportYML(string filePath){
     
     Info("   Generating the YAML file for the current group...", false);
     var allGroupsData = surveys.Values.SelectMany(x => x).Where(x => x.Participants != null && x.Participants.Count > 0);    
-    var currentGroupData = new Survey(){Data = allGroupsData.Where(x => x.GroupName == groupName).ToList()};
-    Utils.SerializeYamlFile(currentGroupData, Path.Combine(Utils.ActionsFolder, $"create-surveys-{groupName}.yml"));
+    var currentGroupData = new Survey(){Data = allGroupsData.Where(x => x.GroupName == currentGroupName).ToList()};
+    Utils.SerializeYamlFile(currentGroupData, Path.Combine(Utils.ActionsFolder, $"create-surveys-{currentGroupName}.yml"));
     Success();    
 
     Info("   Updating existing YAML file for repeater studnets...", false);
-    var otherGroupData = allGroupsData.Where(x => x.GroupName != groupName).GroupBy(x => x.GroupName).ToDictionary(x => x.Key ?? "", x => x.ToList());
+    var otherGroupData = allGroupsData.Where(x => x.GroupName != currentGroupName).GroupBy(x => x.GroupName).ToDictionary(x => x.Key ?? "", x => x.ToList());
     foreach(var otherGroupCode in otherGroupData.Keys){        
         var otherYamlPath = Path.Combine(Utils.ActionsFolder, $"create-surveys-{otherGroupCode}.yml");
 
@@ -232,7 +267,6 @@ void ConvertSagaCSVtoImportYML(string filePath){
         //Storing the updated file
         Utils.SerializeYamlFile(otherYamlData, Path.Combine(otherYamlPath));
     }
-
     Success();    
 }
 

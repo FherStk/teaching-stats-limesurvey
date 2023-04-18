@@ -6,7 +6,6 @@ public class Settings
 
     public MasterData? Data {get; set;}    
     
-
     public class TeachingStatsSettings{
         public string? Host {get; set;}
         public string? Username {get; set;}
@@ -31,18 +30,20 @@ public class Settings
     }
 
     public class SubjectData{
-        public string? Id {get; set;}
         public string? Code {get; set;}
         public string? Name {get; set;}
+        public List<string>? Ids {get; set;}
+        public List<ContentData>? Content {get; set;}
         public List<TrainerData>? Trainers {get; set;}
     }
 
+    public class ContentData{                
+        public List<string>? Groups {get; set;}
+        public List<string>? Ids {get; set;}
+    } 
+
     public class TrainerData{        
         public string? Name {get; set;}
-        public List<GroupsData>? Groups {get; set;}
-    }
-
-    public class GroupsData{        
-        public string? Code {get; set;}
-    }
+        public List<string>? Groups {get; set;}
+    }    
 }
