@@ -1,5 +1,5 @@
 ﻿//Global vars
-var _VERSION = "0.3.1";
+var _VERSION = "0.4.0";
 
 DisplayInfo();
 if(!CheckConfig()) return;
@@ -259,8 +259,8 @@ void ConvertSagaCSVtoImportYML(string filePath){
     Utils.SerializeYamlFile(currentGroupData, Path.Combine(Utils.ActionsFolder, $"create-surveys-{currentGroupName}.yml"));
     Success();    
 
-    Info("   Updating existing YAML file for repeater studnets...", false);
-    var otherGroupData = allGroupsData.Where(x => x.GroupName != groupName).GroupBy(x => x.GroupName).ToDictionary(x => x.Key ?? "", x => x.ToList());
+    Info("   Updating existing YAML file for repeater studnets... ", false);
+    var otherGroupData = allGroupsData.Where(x => x.GroupName != currentGroupName).GroupBy(x => x.GroupName).ToDictionary(x => x.Key ?? "", x => x.ToList());
     foreach(var otherGroupCode in otherGroupData.Keys){        
         var otherYamlPath = Path.Combine(Utils.ActionsFolder, $"create-surveys-{otherGroupCode}.yml");
 
