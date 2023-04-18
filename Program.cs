@@ -108,7 +108,7 @@ void ConvertSagaCSVtoImportYML(string filePath){
     foreach(var s in degree.Subjects){  
         if(s.Ids == null) continue;
 
-        foreach(var id in s.Ids){  
+        foreach(var id in s.Ids){ 
             //All subject has different codes (old curriculum and new curriculum)
             if(!surveys.ContainsKey(id)) surveys.Add(id, new List<Survey.SurveyData>());
             
@@ -206,10 +206,8 @@ void ConvertSagaCSVtoImportYML(string filePath){
                 }
                                 
                 var subjectData = FindSubject();  
-                //TODO: must be checked
-                // if(subjectData == null) throw new IncorrectSettingsException(); 
-                // else if(!studentSubjects.ContainsKey(subjectData)) studentSubjects.Add(subjectData, id.Substring(0, 3));
-                if(subjectData != null && !studentSubjects.ContainsKey(subjectData)) studentSubjects.Add(subjectData, id.Substring(0, 3));
+                if(subjectData == null) throw new IncorrectSettingsException(); 
+                else if(!studentSubjects.ContainsKey(subjectData)) studentSubjects.Add(subjectData, id.Substring(0, 3));
             }
 
             //At this point, we got the subjects where the student is registered in, independant of the student's regular  group
