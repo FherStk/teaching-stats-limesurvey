@@ -1,5 +1,5 @@
 ﻿//Global vars
-var _VERSION = "0.5.0";
+var _VERSION = "0.5.1";
 
 DisplayInfo();
 if(!CheckConfig()) return;
@@ -73,7 +73,7 @@ void Help(){
 }
 
 void ConvertSagaCSVtoImportYML(string filePath){        
-    var surveys = new Dictionary<string, Dictionary<string, Survey.SurveyData>>();    
+    var surveysByContent = new Dictionary<string, Dictionary<string, Survey.SurveyData>>();    
     var currentGroupName = Path.GetFileNameWithoutExtension(filePath);  //Must be like ASIX2B
     
     Info($"Converting from CSV to a LimeSurvey compatible YAML file ({Path.GetFileName(filePath)}):");
@@ -107,54 +107,46 @@ void ConvertSagaCSVtoImportYML(string filePath){
         GroupName = currentGroupName,      
         Participants = new List<Survey.Participant>()
     }); 
-    surveys.Add("SCHOOL", surveyByGroup);    
+    surveysByContent.Add("SCHOOL", surveyByGroup);    
 
     //NOTE: this will be filled from teaching-stats database, once integrated within the IMS (the lack of backoffice for teaching-stats does easier to define all the master data within a YML file).
     foreach(var s in degree.Subjects){
+        if(s.Trainers == null) throw new IncorrectSettingsException();         
+
+        //The same SurveyData instance will be used along content ID's within the same group
+        surveyByGroup = new Dictionary<string, Survey.SurveyData>();        
+        foreach(var t in s.Trainers){
+            if(t.Groups == null) throw new IncorrectSettingsException();                     
+
+            foreach(var groupName in t.Groups){  
+                //Same data object for every subject ID within the same group which simplifies the Distinct() process.
+                var data = new Survey.SurveyData(){            
+                    DegreeName = degree.Name,
+                    DepartmentName = degree.Department,
+                    SubjectCode = s.Code,
+                    SubjectName = s.Name,
+                    GroupName = groupName,
+                    TrainerName = t.Name,
+                    Topic = s.Name,
+                    Participants = new List<Survey.Participant>()
+                };
+
+                if(s.Name != "MENTORING-1-CCFF" && s.Name != "MENTORING-2-CCFF") data.Topic = "SUBJECT-CCFF";
+                surveyByGroup.Add(data.GroupName, data);
+            }             
+        }
+
+        //The same survey data will be used along content IDs (same subject, distinct content)
         if(s.Ids == null) throw new IncorrectSettingsException(); 
-
-        //############### REVISAR AQUI#################################################
-        //TODO: Different object for different groups (same subject).
-        //      Same object for different content ID within the same subject and group
-        //############### REVISAR AQUI#################################################
-
-        //Same data object for every subject ID which simplifies the Distinct() process.
-        var data = new Survey.SurveyData(){            
-            DegreeName = degree.Name,
-            DepartmentName = degree.Department,
-            SubjectCode = s.Code,
-            SubjectName = s.Name,
-            GroupName = currentGroupName,
-            Participants = new List<Survey.Participant>()
-        };
-
-        foreach(var id in s.Ids){
-            surveyByGroup = new Dictionary<string, Survey.SurveyData>();
-            surveys.Add(id, surveyByGroup);
-                        
-            if(s.Name == "FCT"){
-                surveyByGroup.Add(currentGroupName, data);    
-                data.Topic = "FCT";
-            }  
+        foreach(var id in s.Ids){                                    
+            if(!surveysByContent.ContainsKey(id)) surveysByContent.Add(id, surveyByGroup);
             else{
-                if(s.Trainers == null) throw new IncorrectSettingsException(); 
-                foreach(var t in s.Trainers){
-                    
-                    if(t.Groups == null) throw new IncorrectSettingsException();  
-                    foreach(var groupName in t.Groups){  
-                        surveyByGroup.Add(groupName, data);    
-                        data.GroupName = groupName;
-                        data.TrainerName = t.Name;
-                        data.Topic = s.Name;
-
-                        if(s.Name != "MENTORING-1-CCFF" && s.Name != "MENTORING-2-CCFF"){                            
-                            //Regular subject surveys    
-                            data.Topic = "SUBJECT-CCFF";
-                        }
-                    }                    
+                var current = surveysByContent[id];
+                foreach(var key in surveyByGroup.Keys){
+                    current.Add(key, surveyByGroup[key]);
                 }
             }
-        }        
+        }
     }
     Success();  
     
@@ -190,7 +182,7 @@ void ConvertSagaCSVtoImportYML(string filePath){
             var subjects = ((string)r.MATRICULADES).Split(",").Where(x => x.Length > 3).ToList();            
             foreach(var id in subjects){
                 //MPs (codes like 101) and UFs (codes like 10101), the UFs codes will be used when a subject is for 1st and 2nd course (like DAM M03).
-                surveyByGroup = surveys[id];
+                surveyByGroup = surveysByContent[id];
 
                 //The participant will be added to the survey, should be in:
                 //  1. Its own group (this is the normal behaviour).
@@ -214,10 +206,11 @@ void ConvertSagaCSVtoImportYML(string filePath){
             }
 
             //Adding the participant to the school survey
-            var school = surveys["SCHOOL"].FirstOrDefault().Value;
+            var school = surveysByContent["SCHOOL"].FirstOrDefault().Value;
             if(school != null && school.Participants != null) school.Participants.Add(p);
 
-            var mentoring = surveys[$"MENTORING-{degreeCourse}-CCFF"].FirstOrDefault().Value;
+            //Adding the participants to the mentory survey
+            var mentoring = surveysByContent[$"MENTORING-{degreeCourse}-CCFF"][currentGroupName];
             if(mentoring != null && mentoring.Participants != null) mentoring.Participants.Add(p);
         }
     }
@@ -226,24 +219,24 @@ void ConvertSagaCSVtoImportYML(string filePath){
     else Warning("WARNING: \n" + string.Join('\n', warnings));
     
     Info("   Generating the YAML file for the current group... ", false);
-    var allGroupsData = surveys.Values.SelectMany(x => x.Values).Distinct().Where(x => x.Participants != null && x.Participants.Count > 0).ToList();
+    var allGroupsData = surveysByContent.Values.SelectMany(x => x.Values).Distinct().Where(x => x.Participants != null && x.Participants.Count > 0).ToList();
     var currentGroupData = new Survey(){Data = allGroupsData.Where(x => x.GroupName == currentGroupName).ToList()};
     Utils.SerializeYamlFile(currentGroupData, Path.Combine(Utils.ActionsFolder, $"create-surveys-{currentGroupName}.yml"));
     Success();    
 
-    // Info("   Updating existing YAML file for repeater studnets... ", false);
-    // var otherGroupData = allGroupsData.Where(x => x.GroupName != currentGroupName).GroupBy(x => x.GroupName).ToDictionary(x => x.Key ?? "", x => x.ToList());
-    // foreach(var otherGroupCode in otherGroupData.Keys){        
-    //     var otherYamlPath = Path.Combine(Utils.ActionsFolder, $"create-surveys-{otherGroupCode}.yml");
+    Info("   Updating existing YAML file for repeater studnets... ", false);
+    var otherGroupData = allGroupsData.Where(x => x.GroupName != currentGroupName).GroupBy(x => x.GroupName).ToDictionary(x => x.Key ?? "", x => x.ToList());
+    foreach(var otherGroupCode in otherGroupData.Keys){        
+        var otherYamlPath = Path.Combine(Utils.ActionsFolder, $"create-surveys-{otherGroupCode}.yml");
 
-    //     //Loading the current file and adding new data
-    //     var otherYamlData = Utils.DeserializeYamlFile<Survey>(otherYamlPath);
-    //     if(otherYamlData.Data != null) otherYamlData.Data.AddRange(otherGroupData[otherGroupCode]);
+        //Loading the current file and adding new data
+        var otherYamlData = Utils.DeserializeYamlFile<Survey>(otherYamlPath);
+        if(otherYamlData.Data != null) otherYamlData.Data.AddRange(otherGroupData[otherGroupCode]);
 
-    //     //Storing the updated file
-    //     Utils.SerializeYamlFile(otherYamlData, Path.Combine(otherYamlPath));
-    // }
-    // Success();    
+        //Storing the updated file
+        Utils.SerializeYamlFile(otherYamlData, Path.Combine(otherYamlPath));
+    }
+    Success();    
 
     Console.WriteLine();
 }
