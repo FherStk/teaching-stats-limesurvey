@@ -1,4 +1,16 @@
 data:
+- topic: "SCHOOL"
+  degreeName: "DEGREE NAME"
+  departmentName: "DEPARTMENT NAME"
+  groupName: "GROUP NAME"  
+  participants:
+    - email: "me@example.com"
+      firstname: "Name"
+      lastname: "Surname"
+
+    - email: "me@example.com"
+      firstname: "Another Name"
+      lastname: "Another Surname"
 - topic: "SUBJECT-CCFF"
   degreeName: "DEGREE NAME"
   departmentName: "DEPARTMENT NAME"
@@ -43,15 +55,3 @@ data:
       firstname: "Another Name"
       lastname: "Another Surname"
 
-- topic: "SCHOOL"
-  degreeName: "DEGREE NAME"
-  departmentName: "DEPARTMENT NAME"
-  groupName: "GROUP NAME"  
-  participants:
-    - email: "me@example.com"
-      firstname: "Name"
-      lastname: "Surname"
-
-    - email: "me@example.com"
-      firstname: "Another Name"
-      lastname: "Another Surname"

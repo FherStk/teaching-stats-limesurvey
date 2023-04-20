@@ -1,13 +1,13 @@
 teachingStats:
   host: localhost
-  username: postgres
-  password: postgres
+  username: <USERNAME>
+  password: <PASSWORD>
 
 limeSurvey:
   host: https://limesurvey.elpuig.xeill.net
-  username: admin
-  password: admin
-  group: 1 
+  username: <USERNAME>
+  password: <PASSWORD>
+  group: <GROUP_ID> 
 
 data:
   degrees:
@@ -16,662 +16,1338 @@ data:
       subjects:
         - code: "MP01"
           name: "Muntatge i manteniment d’equips"
+          ids:
+            - "10101"
+            - "10102"
+            - "10103"
+            - "10104"
+            - "10105"
+            - "10106"
+            - "00101"
+            - "00102"
+            - "00103"
+            - "00104"
+            - "00105"
+            - "00106"          
           trainers:
-            - name: "<TRINER>"
+            - name: <TRAINER>
               groups:
-                - code: "SMX1A"
-
-            - name: "<TRINER>"
+                - "SMX1A"
+            - name: <TRAINER>
               groups:
-                - code: "SMX1B"
-              
-            - name: "<TRINER>"
+                - "SMX1B"
+            - name: <TRAINER>
               groups:
-                - code: "SMX1C"
-                - code: "SMX1D"  
+                - "SMX1C"
+                - "SMX1D" 
 
         - code: "MP02"
           name: "Sistemes operatius monolloc"
+          ids: 
+            - "10201"
+            - "10202"
+            - "10203"
+            - "00201"
+            - "00202"
+            - "00203"  
           trainers:
-            - name: "<TRINER>"
+            - name: <TRAINER>
               groups:
-                - code: "SMX1A"
-                - code: "SMX1B"
-                - code: "SMX1C"
-
-            - name: "<TRINER>"
+                - "SMX1A"
+                - "SMX1B"
+                - "SMX1C"
+            - name: <TRAINER>
               groups:
-                - code: "SMX1D"   
-
+                - "SMX1D"   
+        
         - code: "MP03"
           name: "Aplicacions ofimàtiques"
+          ids: 
+            - "00301"
+            - "00302"
+            - "00303"
+            - "00304"
+            - "00305"
+            - "00306"
+            - "10301"
+            - "10302"
+            - "10303"
+            - "10304"
+            - "10305"
+            - "10306"
           trainers:
-            - name: "<TRINER>"
+            - name: <TRAINER>
               groups:
-                - code: "SMX1A"
-                - code: "SMX1B"
-                - code: "SMX1C"
-
-            - name: "<TRINER>"
+                - "SMX1A"
+                - "SMX1B"
+                - "SMX1C"
+            - name: <TRAINER>
               groups:
-                - code: "SMX1D"    
-        
+                - "SMX1D" 
+                
         - code: "MP04"
           name: "Sistemes operatius en xarxa"
+          ids: 
+            - "00401"
+            - "00402"
+            - "00403"
+            - "00404"
+            - "10401"
+            - "10402"
+            - "10403"
+            - "10404"
           trainers:
-            - name: "<TRINER>"
+            - name: <TRAINER>
               groups:
-                - code: "SMX2A"
-                - code: "SMX2B"
-
-            - name: "<TRINER>"
+                - "SMX2A"
+                - "SMX2B"
+            - name: <TRAINER>
               groups:
-                - code: "SMX2C"
+                - "SMX2C"
 
         - code: "MP05"
           name: "Xarxes locals"
+          ids: 
+            - "00501"
+            - "00502"
+            - "00503"
+            - "AOEOA"
+            - "AOEOB"
+            - "AOEOC"  
           trainers:
-            - name: "<TRINER>"
+            - name: <TRAINER>
               groups:
-                - code: "SMX1A"
-                - code: "SMX1B"
-                - code: "SMX1C"
-                - code: "SMX1D"
-
-            - name: "<TRINER>"
+                - "SMX1A"
+                - "SMX1B"
+            - name: <TRAINER>
               groups:
-                - code: "SMX1C"
-                - code: "SMX1D"
+                - "SMX1C"
+                - "SMX1D"
         
         - code: "MP06"
           name: "Seguretat informàtica"
+          ids: 
+            - "00601"
+            - "00602"
+            - "00603"
+            - "00604"
+            - "00605"
+            - "AOFOA"
+            - "AOFOB"
+            - "AOFOC"
+            - "AOFOD"
+            - "AOFOE"
           trainers:
-            - name: "<TRINER>"
+            - name: <TRAINER>
               groups:
-                - code: "SMX2A"
-                - code: "SMX2B"
-
-            - name: "<TRINER>"
+                - "SMX2A"
+                - "SMX2B"
+            - name: <TRAINER>
               groups:
-                - code: "SMX2C"
+                - "SMX2C"        
 
         - code: "MP07"
           name: "Serveis de xarxa"
+          ids: 
+            - "00701"
+            - "00702"
+            - "00703"
+            - "00704"
+            - "AOGOA"
+            - "AOGOB"
+            - "AOGOC"
+            - "AOGOD" 
           trainers:
-            - name: "<TRINER>"
+            - name: <TRAINER>
               groups:
-                - code: "SMX2A"
-                - code: "SMX2B"
-
-            - name: "<TRINER>"
+                - "SMX2A"
+                - "SMX2B"
+            - name: <TRAINER>
               groups:
-                - code: "SMX2C"
+                - "SMX2C"        
 
         - code: "MP08"
           name: "Aplicacions web"
+          ids: 
+            - "AOHOA"
+            - "AOHOB"
+            - "AOHOC"
+            - "AOHOD"
+            - "AOHOE"
+            - "00801"
+            - "00802"
+            - "00803"
+            - "00804"
+            - "00805" 
           trainers:
-            - name: "<TRINER>"
+            - name: <TRAINER>
               groups:
-                - code: "SMX2A"
-
-            - name: "<TRINER>"
+                - "SMX2A"
+            - name: <TRAINER>
               groups:
-                - code: "SMX2B"
-
-            - name: "<TRINER>"
+                - "SMX2B"
+            - name: <TRAINER>
               groups:
-                - code: "SMX2C"
-
-            - name: "<TRINER>"
-              groups:
-                - code: "SMX2C"
-
+                - "SMX2C"
+        
         - code: "MP09"
           name: "Formació i orientació laboral"
+          ids: 
+            - "00901"
+            - "00902"
+            - "AOIOA"
+            - "AOIOB"
           trainers:
-            - name: "<TRINER>"
+            - name: <TRAINER>
               groups:
-                - code: "SMX1A"
-                - code: "SMX1B"
-                - code: "SMX1C"
-
-            - name: "<TRINER>"
+                - "SMX1A"
+                - "SMX1B"
+                - "SMX1C"
+            - name: <TRAINER>
               groups:
-                - code: "SMX1D"
-
+                - "SMX1D"
+        
         - code: "MP10"
           name: "Empresa i iniciativa emprenedora"
+          ids: 
+            - "01001"
+            - "11001"
           trainers:
-            - name: "<TRINER>"
+            - name: <TRAINER>
               groups:
-                - code: "SMX2A"
-                - code: "SMX2B"
-
-            - name: "<TRINER>"
+                - "SMX2A"
+                - "SMX2B"
+            - name: <TRAINER>
               groups:
-                - code: "SMX2C"
-
+                - "SMX2C"        
+                            
         - code: "MP11"
-          name: "Anglès"
+          name: "Anglès tècnic"
+          ids: 
+            - "01201" 
+            - "11101" 
           trainers:
-            - name: "<TRINER>"
+            - name: <TRAINER>
               groups:
-                - code: "SMX1A"
-                - code: "SMX1B"
-                - code: "SMX1C"
-
-            - name: "<TRINER>"
+                - "SMX1A"
+                - "SMX1B"
+                - "SMX1C"
+            - name: <TRAINER>
               groups:
-                - code: "SMX1D"
-        
+                - "SMX1D"  
+                
         - code: "MP12"
-          name: "Crèdit de síntesi"
+          name: "Síntesi"
+          ids: 
+            - "01101" 
+            - "11201" 
           trainers:
-            - name: "<TRINER>"
+            - name: <TRAINER>
               groups:
-                - code: "SMX2A"
-                - code: "SMX2B"
+                - "SMX2A"
+                - "SMX2B"
+            - name: <TRAINER>
+              groups:
+                - "SMX2C"   
 
-            - name: "<TRINER>"
+        - code: "MP13"
+          name: "FCT"
+          ids: 
+            - "01301"
+            - "AOJOA"
+          trainers:
+            - name: <TRAINER>
               groups:
-                - code: "SMX2C"        
+                - "SMX2A"
+                - "SMX2B"
+                - "SMX2C"
+          
+        - code: "MP14"
+          name: "Anglès tècnic avançat"
+          ids: 
+            - "BOBOA"
+          trainers:
+            - name: <TRAINER>
+              groups:
+                - "SMX1A"
+                - "SMX1B"
+                - "SMX1C"
+            - name: <TRAINER>
+              groups:
+                - "SMX1D"
+          
+        - code: "MENTORING-1-CCFF"
+          name: "MENTORING-1-CCFF"
+          ids: 
+            - "MENTORING-1-CCFF"
+          trainers:
+            - name: <TRAINER>
+              groups:
+                - "SMX1A"
+                - "SMX1B"
+            - name: <TRAINER>
+              groups:
+                - "SMX1C"
+            - name: <TRAINER>
+              groups:
+                - "SMX1D"
+
+        - code: "MENTORING-2-CCFF"
+          name: "MENTORING-2-CCFF"
+          ids: 
+            - "MENTORING-2-CCFF"
+          trainers:
+            - name: <TRAINER>
+              groups:
+                - "SMX2A"
+                - "SMX2B"
+            - name: <TRAINER>
+              groups:
+                - "SMX2C"            
 
     - name: "GA"
       department: "Administració i gestió"
-      subjects:
+      subjects:          
         - code: "MP01"
           name: "Comunicació empresarial i atenció al client (Llengües estrangeres)"
+          ids: 
+            - "AOAOA"
+            - "AOAOB"
+            - "AOAOC"
+            - "AOAOD"              
           trainers:
-            - name: "<TRINER>"
+            - name: <TRAINER>
               groups:
-                - code: "GA1A"
-                - code: "GA1B"
-
+                - "GA1A"
+                - "GA1B"
+          
         - code: "MP01"
-          name: "Comunicació empresarial i atenció al client (UF1, UF4)"
+          name: "Comunicació empresarial i atenció al client (UF1, UF2, UF4)"
+          ids: 
+            - "00101"
+            - "00102"
+            - "00104"
           trainers:
-            - name: "<TRINER>"
+            - name: <TRAINER>
               groups:
-                - code: "GA2A"
-
+                - "GA2A"
+          
         - code: "MP01"
           name: "Comunicació empresarial i atenció al client (UF3)"
+          ids: 
+            - "00103"
           trainers:
-            - name: "<TRINER>"
+            - name: <TRAINER>
               groups:
-                - code: "GA2A"
-
+                - "GA2A"
+          
         - code: "MP02"
           name: "Operacions administratives de compravenda"
+          ids: 
+            - "AOBOA"
+            - "AOBOB"
+            - "AOBOC"
+            - "00201"
+            - "00202"
+            - "00203"
           trainers:
-            - name: "<TRINER>"
+            - name: <TRAINER>
               groups:
-                - code: "GA1A"
-                - code: "GA1B"
-
+                - "GA1A"
+                - "GA1B"
+          
         - code: "MP03"
           name: "Operacions administratives de recursos humans"
+          ids: 
+            - "10301"
+            - "10302"
+            - "10303"
+            - "00301"
+            - "00302"
+            - "00303"   
           trainers:
-            - name: "<TRINER>"
+            - name: <TRAINER>
               groups:
-                - code: "GA1A"
-                - code: "GA1B"
-
+                - "GA1A"
+                - "GA1B"
+          
         - code: "MP04"
           name: "Operacions auxiliars de gestió de tresoreria"
+          ids: 
+            - "10401"
+            - "10402"
+            - "10403"
+            - "00401"
+            - "00402"
+            - "00403"
           trainers:
-            - name: "<TRINER>"
+            - name: <TRAINER>
               groups:
-                - code: "GA2A"
-
+                - "GA2A"
+          
         - code: "MP05"
           name: "Tècnica comptable"
+          ids: 
+            - "10501"
+            - "10502"
+            - "10503"
+            - "00501"
+            - "00502"
+            - "00503"  
           trainers:
-            - name: "<TRINER>"
+            - name: <TRAINER>
               groups:
-                - code: "GA1A"
-                - code: "GA1B"
-
+                - "GA1A"
+                - "GA1B"
+          
         - code: "MP06"
           name: "Tractament de la documentació comptable"
+          ids: 
+            - "AOFOA"
+            - "AOFOB"
+            - "AOFOC"
+            - "AOFOD"
+            - "00601"
+            - "00602"
+            - "00603"
+            - "00604"
           trainers:
-            - name: "<TRINER>"
+            - name: <TRAINER>
               groups:
-                - code: "GA2A"
-
+                - "GA2A"
+           
         - code: "MP07"
           name: "Tractament informàtic de la informació (UF1, UF2, UF6)"
+          ids: 
+            - "00701"
+            - "00702"
+            - "00706"
+            - "00707"
+            - "10701"
+            - "10702"
+            - "10706"
           trainers:
-            - name: "<TRINER>"
+            - name: <TRAINER>
               groups:
-                - code: "GA1A"
-                - code: "GA1B"
-
+                - "GA1A"
+                - "GA1B"
+         
         - code: "MP07"
           name: "Tractament informàtic de la informació (UF3, UF4, UF5)"
+          ids: 
+            - "10703"
+            - "10704"
+            - "10705"
+            - "00703"
+            - "00704"
+            - "00705"  
+            - "00708" 
           trainers:
-            - name: "<TRINER>"
+            - name: <TRAINER>
               groups:
-                - code: "GA2A"
-
+                - "GA2A"
+          
         - code: "MP08"
           name: "Anglès"
+          ids: 
+            - "10801"       
           trainers:
-            - name: "<TRINER>"
+            - name: <TRAINER>
               groups:
-                - code: "GA1A"
-                - code: "GA1B"
-
+                - "GA1A"
+                - "GA1B"
+          
         - code: "MP08"
           name: "Operacions administratives de suport"
+          ids: 
+            - "00801"
+            - "00802"               
           trainers:
-            - name: "<TRINER>"
+            - name: <TRAINER>
               groups:
-                - code: "GA2A"
-
+                - "GA2A"
+          
         - code: "MP09"
           name: "Empresa i Administració"
+          ids: 
+            - "10901"
+            - "10902"
+            - "10903"
+            - "10904" 
           trainers:
-            - name: "<TRINER>"
+            - name: <TRAINER>
               groups:
-                - code: "GA1A"
-                - code: "GA1B"
-                 
+                - "GA1A"
+                - "GA1B"
+          
+        - code: "MP09"
+          name: "Anglès"
+          ids: 
+            - "00901"                 
+          trainers:
+            - name: <TRAINER>
+              groups:
+                - "GA1A"
+                - "GA1B"
+          
+        - code: "MP10"
+          name: "Empresa a l’aula"
+          ids: 
+            - "11001"     
+          trainers:
+            - name: <TRAINER>
+              groups:
+                - "GA2A"
+          
+        - code: "MP10"
+          name: "Empresa i Administració"
+          ids: 
+            - "01001"
+            - "01002"
+            - "01003"
+            - "01004"  
+          trainers:
+            - name: <TRAINER>
+              groups:
+                - "GA1A"
+                - "GA1B"
+          
+        - code: "MP11"
+          name: "Formació i orientació laboral"
+          ids: 
+            - "AOGOA"
+          trainers:
+            - name: <TRAINER>
+              groups:
+                - "GA1A"
+                - "GA1B"
+          
         - code: "MP11"
           name: "Empresa a l’aula"
+          ids: 
+            - "01101"
           trainers:
-            - name: "<TRINER>"
+            - name: <TRAINER>
               groups:
-                - code: "GA2"
-        
+                - "GA2A"
+          
+        - code: "MP12"
+          name: "Formació i orientació laboral"
+          ids: 
+            - "01201"
+            - "01202"  
+          trainers:
+            - name: <TRAINER>
+              groups:
+                - "GA1A"
+                - "GA1B"
+          
+        - code: "MP12"
+          name: "FCT"     
+          ids: 
+            - "AOIOA"
+          trainers:
+            - name: <TRAINER>
+              groups:
+                - "GA2A"
+          
+        - code: "MP13"
+          name: "FCT"       
+          ids: 
+            - "01301"
+          trainers:
+            - name: <TRAINER>
+              groups:
+                - "GA2A"
+                  
         - code: "MP13"
           name: "Anglès Tècnic"
+          ids: 
+            - "AOHOA"       
           trainers:
-            - name: "<TRINER>"
+            - name: <TRAINER>
               groups:
-                - code: "GA1A"
-                - code: "GA1B"
+                - "GA1A"
+                - "GA1B"
+          
+        - code: "MP14"
+          name: Anglès tècnic avançat
+          ids: 
+            - "AOJOA"  
+          trainers:
+            - name: <TRAINER>
+              groups:
+                - "GA1A"
+                - "GA1B"
+          
+        - code: "MENTORING-1-CCFF"
+          name: "MENTORING-1-CCFF"
+          ids: 
+            - "MENTORING-1-CCFF"
+          trainers:
+            - name: <TRAINER>
+              groups:
+                - "GA1A"
+                - "GA1B"
+
+        - code: "MENTORING-2-CCFF"
+          name: "MENTORING-2-CCFF"
+          ids: 
+            - "MENTORING-2-CCFF"
+          trainers:
+            - name: <TRAINER>
+              groups:
+                - "GA2A"                
 
     - name: "AIF"
       department: "Administració i gestió"
-      subjects:
+      subjects:          
         - code: "MP01"
           name: "Comunicació i atenció al client"
+          ids: 
+            - "10101"
+            - "10102"
+            - "10103"            
+            - "00101"
+            - "00102"
+            - "00103"
+            - "00104"
+            - "00105"
+            - "00106"
+            - "00107"
           trainers:
-            - name: "<TRINER>"
+            - name: <TRAINER>
               groups:
-                - code: "AIF1A"
-                - code: "AIF1B"
-
+                - "AIF1A"
+          
         - code: "MP02"
           name: "Gestió de la documentació jurídica i empresarial"
+          ids: 
+            - "10201"
+            - "10202"
+            - "10203"
+            - "00201"
+            - "00202"
+            - "00203"
+            - "01501"
+            - "01502"
+            - "01503"
           trainers:
-            - name: "<TRINER>"
+            - name: <TRAINER>
               groups:
-                - code: "AIF1A"
-                - code: "AIF1B"       
-
-            - name: "<TRINER>"
+                - "AIF1A"   
+            - name: <TRAINER>
               groups:
-                - code: "AIF2A"
-
+                - "AIF2A"          
+          
         - code: "MP03"
           name: "Procés integral de l’activitat comercial"
+          ids: 
+            - "AOCOA"
+            - "AOCOB"
+            - "AOCOC"
+            - "AOCOD"
+            - "00301"
+            - "00302"
+            - "00303"
+            - "00304"
+            - "00305"
           trainers:
-            - name: "<TRINER>"
+            - name: <TRAINER>
               groups:
-                - code: "AIF1A"
-                - code: "AIF1B"
-
+                - "AIF1A"
+          
         - code: "MP04"
           name: "Recursos humans i responsabilitat social corporativa"
+          ids: 
+            - "10401"
+            - "10402"
+            - "00401"
+            - "00402"              
           trainers:
-            - name: "<TRINER>"
+            - name: <TRAINER>
               groups:
-                - code: "AIF2A"
-
+                - "AIF2A"         
+          
         - code: "MP05"
           name: "Ofimàtica i procés de la informació"
+          ids: 
+            - "10501"
+            - "10502"
+            - "10503"
+            - "00501"
+            - "00502"
+            - "00503"
+            - "01601"
+            - "01602"
+            - "01603"
           trainers:
-            - name: "<TRINER>"
+            - name: <TRAINER>
               groups:
-                - code: "AIF1A"
-                - code: "AIF1B"
-
+                - "AIF1A"
+          
         - code: "MP06"
           name: "Anglès"
+          ids: 
+            - "10601"                
+            - "00601"            
           trainers:
-            - name: "<TRINER>"
+            - name: <TRAINER>
               groups:
-                - code: "AIF1A"
-                - code: "AIF1B"
-
-            - name: "<TRINER>"
+                - "AIF1A"
+            - name: <TRAINER>
               groups:
-                - code: "AIF2A"
-
+                - "AIF2A"          
+          
         - code: "MP07"
           name: "Gestió de recursos humans"
+          ids: 
+            - "10701"
+            - "10702"                
+            - "00701"
+            - "00702"            
           trainers:
-            - name: "<TRINER>"
+            - name: <TRAINER>
               groups:
-                - code: "AIF1A"
-                - code: "AIF1B"
-
+                - "AIF1A"
+          
         - code: "MP08"
           name: "Gestió financera"
+          ids: 
+            - "10801"
+            - "10802"
+            - "10803"
+            - "00801"
+            - "00802"
+            - "00803"
           trainers:
-            - name: "<TRINER>"
+            - name: <TRAINER>
               groups:
-                - code: "AIF2A"
-
+                - "AIF2A"          
+          
         - code: "MP09"
           name: "Comptabilitat i fiscalitat (UF1, UF2)"
+          ids: 
+            - "10901"
+            - "10902"
+            - "00901"
+            - "00902"
           trainers:
-            - name: "<TRINER>"
+            - name: <TRAINER>
               groups:
-                - code: "AIF2A"
-
+                - "AIF2A"
+          
         - code: "MP09"
           name: "Comptabilitat i fiscalitat (UF3)"
+          ids: 
+            - "10903"
+            - "00903"
           trainers:
-            - name: "<TRINER>"
+            - name: <TRAINER>
               groups:
-                - code: "AIF2A"
-
+                - "AIF2A"                 
+          
+        - code: "MP10"
+          name: "Gestió logística i comercial"
+          ids: 
+            - "AAOOA"
+            - "AAOOB"
+            - "AAOOC"
+            - "01001"
+            - "01002"
+            - "01003"
+          trainers:
+            - name: <TRAINER>
+              groups:
+                - "AIF2A"          
+          
         - code: "MP11"
           name: "Simulació empresarial"
+          ids: 
+            - "AAAOA"                
+            - "01101"
           trainers:
-            - name: "<TRINER>"
+            - name: <TRAINER>
               groups:
-                - code: "AIF2A"
-
-            - name: "<TRINER>"
-              groups:
-                - code: "AIF2A"
-
+                - "AIF2A"            
+                    
         - code: "MP12"
           name: "Formació i orientació laboral"
+          ids: 
+            - "AABOA"
+            - "AABOB"
+            - "01201"
+            - "01202"
           trainers:
-            - name: "<TRINER>"
+            - name: <TRAINER>
               groups:
-                - code: "AIF1A"
-                - code: "AIF1B"
-
-            - name: "<TRINER>"
+                - "AIF1A"
+            - name: <TRAINER>
               groups:
-                - code: "AIF2A"
-
+                - "AIF2A"
+          
         - code: "MP13"
           name: "Projecte d’administració i finances"
+          ids: 
+            - "11301"
+            - "01301"
           trainers:
-            - name: "<TRINER>"
+            - name: <TRAINER>
               groups:
-                - code: "AIF2A"
+                - "AIF2A"            
+          
+        - code: "MP14"
+          name: "FCT"   
+          ids: 
+            - "AACOA"
+            - "01401"
+          trainers:
+            - name: <TRAINER>
+              groups:
+                - "AIF2A"
+          
+        - code: "MENTORING-1-CCFF"
+          name: "MENTORING-1-CCFF"
+          ids: 
+            - "MENTORING-1-CCFF"
+          trainers:
+            - name: <TRAINER>
+              groups:
+                - "AIF1A"
+                - "AIF1B"
 
-            - name: "<TRINER>"
+        - code: "MENTORING-2-CCFF"
+          name: "MENTORING-2-CCFF"
+          ids: 
+            - "MENTORING-2-CCFF"
+          trainers:
+            - name: <TRAINER>
               groups:
-                - code: "AIF2A"
+                - "AIF2A"                
 
     - name: "ASIX"
       department: "Informàtica"
-      subjects:
+      subjects:          
         - code: "MP01"
-          name: "Sistemes informàtics"
+          name: "Sistemes informàtics (UF1, UF2, UF3)"
+          ids: 
+            - "10101"
+            - "10102"
+            - "10103"
+            - "00101"
+            - "00102"
+            - "00103"
           trainers:
-            - name: "<TRINER>"
+            - name: <TRAINER>
               groups:
-                - code: "ASIX1A"
-
+                - "ASIX1A"
+          
         - code: "MP02"
-          name: "Bases de dades (UF1, UF2, UF3)"
+          name: "Bases de dades (UF1, UF2, +UF1 M10)"
+          ids: 
+            - "10201"
+            - "10202"
+            - "00201"
+            - "00202"  
+            - "AAOOA"  
+            - "01001"                      
           trainers:
-            - name: "<TRINER>"
+            - name: <TRAINER>
               groups:
-                - code: "ASIX1A"
-
+                - "ASIX1A"
+          
         - code: "MP03"
           name: "Programació bàsica"
+          ids: 
+            - "AOCOA"
+            - "AOCOB"
+            - "AOCOC"
+            - "00301" 
+            - "00302"
+            - "00303"  
           trainers:
-            - name: "<TRINER>"
+            - name: <TRAINER>
               groups:
-                - code: "ASIX1A"
-
-            - name: "<TRINER>"
+                - "ASIX1A"
+            - name: <TRAINER>
               groups:
-                - code: "ASIX1A"
-
+                - "ASIX2A"
+                - "ASIX2B"  
+          
         - code: "MP04"
           name: "Llenguatges de marques i sistemes de gestió empresarial"
+          ids: 
+            - "10401"
+            - "10402"
+            - "10403"
+            - "00401" 
+            - "00402" 
+            - "00403" 
+            - "00404" 
           trainers:
-            - name: "<TRINER>"
+            - name: <TRAINER>
               groups:
-                - code: "ASIX1A"
-
+                - "ASIX1A"
+          
         - code: "MP05"
           name: "Fonaments de maquinari"
+          ids: 
+            - "10501"
+            - "10502"
+            - "10503"
+            - "00501"
+            - "00502"
+            - "00503"
           trainers:
-            - name: "<TRINER>"
+            - name: <TRAINER>
               groups:
-                - code: "ASIX2A"
-
-            - name: "<TRINER>"
+                - "ASIX2A"
+            - name: <TRAINER>
               groups:
-                - code: "ASIX2B"
-
+                - "ASIX2B"
+          
         - code: "MP06"
           name: "Administració de sistemes operatius (+UF4 MP01)"
+          ids: 
+            - "AOFOA"
+            - "AOFOB"
+            - "00601"
+            - "00602"                
+            - "10104"
+            - "00104"
           trainers:
-            - name: "<TRINER>"
+            - name: <TRAINER>
               groups:
-                - code: "ASIX2A"
-
-            - name: "<TRINER>"
+                - "ASIX2A"
+            - name: <TRAINER>
               groups:
-                - code: "ASIX2B"
-
+                - "ASIX2B"          
+          
         - code: "MP07"
           name: "Planificació i administració de xarxes"
+          ids: 
+            - "10701"
+            - "10702"
+            - "10703"
+            - "00701"                
+            - "00702"
+            - "00703"
           trainers:
-            - name: "<TRINER>"
+            - name: <TRAINER>
               groups:
-                - code: "ASIX2A"
-
-            - name: "<TRINER>"
+                - "ASIX1A"
+            - name: <TRAINER>
               groups:
-                - code: "ASIX2B"
-
+                - "ASIX2A"
+            - name: <TRAINER>
+              groups:
+                - "ASIX2B"
+          
         - code: "MP08"
           name: "Serveis de xarxa i Internet"
+          ids: 
+            - "10801"
+            - "10802"
+            - "10803"
+            - "10804"
+            - "00801"                
+            - "00802"
+            - "00803"
+            - "00804"
           trainers:
-            - name: "<TRINER>"
+            - name: <TRAINER>
               groups:
-                - code: "ASIX2A"
-
-            - name: "<TRINER>"
+                - "ASIX2A"
+            - name: <TRAINER>
               groups:
-                - code: "ASIX2B"
-
+                - "ASIX2B"                
+          
         - code: "MP09"
           name: "Implantació d'aplicacions web"
+          ids: 
+            - "10901"
+            - "10902"
+            - "00901"
+            - "00902"
           trainers:
-            - name: "<TRINER>"
+            - name: <TRAINER>
               groups:
-                - code: "ASIX2A"
-
-            - name: "<TRINER>"
+                - "ASIX2A"
+            - name: <TRAINER>
               groups:
-                - code: "ASIX2B"
-
+                - "ASIX2B"
+                    
         - code: "MP10"
           name: "Gestió i Administració d'SGBDs (UF3 MP02 + UF2 MP10)"
+          ids: 
+            - "01002"
+            - "10203"
+            - "00203"
           trainers:
-            - name: "<TRINER>"
+            - name: <TRAINER>
               groups:
-                - code: "ASIX2A"
-
-            - name: "<TRINER>"
+                - "ASIX2A"
+            - name: <TRAINER>
               groups:
-                - code: "ASIX2B"
-
+                - "ASIX2B"         
+          
         - code: "MP11"
           name: "Seguretat i alta disponibilitat"
+          ids: 
+            - "11101"
+            - "11102"
+            - "11103"
+            - "11104"
+            - "01101"
+            - "01102"
+            - "01103"
+            - "01104"
           trainers:
-            - name: "<TRINER>"
+            - name: <TRAINER>
               groups:
-                - code: "ASIX2A"
-
-            - name: "<TRINER>"
+                - "ASIX2A"
+            - name: <TRAINER>
               groups:
-                - code: "ASIX2B"
-
+                - "ASIX2B"
+          
+        - code: "MP12"
+          name: "Formació i orientació laboral"
+          ids: 
+            - "AAPOA"
+            - "AAPOB"
+            - "01201"
+            - "01202"                
+          trainers:
+            - name: <TRAINER>
+              groups:
+                - "ASIX1A"          
+          
+        - code: "MP13"
+          name: "Empresa i iniciativa emprenedora"
+          ids: 
+            - "11301"
+            - "01301"
+          trainers:
+            - name: <TRAINER>
+              groups:
+                - "ASIX1A"          
+          
         - code: "MP14"
           name: "Projecte"
+          ids: 
+            - "11401"
+            - "01401"
           trainers:
-            - name: "<TRINER>"
+            - name: <TRAINER>
               groups:
-                - code: "ASIX2A"
-
-            - name: "<TRINER>"
+                - "ASIX2A"            
+            - name: <TRAINER>
               groups:
-                - code: "ASIX2A"
-
-            - name: "<TRINER>"
+                - "ASIX2B"          
+          
+        - code: "MP15"
+          name: "FCT"  
+          ids: 
+            - "AAQOA"
+            - "01501"
+          trainers:
+            - name: <TRAINER>
               groups:
-                - code: "ASIX2B"
+                - "ASIX2A"
+                - "ASIX2B"
+          
+        - code: "MP16"
+          name: "Anglès tècnic"
+          ids: 
+            - "BOAOA"
+          trainers:
+            - name: <TRAINER>
+              groups:
+                - "ASIX1A"
+          
+        - code: "MP17"
+          name: "Anglès tècnic avançat"
+          ids: 
+            - "BOBOA" 
+          trainers:
+            - name: <TRAINER>
+              groups:
+                - "ASIX1A"
+          
+        - code: "MENTORING-1-CCFF"
+          name: "MENTORING-1-CCFF"
+          ids: 
+            - "MENTORING-1-CCFF"
+          trainers:
+            - name: <TRAINER>
+              groups:
+                - "ASIX1A"
 
+        - code: "MENTORING-2-CCFF"
+          name: "MENTORING-2-CCFF"
+          ids: 
+            - "MENTORING-2-CCFF"
+          trainers:
+            - name: <TRAINER>
+              groups:
+                - "ASIX2A"
+                - "ASIX2B"            
+      
     - name: "DAM"
       department: "Informàtica"
-      subjects:
+      subjects:          
         - code: "MP01"
           name: "Sistemes informàtics"
+          ids: 
+            - "10101"
+            - "10102"
+            - "10103"
+            - "00101"
+            - "00102"
+            - "00103"
           trainers:
-            - name: "<TRINER>"
+            - name: <TRAINER>
               groups:
-                - code: "DAM1A"
-
+                - "DAM1A"        
+          
         - code: "MP02"
           name: "Bases de dades (UF1, UF2, UF3)"
+          ids: 
+            - "10201"
+            - "10202"
+            - "10203"
+            - "00201"
+            - "00202"
+            - "00203"
           trainers:
-            - name: "<TRINER>"
+            - name: <TRAINER>
               groups:
-                - code: "DAM1A"
+                - "DAM1A"          
+          
+        - code: "MP03"
+          name: "Programació bàsica (UF1, UF2, UF3)"
+          ids: 
+            - "AOCOA"
+            - "AOCOB"
+            - "AOCOC"                
+            - "00301" 
+            - "00302"
+            - "00303"            
+          trainers:
+            - name: <TRAINER>
+              groups:
+                - "DAM1A"
+            - name: <TRAINER>
+              groups:
+                - "DAM2A"
+                - "DAM2B"
 
         - code: "MP03"
-          name: "Programació bàsica"
+          name: "Programació bàsica (UF4, UF5, UF6)"
+          ids: 
+            - "AOCOD"
+            - "AOCOE"
+            - "AOCOF"                
+            - "00304" 
+            - "00305"
+            - "00306"
           trainers:
-            - name: "<TRINER>"
+            - name: <TRAINER>
               groups:
-                - code: "DAM1A"
-
-            - name: "<TRINER>"
-              groups:
-                - code: "DAM1A"
-
-            - name: "<TRINER>"
-              groups:
-                - code: "DAM1A"
-
-            - name: "<TRINER>"
-              groups:
-                - code: "DAM2A"
-                - code: "DAM2B"
-
+                - "DAM2A"
+                - "DAM2B"                       
+          
         - code: "MP04"
           name: "Llenguatges de marques i sistemes de gestió empresarial"
+          ids: 
+            - "10401"
+            - "10402"
+            - "10403"
+            - "00401" 
+            - "00402" 
+            - "00403" 
+            - "00404" 
           trainers:
-            - name: "<TRINER>"
+            - name: <TRAINER>
               groups:
-                - code: "DAM1A"
-
+                - "DAM1A"
+          
         - code: "MP05"
           name: "Entorns de desenvolupament"
+          ids: 
+            - "10501"
+            - "10502"
+            - "10503"
+            - "00501" 
+            - "00502" 
+            - "00503" 
           trainers:
-            - name: "<TRINER>"
+            - name: <TRAINER>
               groups:
-                - code: "DAM1A"
-                - code: "DAM2A"
-                - code: "DAM2B"
-
+                - "DAM1A"
+                - "DAM2A"
+                - "DAM2B"         
+          
         - code: "MP06"
           name: "Accés a dades (+UF4 MP02)"
+          ids: 
+            - "10601"
+            - "10602"
+            - "10603"
+            - "10604"
+            - "00601" 
+            - "00602" 
+            - "00603" 
+            - "00604" 
+            - "10204"
+            - "00204"
           trainers:
-            - name: "<TRINER>"
+            - name: <TRAINER>
               groups:
-                - code: "DAM2A"
+                - "DAM2A"
 
-            - name: "<TRINER>"
+            - name: <TRAINER>
               groups:
-                - code: "DAM2B"
-
+                - "DAM2B"
+          
         - code: "MP07"
           name: "Desenvolupament d'interfícies"
+          ids: 
+            - "10701"
+            - "10702"
+            - "00701"
+            - "00702"
           trainers:
-            - name: "<TRINER>"
+            - name: <TRAINER>
               groups:
-                - code: "DAM2A"
-                - code: "DAM2B"
-
+                - "DAM2A"
+                - "DAM2B"
+                   
         - code: "MP08"
           name: "Programació multimèdia i dispositius mòbils"
+          ids: 
+            - "AOHOA"
+            - "AOHOB"
+            - "AOHOC"
+            - "00801"
+            - "00802"
+            - "00803"
           trainers:
-            - name: "<TRINER>"
+            - name: <TRAINER>
               groups:
-                - code: "DAM2A"
-                - code: "DAM2B"
-
+                - "DAM2A"
+                - "DAM2B"          
+          
         - code: "MP09"
           name: "Programació de serveis i processos"
+          ids: 
+            - "10901"
+            - "10902"
+            - "10903"
+            - "00901"
+            - "00902"
+            - "00903"
           trainers:
-            - name: "<TRINER>"
+            - name: <TRAINER>
               groups:
-                - code: "DAM2A"
-                - code: "DAM2B"
-
+                - "DAM2A"
+                - "DAM2B"          
+          
         - code: "MP10"
           name: "Sistemes de gestió empresarial"
+          ids: 
+            - "AAOOA"
+            - "AAOOB"
+            - "01001"
+            - "01002"
           trainers:
-            - name: "<TRINER>"
+            - name: <TRAINER>
               groups:
-                - code: "DAM1A"
-
-            - name: "<TRINER>"
+                - "DAM1A"
+            - name: <TRAINER>
               groups:
-                - code: "DAM2A"
-                - code: "DAM2B"
-
+                - "DAM2A"
+                - "DAM2B"
+          
         - code: "MP11"
           name: "Formació i orientació laboral"
+          ids: 
+            - "AAPOA"
+            - "AAPOB"
+            - "01101"
+            - "01102"
           trainers:
-            - name: "<TRINER>"
+            - name: <TRAINER>
               groups:
-                - code: "DAM1A"
-
+                - "DAM1A"         
+          
         - code: "MP12"
           name: "Empresa i iniciativa emprenedora"
+          ids: 
+            - "11201"
+            - "01201"                  
           trainers:
-            - name: "<TRINER>"
+            - name: <TRAINER>
               groups:
-                - code: "DAM1A"
-
+                - "DAM1A"
+                    
         - code: "MP13"
           name: "Projecte"
+          ids: 
+            - "11301"
+            - "01301"  
           trainers:
-            - name: "<TRINER>"
+            - name: <TRAINER>
               groups:
-                - code: "DAM2A"
-            
-            - name: "<TRINER>"
+                - "DAM2A"            
+            - name: <TRAINER>
               groups:
-                - code: "DAM2A"
-
-            - name: "<TRINER>"
+                - "DAM2B"          
+          
+        - code: "MP14"
+          name: "FCT"  
+          ids: 
+            - "AAQOA"
+            - "01401"
+          trainers:
+            - name: <TRAINER>
               groups:
-                - code: "DAM2B"
-
+                - "DAM2A"
+                - "DAM2B"
+                    
         - code: "MP15"
           name: "Anglès tècnic"
+          ids: 
+            - "BOAOA"
           trainers:
-            - name: "<TRINER>"
+            - name: <TRAINER>
               groups:
-                - code: "DAM1A"
+                - "DAM1A"
+          
+        - code: "MP16"
+          name: "Anglès tècnic avançat"
+          ids: 
+            - "BOBOA"
+          trainers:
+            - name: <TRAINER>
+              groups:
+                - "DAM1A"
+          
+        - code: "MENTORING-1-CCFF"
+          name: "MENTORING-1-CCFF"
+          ids: 
+            - "MENTORING-1-CCFF"
+          trainers:
+            - name: <TRAINER>
+              groups:
+                - "DAM1A"
+
+        - code: "MENTORING-2-CCFF"
+          name: "MENTORING-2-CCFF"
+          ids: 
+            - "MENTORING-2-CCFF"
+          trainers:
+            - name: <TRAINER>
+              groups:
+                - "DAM2A"
+                - "DAM2B"            
