@@ -63,8 +63,8 @@ public class TeachingStats : System.IDisposable{
         var importData = new List<EF.Answer>();
         foreach(var item in list){
             //TODO: check this "1" for multiple responses
-            var data = item["1"];
-            if(data == null) throw new Exception("Unable to parse, the 'responses' array seems to be empty.");
+            if(item.First == null || item.First.First == null) throw new Exception("Unable to parse, the 'responses' array seems to be empty.");
+            var data = item.First.First;            
 
             //Load the responses
             var numeric = data.Children().Where(x => x.GetType() == typeof(JProperty)).Where(x => ((JProperty)x).Name.StartsWith("questions")).Cast<JProperty>().ToList();

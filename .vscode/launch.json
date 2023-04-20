@@ -12,9 +12,10 @@
             // If you have changed target frameworks, make sure to update the program path.
             "program": "${workspaceFolder}/bin/Debug/net6.0/teaching-stats-limesurvey.dll",
             //"args": ["-sc", "/home/fher/Descargas/pendents/AIF2A.csv"],               //--saga-create (single file)
-            "args": ["-sc", "/home/fher/Descargas/pendents/*.csv"],                     //--saga-create (multi file)            
+            //"args": ["-sc", "/home/fher/Descargas/pendents/*.csv"],                   //--saga-create (multi file)            
             //"args": ["-ss"],                                                          //--start-surveys
             //"args": ["-sr"],                                                          //--send-reminders
+            "args": ["-ll"],                                                            //--loads data from limesurvey to teaching-stats
             "cwd": "${workspaceFolder}",
             // For more information about the 'console' field, see https://aka.ms/VSCode-CS-LaunchJson-Console
             "console": "integratedTerminal",

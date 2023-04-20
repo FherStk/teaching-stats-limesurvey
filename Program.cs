@@ -18,14 +18,12 @@ else{
         switch(arg){    
             case "--saga-convert":
             case "-sc":                
-                var files = Directory.GetFiles(Path.GetDirectoryName(args[i+1]) ?? "", Path.GetFileName(args[i+1]));
-                SetupConvertSagaCSVtoImportYML(files);                
+                SetupConvertSagaCSVtoImportYML(Directory.GetFiles(Path.GetDirectoryName(args[i+1]) ?? "", Path.GetFileName(args[i+1])));                
                 break;  
 
             case "--create-survey":
             case "-cs":
-                //TODO: check there is a filepath
-                CreateNewSurveyFromFile(args[i+1]);
+                SetupCreateNewSurveyFromFile(Directory.GetFiles(Path.GetDirectoryName(args[i+1]) ?? "", Path.GetFileName(args[i+1])));
                 break;    
 
             case "--start-survey":
@@ -63,7 +61,7 @@ void Help(){
     Info("  -sc <FILE_PATH>, --saga-convert <FILE_PATH>: parses a SAGA's CSV file and creates a YML file which can be used to create new surveys (school, mentoring and subject) on LimeSurvey, a CSV file must be provided.");    
     Info("  -ss, --start-survey: enables all the created surveys at limesurvey (just the created with this tool) and sends the invitations to the participants.");
     Info("  -sr, --send-reminders: send survey reminders to all the participants (just the created with this tool) that still has not responded the surveys.");
-    Info("  -lt, --load-teachingstats: loads all pending reporting data from 'teaching-stats'.");
+    Info("  -lt, --load-teachingstats: loads all pending reporting data from 'teaching-stats', also stops the survey so no new data would be collected.");
     Info("  -ll, --load-limesurvey: loads all pending reporting data from 'lime-survey'.");
     Console.WriteLine();    
 }
@@ -272,6 +270,19 @@ void ConvertSagaCSVtoImportYML(string filePath){
     Console.WriteLine();
 }
 
+void SetupCreateNewSurveyFromFile(string[] files){ 
+    if(files.Length == 0) Error("Unable to find the specified file");
+    else{
+        foreach (var f in files.OrderBy(x => x))
+        {
+            //Conversions must be done first for 1st level (which generates the 1st level file) and then for 2nd level (which
+            //generates the 2nd level file and updates the 1st level ones).
+            if(!File.Exists(f)) throw new FileNotFoundException("File not found!", f);
+            CreateNewSurveyFromFile(f);                    
+        }     
+    }                                   
+}
+
 void CreateNewSurveyFromFile(string filePath){
     //This option will create new 'limesurvey' surveyss using the provided YML file (template at 'actions/create-survey.yml.template')
     
@@ -300,30 +311,39 @@ void CreateNewSurveyFromFile(string filePath){
     }
 }
 
-void LoadFromLimeSurvey(){
-    var response = Question("This option will load all the 'limesurvey' responses (only for the surveys generated with this tool) into the report tables, closing and cleaning the original surveys. Do you want no continue? [Y/n]", "y");
-    if(response == "n") Error("Operation cancelled.");
-    else{
-         using(var ls = new LimeSurvey()){
-            using(var ts = new TeachingStats()){
-                foreach(var s in ls.ListSurveys()){
-                    if((s["active"] ?? "").ToString() == "N") continue;
-                    int surveyID = int.Parse((s["sid"] ?? "").ToString());
-                    var type = ls.GetSurveyTopic(surveyID);
-                    
-                    if(type != null){
-                        //TODO: this will be not necessary once ListSurveys returns the surveys by group
+void LoadFromLimeSurvey(){    
+    using(var ls = new LimeSurvey()){
+        using(var ts = new TeachingStats()){            
+            foreach(var s in ls.ListSurveys('Y')){
+                int surveyID = int.Parse((s["sid"] ?? "").ToString());
+                var type = ls.GetSurveyTopic(surveyID);
+                
+                if(type != null){
+                    Info($"Importing all pending answers from LimeSurvey to Teaching-Stats (id={surveyID}):");
+                    try{
+                        Info("Downloading data from LimeSurvey... ", false);
                         var answers = ls.GetSurveyResponses(surveyID);
                         var questions = ls.GetSurveyQuestions(surveyID);
+                        Success();
 
+                        Info("Importing data into Teaching-Stats... ", false);
                         ts.ImportFromLimeSurvey(questions, answers);
-                        
+                        Success();
+
+                        //Info("Stopping the surveys in LimeSurvey... ", false);
                         //TODO: stop the LS surveys
+                        //Success();                        
+                    }
+                    catch(Exception ex){
+                        Error($"ERROR: {ex.ToString()}");
+                    }
+                    finally{
+                        Console.WriteLine();
                     }
                 }
             }
         }
-    }
+    }    
 }
 
 void LoadFromTeachingStats(){
