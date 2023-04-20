@@ -74,7 +74,9 @@ public class LimeSurvey : IDisposable{
 
             if(gsid == group){
                 var active = char.Parse((props["active"] ?? "").ToString());
-                if(activeValue == ' ' || activeValue == active) filtered.Add(survey);
+                var expired = (props["expires"] ?? "").ToString();
+
+                if(string.IsNullOrEmpty(expired) && (activeValue == ' ' || activeValue == active)) filtered.Add(survey);
             } 
         }
         

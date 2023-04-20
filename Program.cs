@@ -330,9 +330,9 @@ void LoadFromLimeSurvey(){
                         ts.ImportFromLimeSurvey(questions, answers);
                         Success();
 
-                        //Info("Stopping the surveys in LimeSurvey... ", false);
-                        //TODO: stop the LS surveys
-                        //Success();                        
+                        Info("Stopping the surveys in LimeSurvey... ", false);
+                        ls.ExpireSurvey(surveyID);
+                        Success();                        
                     }
                     catch(Exception ex){
                         Error($"ERROR: {ex.ToString()}");
