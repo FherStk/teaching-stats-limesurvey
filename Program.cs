@@ -1,5 +1,5 @@
 ﻿//Global vars
-var _VERSION = "0.5.2";
+var _VERSION = "0.5.3";
 
 DisplayInfo();
 if(!CheckConfig()) return;
@@ -19,11 +19,7 @@ else{
             case "--saga-convert":
             case "-sc":                
                 var files = Directory.GetFiles(Path.GetDirectoryName(args[i+1]) ?? "", Path.GetFileName(args[i+1]));
-                foreach (var f in files)
-                {
-                    if(!File.Exists(f)) throw new FileNotFoundException("File not found!", f);
-                    ConvertSagaCSVtoImportYML(f);                    
-                }                
+                SetupConvertSagaCSVtoImportYML(files);                
                 break;  
 
             case "--create-survey":
@@ -72,7 +68,22 @@ void Help(){
     Console.WriteLine();    
 }
 
-void ConvertSagaCSVtoImportYML(string filePath){        
+void SetupConvertSagaCSVtoImportYML(string[] files){ 
+    if(files.Length == 0) Error("Unable to find the specified file");
+    else{
+        foreach (var f in files.OrderBy(x => x))
+        {
+            //Conversions must be done first for 1st level (which generates the 1st level file) and then for 2nd level (which
+            //generates the 2nd level file and updates the 1st level ones).
+            if(!File.Exists(f)) throw new FileNotFoundException("File not found!", f);
+            ConvertSagaCSVtoImportYML(f);                    
+        }     
+    }                                   
+}
+
+void ConvertSagaCSVtoImportYML(string filePath){     
+    //WARNING: overrides the current group file and updates another existing files.
+    //Must be executed for 1st courses first, and then for 2nd courses.   
     var surveysByContent = new Dictionary<string, Dictionary<string, Survey.SurveyData>>();    
     var currentGroupName = Path.GetFileNameWithoutExtension(filePath);  //Must be like ASIX2B
     
@@ -178,24 +189,25 @@ void ConvertSagaCSVtoImportYML(string filePath){
                     Lastname = completeName.Substring(0, coma).Trim(),
                     Email = r.EMAIL
                 };
-                
+                                
                 var studentSurveys = new List<Survey.SurveyData>();            
                 var subjects = ((string)r.MATRICULADES).Split(",").Where(x => x.Length > 3).ToList();            
                 foreach(var id in subjects){
                     //MPs (codes like 101) and UFs (codes like 10101), the UFs codes will be used when a subject is for 1st and 2nd course (like DAM M03).
+                    //Repeated surveys will be added (repeated but same instance, so no memory waste and easy to Distinct())
                     if(!surveysByContent.ContainsKey(id)) throw new IncorrectSettingsException($"The content code '{id}' cannot be found within the config file for the group '{currentGroupName}'");
                     surveyByGroup = surveysByContent[id];
 
                     //The participant will be added to the survey, should be in:
                     //  1. Its own group (this is the normal behaviour).
                     //  2. A 1st course group if the it's a second course student repeating a 1st course subject (and there's only one 1st course group).
-                    //  3. More than one 1st course group if the it's a second course student repeating a 1st course subject  (and there's more than one 1st course group). This produces a WARNING.
-
+                    //  3. More than one 1st course group if the it's a second course student repeating a 1st course subject  (and there's more than one 1st course group). This produces a WARNING.                    
                     if(surveyByGroup.ContainsKey(currentGroupName)) studentSurveys.Add(surveyByGroup[currentGroupName]);
                     else{
-                        var first = surveyByGroup.Values.FirstOrDefault();
+                        var first = surveyByGroup.Values.FirstOrDefault(); 
                         if(first != null){
-                            warnings.Add($"   WARNING: the student '{r.NOM}' is enrolled on '{currentGroupName}' but has been assigned to different groups for '{first.SubjectCode}'. Please, fix it manually (possibly a repeater student).");                    
+                            //The user has been added to another group, a warning will be displayed, repeated entries will be added.
+                            warnings.Add($"   WARNING: the student '{r.NOM}' is enrolled on '{currentGroupName}' but has been assigned to different groups for '{first.SubjectCode}'. Please, fix it manually (possibly a repeater student).");
                             studentSurveys.AddRange(surveyByGroup.Values);
                         }
                     }
@@ -218,7 +230,7 @@ void ConvertSagaCSVtoImportYML(string filePath){
         }
         
         if(warnings.Count == 0) Success();    
-        else Warning("WARNING: \n" + string.Join('\n', warnings));
+        else Warning("WARNING: \n" + string.Join('\n', warnings.Distinct()));
         
         Info("   Generating the YAML file for the current group... ", false);
         var allGroupsData = surveysByContent.Values.SelectMany(x => x.Values).Distinct().Where(x => x.Participants != null && x.Participants.Count > 0).ToList();
