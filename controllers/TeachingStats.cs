@@ -23,9 +23,10 @@ public class TeachingStats : System.IDisposable{
         var data = ParseFromLimeSurveyToTeachingStats(questions, answers);
         
         using(var context = new EF.TeachingStatsContext()){
-            var lastID = context.Answers.OrderByDescending(x => x.EvaluationId).Select(x => x.EvaluationId).FirstOrDefault() + 1;
-            foreach(var item in data){
-                item.EvaluationId = lastID++;
+            var lastID = context.Answers.OrderByDescending(x => x.EvaluationId).Select(x => x.EvaluationId).FirstOrDefault() + 1;            
+
+            foreach(var item in data){                
+                item.EvaluationId += lastID;
                 item.Level = Cut(item.Level ?? "", 3);
                 item.Department = Cut(item.Department ?? "", 75);
                 item.Degree = Cut(item.Degree ?? "", 4);
@@ -60,6 +61,7 @@ public class TeachingStats : System.IDisposable{
         var list = answers["responses"];
         if(list == null) throw new Exception("Unable to parse, the 'responses' array seems to be missing.");
 
+        int evalID = 1;
         var importData = new List<EF.Answer>();
         foreach(var item in list){
             //TODO: check this "1" for multiple responses
@@ -80,21 +82,24 @@ public class TeachingStats : System.IDisposable{
             //Store the splitted answers            
             short sort = 1;
             foreach(var answer in numeric.OrderBy(x => x.Name))
-                importData.Add(ParseAnswer(statements, data, answer, sort++, timeStamp, year, QuestionType.Numeric));
+                importData.Add(ParseAnswer(evalID, statements, data, answer, sort++, timeStamp, year, QuestionType.Numeric));
 
             foreach(var answer in comments.OrderBy(x => x.Name))
-                importData.Add(ParseAnswer(statements, data, answer, sort++, timeStamp, year, QuestionType.Text));
-                      
+                importData.Add(ParseAnswer(evalID, statements, data, answer, sort++, timeStamp, year, QuestionType.Text));
+            
+            //All the responses from the same group will share the ID;
+            evalID++;                      
         }
 
         return importData;
     }
 
-    private EF.Answer ParseAnswer(Dictionary<string, string> statements, JToken data, JProperty answer, short sort, string timeStamp, int year, QuestionType type){
+    private EF.Answer ParseAnswer(int evalID, Dictionary<string, string> statements, JToken data, JProperty answer, short sort, string timeStamp, int year, QuestionType type){
         var code = (type == QuestionType.Numeric ? answer.Name.Split(new char[]{'[', ']'})[1] : answer.Name);
 
         //Note: the answers will come as teaching-stats database needs, because has been setup like this within the 'equation' property.
         return new EF.Answer(){
+            EvaluationId = evalID,
             QuestionSort = sort,
             Timestamp = DateTime.Parse(timeStamp),
             Year = year,
