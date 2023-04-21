@@ -1,5 +1,5 @@
 ﻿//Global vars
-var _VERSION = "0.5.4";
+var _VERSION = "0.6.0";
 
 DisplayInfo();
 if(!CheckConfig()) return;
@@ -131,16 +131,19 @@ void ConvertSagaCSVtoImportYML(string filePath){
                     //Same data object for every subject ID within the same group which simplifies the Distinct() process.
                     var data = new Survey.SurveyData(){            
                         DegreeName = degree.Name,
-                        DepartmentName = degree.Department,
-                        SubjectCode = s.Code,
-                        SubjectName = s.Name,
+                        DepartmentName = degree.Department,                        
                         GroupName = groupName,
                         TrainerName = t.Name,
-                        Topic = s.Name,
+                        Topic = s.Code,
                         Participants = new List<Survey.Participant>()
                     };
 
-                    if(s.Name != "MENTORING-1-CCFF" && s.Name != "MENTORING-2-CCFF") data.Topic = "SUBJECT-CCFF";
+                    if(s.Code != "MENTORING-1-CCFF" && s.Code != "MENTORING-2-CCFF"){
+                        data.Topic = "SUBJECT-CCFF";
+                        data.SubjectCode = s.Code;
+                        data.SubjectName = s.Name;
+                    } 
+
                     if(surveyByGroup.ContainsKey(data.GroupName)) throw new IncorrectSettingsException($"The group '{data.GroupName}' cannot appear more than once for the subject '{s.Name}'");
                     else surveyByGroup.Add(data.GroupName, data);
                 }             

@@ -122,22 +122,25 @@ public class LimeSurvey : IDisposable{
         var content = File.ReadAllText(template);               
 
         //Setting up template values
+        var surveyName = string.Empty;
         var description = string.Empty;
         switch(topic){
             case Topic.SCHOOL:
                 data.SubjectCode = "Centre";
                 data.SubjectName = "Instal·lacions i estada";
+                surveyName = (Utils.Settings.Data == null ? "SCHOOL" : Utils.Settings.Data.School);                
                 description = @"<p><strong>Si us plau, abans de contestar l'enquesta, tingues en compte el següent:</strong></p>
                                 <ol style='text-align: left;'>
                                     <li>Aquesta enquesta és completament anònima, si us plau, sigues sincer.</li>
                                     <li>Sigues constructiu, explica'ns quines coses fem bé i com podem millorar.</li>
                                     <li>Sigues educat i respectuós, així ens ajudes a fer millor el nostre institut.</li>
-                                </ol>";
+                                </ol>";                
                 break;
 
             case Topic.MENTORING_1_CCFF:
                 data.SubjectCode = "Tutoria";
                 data.SubjectName = "1er Curs";
+                surveyName = $"{(Utils.Settings.Data == null ? "MENTORING 1ST" : Utils.Settings.Data.Mentoring)} ({data.TrainerName})";
                 description = @"<p><strong>Si us plau, abans de contestar l'enquesta, tingues en compte el següent:</strong></p>
                                 <ol style='text-align: left;'>
                                     <li>Aquesta enquesta és completament anònima, si us plau, sigues sincer.</li>
@@ -149,6 +152,7 @@ public class LimeSurvey : IDisposable{
             case Topic.MENTORING_2_CCFF:
                 data.SubjectCode = "Tutoria";
                 data.SubjectName = "2n Curs";
+                surveyName = $"{(Utils.Settings.Data == null ? "MENTORING 2ND" : Utils.Settings.Data.Mentoring)} ({data.TrainerName})";
                 description = @"<p><strong>Si us plau, abans de contestar l'enquesta, tingues en compte el següent:</strong></p>
                                 <ol style='text-align: left;'>
                                     <li>Aquesta enquesta és completament anònima, si us plau, sigues sincer.</li>
@@ -158,6 +162,7 @@ public class LimeSurvey : IDisposable{
                 break;
 
             case Topic.SUBJECT_CCFF:
+                surveyName = $"{data.GroupName} {data.SubjectCode}: {data.SubjectName}";
                 description = @"<p><strong>Si us plau, abans de contestar l'enquesta, tingues en compte el següent:</strong></p>
                                 <ol style='text-align: left;'>
                                     <li>Si no estàs matriculat d'aquest Mòdul Professional o en trobes a faltar enquestes sobre altres Mòduls que tens matriculats, posa't en contacte amb el teu tutor.</li>
@@ -168,9 +173,7 @@ public class LimeSurvey : IDisposable{
             break;
         }
 
-        var surveyName = $"{data.GroupName} {data.SubjectCode}: {data.SubjectName}";
-        if(!string.IsNullOrEmpty(data.TrainerName) && topic != Topic.SCHOOL) surveyName += $" ({data.TrainerName})";
-        
+                        
         //Replacing template values
         content = content.Replace("{'TITLE'}", $"{surveyName}");
         content = content.Replace("{'DESCRIPTION'}", $"{description}");

@@ -20,6 +20,8 @@ public class Settings
     }
 
     public class MasterData{
+        public string? School {get; set;}
+        public string? Mentoring {get; set;}
         public List<DegreeData>? Degrees {get; set;}
     }
 
