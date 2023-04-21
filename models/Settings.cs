@@ -1,3 +1,5 @@
+using YamlDotNet.Serialization;
+
 public class Settings
 {
     public TeachingStatsSettings? TeachingStats {get; set;}
@@ -20,9 +22,18 @@ public class Settings
     }
 
     public class MasterData{
-        public string? School {get; set;}
-        public string? Mentoring {get; set;}
+        public CaptionsData? Captions {get; set;}
         public List<DegreeData>? Degrees {get; set;}
+    }
+
+    public class CaptionsData{
+        public string? School {get; set;}
+        
+        [YamlMember(Alias ="mentoring-1-ccff", ApplyNamingConventions = false)]
+        public string? Mentoring1 {get; set;}
+        
+        [YamlMember(Alias ="mentoring-2-ccff", ApplyNamingConventions = false)]
+        public string? Mentoring2 {get; set;}
     }
 
     public class DegreeData{

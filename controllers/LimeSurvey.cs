@@ -21,7 +21,9 @@ public class LimeSurvey : IDisposable{
         SCHOOL,
         MENTORING_1_CCFF,
         MENTORING_2_CCFF,
-        SUBJECT_CCFF        
+        SUBJECT_CCFF,
+        STAFF,
+        TEACHERS        
     }
 
     public string? SessionKey {get; private set;}    
@@ -124,11 +126,12 @@ public class LimeSurvey : IDisposable{
         //Setting up template values
         var surveyName = string.Empty;
         var description = string.Empty;
+        var captions = (Utils.Settings.Data == null ? null : Utils.Settings.Data.Captions);
         switch(topic){
             case Topic.SCHOOL:
                 data.SubjectCode = "Centre";
                 data.SubjectName = "Instal·lacions i estada";
-                surveyName = (Utils.Settings.Data == null ? "SCHOOL" : Utils.Settings.Data.School);                
+                surveyName = $"{data.GroupName} {(captions == null ? "SCHOOL" : captions.School)}";
                 description = @"<p><strong>Si us plau, abans de contestar l'enquesta, tingues en compte el següent:</strong></p>
                                 <ol style='text-align: left;'>
                                     <li>Aquesta enquesta és completament anònima, si us plau, sigues sincer.</li>
@@ -140,7 +143,7 @@ public class LimeSurvey : IDisposable{
             case Topic.MENTORING_1_CCFF:
                 data.SubjectCode = "Tutoria";
                 data.SubjectName = "1er Curs";
-                surveyName = $"{(Utils.Settings.Data == null ? "MENTORING 1ST" : Utils.Settings.Data.Mentoring)} ({data.TrainerName})";
+                surveyName = $"{data.GroupName} {(captions == null ? "MENTORING 1ST" : captions.Mentoring1)} ({data.TrainerName})";
                 description = @"<p><strong>Si us plau, abans de contestar l'enquesta, tingues en compte el següent:</strong></p>
                                 <ol style='text-align: left;'>
                                     <li>Aquesta enquesta és completament anònima, si us plau, sigues sincer.</li>
@@ -152,7 +155,7 @@ public class LimeSurvey : IDisposable{
             case Topic.MENTORING_2_CCFF:
                 data.SubjectCode = "Tutoria";
                 data.SubjectName = "2n Curs";
-                surveyName = $"{(Utils.Settings.Data == null ? "MENTORING 2ND" : Utils.Settings.Data.Mentoring)} ({data.TrainerName})";
+                surveyName = $"{data.GroupName} {(captions == null ? "MENTORING 2ND" : captions.Mentoring2)} ({data.TrainerName})";
                 description = @"<p><strong>Si us plau, abans de contestar l'enquesta, tingues en compte el següent:</strong></p>
                                 <ol style='text-align: left;'>
                                     <li>Aquesta enquesta és completament anònima, si us plau, sigues sincer.</li>
@@ -171,6 +174,11 @@ public class LimeSurvey : IDisposable{
                                     <li>Sigues educat i respectuós, així ens ajudes a fer millor el nostre institut.</li>
                                 </ol>";
             break;
+
+            case Topic.STAFF:
+            case Topic.TEACHERS:
+            default:
+                throw new NotImplementedException();
         }
 
                         

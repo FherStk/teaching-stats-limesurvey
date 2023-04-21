@@ -10,6 +10,11 @@ limeSurvey:
   group: <GROUP_ID> 
 
 data:
+  captions:
+    school: "Centre: Instal·lacions i estada"
+    mentoring-1-ccff: "Tutoria: 1er curs"
+    mentoring-2-ccff: "Tutoria: 2n curs"    
+    
   degrees:
     - name: "SMX"
       department: "Informàtica"

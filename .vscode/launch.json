@@ -15,7 +15,8 @@
             //"args": ["-sc", "/home/fher/Descargas/pendents/*.csv"],                   //--saga-create (multi file)            
             //"args": ["-ss"],                                                          //--start-surveys
             //"args": ["-sr"],                                                          //--send-reminders
-            "args": ["-ll"],                                                            //--loads data from limesurvey to teaching-stats
+            //"args": ["-ll"],                                                          //--loads data from limesurvey to teaching-stats
+            "args": ["-cs", "actions/create-surveys-ASIX1A.yml"],                       //--create-survey (single file)
             "cwd": "${workspaceFolder}",
             // For more information about the 'console' field, see https://aka.ms/VSCode-CS-LaunchJson-Console
             "console": "integratedTerminal",
