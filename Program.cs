@@ -1,5 +1,5 @@
 ﻿//Global vars
-var _VERSION = "0.6.1";
+var _VERSION = "0.7.0";
 
 DisplayInfo();
 if(!CheckConfig()) return;
@@ -174,7 +174,7 @@ void ConvertSagaCSVtoImportYML(string filePath){
         //               different teacher can be evaluated in different surveys for the same group if the content codes (UF) are different.
 
         Info("   Loading participants data... ", false);
-        var warnings = new List<string>();
+        var warnings = new Dictionary<string, List<string>>();
 
         using (var reader = new StreamReader(filePath, System.Text.Encoding.UTF8))
         using (var csv = new CsvHelper.CsvReader(reader, System.Globalization.CultureInfo.InvariantCulture))
@@ -208,7 +208,8 @@ void ConvertSagaCSVtoImportYML(string filePath){
                         var first = surveyByGroup.Values.FirstOrDefault(); 
                         if(first != null){
                             //The user has been added to another group, a warning will be displayed, repeated entries will be added.
-                            warnings.Add($"   WARNING: the student '{r.NOM}' is enrolled on '{currentGroupName}' but has been assigned to different groups for '{first.SubjectCode}'. Please, fix it manually (possibly a repeater student).");
+                            if(!warnings.ContainsKey(r.NOM)) warnings.Add(r.NOM, new List<string>());
+                            warnings[r.NOM].Add(first.SubjectCode);                            
                             studentSurveys.AddRange(surveyByGroup.Values);
                         }
                     }
@@ -231,7 +232,13 @@ void ConvertSagaCSVtoImportYML(string filePath){
         }
         
         if(warnings.Count == 0) Success();    
-        else Warning("WARNING: \n" + string.Join('\n', warnings.Distinct()));
+        else{
+            string info = $"   WARNING: the following students are enrolled on '{currentGroupName}' but have been assigned to different groups. Please, fix them manually (possibly a repeater students).\n";            
+            foreach(var student in warnings.Keys){
+                info += $"      - {student}: {string.Join(", ", warnings[student].Distinct())}.\n";                
+            }        
+            Warning(info);
+        }
         
         Info("   Generating the YAML file for the current group... ", false);
         var allGroupsData = surveysByContent.Values.SelectMany(x => x.Values).Distinct().Where(x => x.Participants != null && x.Participants.Count > 0).ToList();
