@@ -1,5 +1,5 @@
 ﻿//Global vars
-var _VERSION = "0.7.0";
+var _VERSION = "0.7.1";
 
 DisplayInfo();
 if(!CheckConfig()) return;
@@ -209,7 +209,7 @@ void ConvertSagaCSVtoImportYML(string filePath){
                         if(first != null){
                             //The user has been added to another group, a warning will be displayed, repeated entries will be added.
                             if(!warnings.ContainsKey(r.NOM)) warnings.Add(r.NOM, new List<string>());
-                            warnings[r.NOM].Add(first.SubjectCode);                            
+                            warnings[r.NOM].Add($"{first.SubjectCode}: {first.SubjectName}");                            
                             studentSurveys.AddRange(surveyByGroup.Values);
                         }
                     }
@@ -235,7 +235,11 @@ void ConvertSagaCSVtoImportYML(string filePath){
         else{
             string info = $"   WARNING: the following students are enrolled on '{currentGroupName}' but have been assigned to different groups. Please, fix them manually (possibly a repeater students).\n";            
             foreach(var student in warnings.Keys){
-                info += $"      - {student}: {string.Join(", ", warnings[student].Distinct())}.\n";                
+                info += $"      - {student}:\n";                
+                foreach(var subject in warnings[student].Distinct()){
+                    info += $"         - {subject}\n";                
+                }
+                info += "\n";
             }        
             Warning(info);
         }
