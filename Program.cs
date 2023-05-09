@@ -1,5 +1,5 @@
 ﻿//Global vars
-var _VERSION = "0.7.2";
+var _VERSION = "0.7.3";
 
 DisplayInfo();
 if(!CheckConfig()) return;
@@ -304,7 +304,7 @@ void CreateNewSurveyFromFile(string filePath){
     if(importData.Data == null) return;
 
     using(var ls = new LimeSurvey()){   
-        Info($"Creating new surveys:");
+        Info($"Creating new surveys ({Path.GetFileName(filePath)}):");
         foreach(var data in importData.Data){ 
             try{
                 Info("   Creating... ", false);
@@ -318,9 +318,9 @@ void CreateNewSurveyFromFile(string filePath){
         }
         
         if(importData.Data.Count == 0) Warning($"There is no new survey info within the '{filePath}' YAML file.");
-        else{
-            Console.WriteLine();
+        else{            
             Success("Process finished, all the surveys have been created.");        
+            Console.WriteLine();
         } 
     }
 }
