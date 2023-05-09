@@ -165,7 +165,7 @@ public class LimeSurvey : IDisposable{
                 break;
 
             case Topic.SUBJECT_CCFF:
-                surveyName = $"{data.GroupName} {data.SubjectCode}: {data.SubjectName}";
+                surveyName = $"{data.GroupName} {data.SubjectCode}: {data.SubjectName} ({data.TrainerName})";
                 description = @"<p><strong>Si us plau, abans de contestar l'enquesta, tingues en compte el següent:</strong></p>
                                 <ol style='text-align: left;'>
                                     <li>Si no estàs matriculat d'aquest Mòdul Professional o en trobes a faltar enquestes sobre altres Mòduls que tens matriculats, posa't en contacte amb el teu tutor.</li>
