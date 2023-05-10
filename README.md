@@ -7,4 +7,4 @@ This program prepares the teaching-stats reporting system, collecting up all nee
 The project is still under development and has not been completed yet. Please, refer to each release description for further information.
 
 ## How to use it
-TODO:
+TODO
