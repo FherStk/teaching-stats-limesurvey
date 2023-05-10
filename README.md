@@ -8,5 +8,3 @@ The project is still under development and has not been completed yet. Please, r
 
 ## How to use it
 TODO
-
-test
