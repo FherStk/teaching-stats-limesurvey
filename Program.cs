@@ -496,18 +496,18 @@ bool CheckConfig(){
         using(var ts = new TeachingStats()){    
             Success();
             
-            // if(!ts.CheckIfUpgraded()){
-            //     var response = Question("The current 'teaching-stats' database has not been upgraded, do you want to perform the necessary changes to use this program? [Y/n]", "y");
-            //     if(response.ToLower() != "y"){
-            //         Error("The program cannot continue, becasue the 'teaching-stats' database has not been upgraded.");
-            //         return false;
-            //     }
+            if(!ts.CheckIfUpgraded()){
+                var response = Question("The current 'teaching-stats' database has not been upgraded, do you want to perform the necessary changes to use this program? [Y/n]", "y");
+                if(response.ToLower() != "y"){
+                    Error("The program cannot continue, becasue the 'teaching-stats' database has not been upgraded.");
+                    return false;
+                }
 
-            //     Info("Upgrading the teaching-stats' database... ", false);
-            //     ts.PerformDataDaseUpgrade();
-            //     Success();
-            //     Console.WriteLine();
-            // }
+                Info("Upgrading the teaching-stats' database... ", false);
+                ts.PerformDataDaseUpgrade();
+                Success();
+                Console.WriteLine();
+            }
         }
 
         //Testing LimeSurvey config
