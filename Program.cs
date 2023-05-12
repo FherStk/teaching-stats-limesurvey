@@ -1,5 +1,5 @@
 ﻿//Global vars
-var _VERSION = "0.7.3";
+var _VERSION = "0.8.0";
 
 DisplayInfo();
 if(!CheckConfig()) return;
@@ -31,6 +31,11 @@ else{
                 StartSurveys();
                 break;  
 
+            case "--send-invitations":
+            case "-si":
+                SendInvitations();
+                break; 
+
             case "--send-reminders":
             case "-sr":
                 SendReminders();
@@ -60,6 +65,7 @@ void Help(){
     Info("  -cs <FILE_PATH>, --create-survey <FILE_PATH>: creates a new survey, a YML file must be provided.");    
     Info("  -sc <FILE_PATH>, --saga-convert <FILE_PATH>: parses a SAGA's CSV file and creates a YML file which can be used to create new surveys (school, mentoring and subject) on LimeSurvey, a CSV file must be provided.");    
     Info("  -ss, --start-survey: enables all the created surveys at limesurvey (just the created with this tool) and sends the invitations to the participants.");
+    Info("  -si, --send-invitations: send the invitations for already active surveys, but just for whom has not received any yet.");
     Info("  -sr, --send-reminders: send survey reminders to all the participants (just the created with this tool) that still has not responded the surveys.");
     Info("  -lt, --load-teachingstats: loads all pending reporting data from 'teaching-stats', also stops the survey so no new data would be collected.");
     Info("  -ll, --load-limesurvey: loads all pending reporting data from 'lime-survey'.");
@@ -382,8 +388,11 @@ void StartSurveys(){
     //This option will start all the 'limesurvey' surveys (only for the surveys within the definded app setting's group, which should be the surveys created with this tool) sending also the email invitations to the participants.
     
     using(var ls = new LimeSurvey()){            
-        var list = ls.ListSurveys('N');        
-        
+        Info($"   Loading the survey list... ", false);        
+        var list = ls.ListSurveys('N');
+        Success();
+        Console.WriteLine();
+
         foreach(var s in list){
             //Just the non-active surveys (all within the current group, which should be the surveys created with this tool).
             var id = int.Parse((s["sid"] ?? "").ToString());
@@ -392,11 +401,11 @@ void StartSurveys(){
             try{
                 Info($"   Activating... ", false);
                 ls.ActivateSurvey(id);
-                Success("OK");
+                Success();
                 
                 Info($"   Sending invitation... ", false);
                 ls.SendInvitationsToParticipants(id);
-                Success("OK");
+                Success();
             }
             catch(Exception ex){
                 Error($"ERROR: {ex.ToString()}");
@@ -414,12 +423,44 @@ void StartSurveys(){
     }
 }
 
+void SendInvitations(){
+    //NOTE: this should be a temporal method, because for some reason, all the surveys has been activated but not all the invitations has been sent (email limit?)
+    Info($"Sending invitations: ", true);
+
+    using(var ls = new LimeSurvey()){    
+        Info($"   Loading the survey list... ", false);        
+        var list = ls.ListSurveys('Y');
+        Success();
+
+        foreach(var s in list){            
+            var id = int.Parse((s["sid"] ?? "").ToString());
+
+            try{                
+                Info($"   Sending invitation for the survey with id={id}... ", false);
+                ls.SendInvitationsToParticipants(id);
+                Success();
+            }
+            catch(Exception ex){
+                Error($"ERROR: {ex.ToString()}");
+            }            
+        }
+
+        if(list.Count == 0) Warning($"Unable to load any active survey from limesurvey (within the current app group).");
+        else{
+            Console.WriteLine();
+            Success("Process finished, all the invitations has been sent.");  
+        }   
+    }
+}
+
 void SendReminders(){
     //This option will start all the 'limesurvey' surveys (only for the surveys within the definded app setting's group, which should be the surveys created with this tool) sending also the email invitations to the participants.
+    Info($"Sending reminders for all open surveys:"); 
     
-    using(var ls = new LimeSurvey()){   
-        Info($"Sending reminders for all open surveys:"); 
-        var list = ls.ListSurveys('Y');        
+    using(var ls = new LimeSurvey()){           
+        Info($"   Loading the survey list... ", false);        
+        var list = ls.ListSurveys('Y');
+        Success();
         
         foreach(var s in list){
             //Just the non-active surveys (all within the current group, which should be the surveys created with this tool).
@@ -428,7 +469,7 @@ void SendReminders(){
             try{               
                 Info($"   Sending reminders for the survey with id={id}... ", false);
                 ls.SendRemindersToParticipants(id);
-                Success("OK");
+                Success();
             }
             catch(Exception ex){
                 Error($"ERROR: {ex.ToString()}");
@@ -451,18 +492,18 @@ bool CheckConfig(){
         using(var ts = new TeachingStats()){    
             Success();
             
-            if(!ts.CheckIfUpgraded()){
-                var response = Question("The current 'teaching-stats' database has not been upgraded, do you want to perform the necessary changes to use this program? [Y/n]", "y");
-                if(response.ToLower() != "y"){
-                    Error("The program cannot continue, becasue the 'teaching-stats' database has not been upgraded.");
-                    return false;
-                }
+            // if(!ts.CheckIfUpgraded()){
+            //     var response = Question("The current 'teaching-stats' database has not been upgraded, do you want to perform the necessary changes to use this program? [Y/n]", "y");
+            //     if(response.ToLower() != "y"){
+            //         Error("The program cannot continue, becasue the 'teaching-stats' database has not been upgraded.");
+            //         return false;
+            //     }
 
-                Info("Upgrading the teaching-stats' database... ", false);
-                ts.PerformDataDaseUpgrade();
-                Success();
-                Console.WriteLine();
-            }
+            //     Info("Upgrading the teaching-stats' database... ", false);
+            //     ts.PerformDataDaseUpgrade();
+            //     Success();
+            //     Console.WriteLine();
+            // }
         }
 
         //Testing LimeSurvey config

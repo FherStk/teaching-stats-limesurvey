@@ -238,7 +238,7 @@ public class LimeSurvey : IDisposable{
         return JArray.Parse(this.ReadClientResult() ?? "");
     }
 
-    public JObject SendInvitationsToParticipants(int surveyID){
+    public JObject SendInvitationsToParticipants(int surveyID, int retries = 0, int maxRetries = 20){
         this.Client.Method = "invite_participants";        
         this.Client.Parameters.Add("sSessionKey", this.SessionKey);
         this.Client.Parameters.Add("iSurveyID", surveyID);               
@@ -246,10 +246,19 @@ public class LimeSurvey : IDisposable{
         this.Client.ClearParameters();        
 
         //Returns a collection with the added values
-        return JObject.Parse(this.ReadClientResult() ?? "");
+        var result = JObject.Parse(this.ReadClientResult() ?? "");
+        var data = (result["status"] ?? "").ToString();
+
+        //For some reason (SMTP server limits, too much logint attempts, etc.) an OK is received but no invitations has been sent...
+        //A retry will be performed till "No candidate tokens" has been received.
+        if(data.Contains("No candidate tokens")) return result;
+        else{
+            if(retries < maxRetries) return SendInvitationsToParticipants(surveyID, retries+1);        
+            else throw new SmtpException();
+        } 
     }
 
-    public JObject SendRemindersToParticipants(int surveyID){
+    public JObject SendRemindersToParticipants(int surveyID, int retries = 0, int maxRetries = 20){
         this.Client.Method = "remind_participants";        
         this.Client.Parameters.Add("sSessionKey", this.SessionKey);
         this.Client.Parameters.Add("iSurveyID", surveyID);               
@@ -257,7 +266,16 @@ public class LimeSurvey : IDisposable{
         this.Client.ClearParameters();        
 
         //Returns a collection with the added values
-        return JObject.Parse(this.ReadClientResult() ?? "");
+        var result = JObject.Parse(this.ReadClientResult() ?? "");
+        var data = (result["status"] ?? "").ToString();
+
+        //For some reason (SMTP server limits, too much logint attempts, etc.) an OK is received but no invitations has been sent...
+        //A retry will be performed till "No candidate tokens" has been received.
+        if(data.Contains("No candidate tokens")) return result;
+        else{
+            if(retries < maxRetries) return SendRemindersToParticipants(surveyID, retries+1);        
+            else throw new SmtpException();
+        } 
     }
 
     public JArray GetSurveyQuestions(int surveyID){

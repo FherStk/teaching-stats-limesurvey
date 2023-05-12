@@ -14,7 +14,8 @@
             //"args": ["-sc", "/home/fher/Descargas/pendents/AIF2A.csv"],               //--saga-create (single file)
             //"args": ["-sc", "/home/fher/Descargas/input/*.csv"],                      //--saga-create (batch)            
             //"args": ["-ss"],                                                          //--start-surveys
-            "args": ["-sr"],                                                            //--send-reminders
+            //"args": ["-sr"],                                                          //--send-reminders
+            "args": ["-si"],                                                            //--send-invitations
             //"args": ["-ll"],                                                          //--loads data from limesurvey to teaching-stats
             //"args": ["-cs", "actions/create-surveys-ASIX1A.yml"],                     //--create-survey (single file)
             //"args": ["-cs", "actions/*.yml"],                                         //--create-survey (batch)
