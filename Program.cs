@@ -1,5 +1,5 @@
 ﻿//Global vars
-var _VERSION = "0.8.1";
+var _VERSION = "0.8.2";
 
 DisplayInfo();
 if(!CheckConfig()) return;

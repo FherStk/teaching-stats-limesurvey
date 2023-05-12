@@ -238,7 +238,7 @@ public class LimeSurvey : IDisposable{
         return JArray.Parse(this.ReadClientResult() ?? "");
     }
 
-    public JObject SendInvitationsToParticipants(int surveyID, int retries = 0, int maxRetries = 5){
+    public JObject SendInvitationsToParticipants(int surveyID, int retries = 0, int maxRetries = 1){
         this.Client.Method = "invite_participants";        
         this.Client.Parameters.Add("sSessionKey", this.SessionKey);
         this.Client.Parameters.Add("iSurveyID", surveyID);               
@@ -258,7 +258,7 @@ public class LimeSurvey : IDisposable{
         } 
     }
 
-    public JObject SendRemindersToParticipants(int surveyID, int retries = 0, int maxRetries = 5){
+    public JObject SendRemindersToParticipants(int surveyID, int retries = 0, int maxRetries = 1){
         this.Client.Method = "remind_participants";        
         this.Client.Parameters.Add("sSessionKey", this.SessionKey);
         this.Client.Parameters.Add("iSurveyID", surveyID);               
