@@ -1,5 +1,5 @@
 ﻿//Global vars
-var _VERSION = "0.8.0";
+var _VERSION = "0.8.1";
 
 DisplayInfo();
 if(!CheckConfig()) return;
@@ -409,6 +409,8 @@ void StartSurveys(){
             }
             catch(Exception ex){
                 Error($"ERROR: {ex.ToString()}");
+
+                //TODO: wait and retry
             }
             finally{
                 Console.WriteLine();
@@ -442,6 +444,8 @@ void SendInvitations(){
             }
             catch(Exception ex){
                 Error($"ERROR: {ex.ToString()}");
+
+                //TODO: wait and retry
             }            
         }
 
@@ -574,7 +578,7 @@ void DisplayInfo(){
     Console.ForegroundColor = ConsoleColor.Yellow;
     Console.Write("Copyright © 2023: ");
     Console.ResetColor();
-    Console.WriteLine($"Coordinació de Qualitat Serrano");
+    Console.WriteLine($"Fernando Porrino Serrano");
 
     Console.ForegroundColor = ConsoleColor.Yellow;
     Console.Write("Under the AGPL license: ");
