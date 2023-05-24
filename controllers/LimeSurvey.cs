@@ -271,7 +271,7 @@ public class LimeSurvey : IDisposable{
 
         //For some reason (SMTP server limits, too much logint attempts, etc.) an OK is received but no invitations has been sent...
         //A retry will be performed till "No candidate tokens" has been received.
-        if(data.Contains("No candidate tokens")) return result;
+        if(data.Contains("0 left to send")) return result;
         else{
             if(retries < maxRetries) return SendRemindersToParticipants(surveyID, retries+1);        
             else throw new SmtpException();
