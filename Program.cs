@@ -1,5 +1,5 @@
 ﻿//Global vars
-var _VERSION = "0.8.5";
+var _VERSION = "0.9.0";
 
 DisplayInfo();
 if(!CheckConfig()) return;
@@ -434,12 +434,12 @@ void SendInvitations(){
         var list = ls.ListSurveys('Y');
         Success();
 
-        //TODO: display a counter like "Sending INVITATION for the survey 14/27 with id={id}..."
+        int i = 1;
         foreach(var s in list){            
             var id = int.Parse((s["sid"] ?? "").ToString());
 
             try{                
-                Info($"   Sending invitation for the survey with id={id}... ", false);
+                Info($"   Sending invitation for the survey {i}/{list.Count} with id={id}... ", false);
                 ls.SendInvitationsToParticipants(id);
                 Success();
             }
@@ -467,13 +467,13 @@ void SendReminders(){
         var list = ls.ListSurveys('Y');
         Success();
         
-        //TODO: display a counter like "Sending reminders for the survey 14/27 with id={id}..."
+        int i = 0;
         foreach(var s in list){
             //Just the non-active surveys (all within the current group, which should be the surveys created with this tool).
             var id = int.Parse((s["sid"] ?? "").ToString());
                         
             try{               
-                Info($"   Sending reminders for the survey with id={id}... ", false);
+                Info($"   Sending reminders for the survey {i}/{list.Count} with id={id}... ", false);
                 ls.SendRemindersToParticipants(id);
                 Success();
             }
