@@ -439,7 +439,7 @@ void SendInvitations(){
             var id = int.Parse((s["sid"] ?? "").ToString());
 
             try{                
-                Info($"   Sending invitation for the survey {i}/{list.Count} with id={id}... ", false);
+                Info($"   Sending invitation for the survey {i++}/{list.Count} with id={id}... ", false);
                 ls.SendInvitationsToParticipants(id);
                 Success();
             }
@@ -467,13 +467,13 @@ void SendReminders(){
         var list = ls.ListSurveys('Y');
         Success();
         
-        int i = 0;
+        int i = 1;
         foreach(var s in list){
             //Just the non-active surveys (all within the current group, which should be the surveys created with this tool).
             var id = int.Parse((s["sid"] ?? "").ToString());
                         
             try{               
-                Info($"   Sending reminders for the survey {i}/{list.Count} with id={id}... ", false);
+                Info($"   Sending reminders for the survey {i++}/{list.Count} with id={id}... ", false);
                 ls.SendRemindersToParticipants(id);
                 Success();
             }
