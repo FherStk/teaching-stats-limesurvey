@@ -1,5 +1,5 @@
 ﻿//Global vars
-var _VERSION = "0.9.0";
+var _VERSION = "0.10.0";
 
 DisplayInfo();
 if(!CheckConfig()) return;
@@ -26,9 +26,14 @@ else{
                 SetupCreateNewSurveyFromFile(Directory.GetFiles(Path.GetDirectoryName(args[i+1]) ?? "", Path.GetFileName(args[i+1])));
                 break;    
 
-            case "--start-survey":
+            case "--start-surveys":
             case "-ss":
                 StartSurveys();
+                break;  
+
+            case "--expire-surveys":
+            case "-es":
+                ExpireSurveys();
                 break;  
 
             case "--send-invitations":
@@ -64,9 +69,10 @@ void Help(){
     Info("Allowed arguments: ");
     Info("  -cs <FILE_PATH>, --create-survey <FILE_PATH>: creates a new survey, a YML file must be provided.");    
     Info("  -sc <FILE_PATH>, --saga-convert <FILE_PATH>: parses a SAGA's CSV file and creates a YML file which can be used to create new surveys (school, mentoring and subject) on LimeSurvey, a CSV file must be provided.");    
-    Info("  -ss, --start-survey: enables all the created surveys at limesurvey (just the created with this tool) and sends the invitations to the participants.");
+    Info("  -ss, --start-surveys: enables all the created surveys at limesurvey (just the ones belonging to the defined group at settings) and sends the invitations to the participants.");
+    Info("  -es, --expire-surveys: expires (stops) all the created surveys at limesurvey (just the ones belonging to the defined group at settings) so no pending participants will be able to answer the surveys.");
     Info("  -si, --send-invitations: send the invitations for already active surveys, but just for whom has not received any yet.");
-    Info("  -sr, --send-reminders: send survey reminders to all the participants (just the created with this tool) that still has not responded the surveys.");
+    Info("  -sr, --send-reminders: send survey reminders to all the participants (just the ones belonging to the defined group at settings) that still has not responded the surveys.");
     Info("  -lt, --load-teachingstats: loads all pending reporting data from 'teaching-stats', also stops the survey so no new data would be collected.");
     Info("  -ll, --load-limesurvey: loads all pending reporting data from 'lime-survey'.");
     Console.WriteLine();    
@@ -331,39 +337,41 @@ void CreateNewSurveyFromFile(string filePath){
     }
 }
 
-void LoadFromLimeSurvey(){    
-    using(var ls = new LimeSurvey()){
-        using(var ts = new TeachingStats()){            
-            foreach(var s in ls.ListSurveys('Y')){
-                int surveyID = int.Parse((s["sid"] ?? "").ToString());
-                var type = ls.GetSurveyTopic(surveyID);
+void LoadFromLimeSurvey(){  
+    throw new NotImplementedException();
+      
+    // using(var ls = new LimeSurvey()){
+    //     using(var ts = new TeachingStats()){            
+    //         foreach(var s in ls.ListSurveys('Y')){
+    //             int surveyID = int.Parse((s["sid"] ?? "").ToString());
+    //             var type = ls.GetSurveyTopic(surveyID);
                 
-                if(type != null){
-                    Info($"Importing all pending answers from LimeSurvey to Teaching-Stats (id={surveyID}):");
-                    try{
-                        Info("Downloading data from LimeSurvey... ", false);
-                        var answers = ls.GetSurveyResponses(surveyID);
-                        var questions = ls.GetSurveyQuestions(surveyID);
-                        Success();
+    //             if(type != null){
+    //                 Info($"Importing all pending answers from LimeSurvey to Teaching-Stats (id={surveyID}):");
+    //                 try{
+    //                     Info("Downloading data from LimeSurvey... ", false);
+    //                     var answers = ls.GetSurveyResponses(surveyID);
+    //                     var questions = ls.GetSurveyQuestions(surveyID);
+    //                     Success();
 
-                        Info("Importing data into Teaching-Stats... ", false);
-                        ts.ImportFromLimeSurvey(questions, answers);
-                        Success();
+    //                     Info("Importing data into Teaching-Stats... ", false);
+    //                     ts.ImportFromLimeSurvey(questions, answers);
+    //                     Success();
 
-                        Info("Stopping the surveys in LimeSurvey... ", false);
-                        ls.ExpireSurvey(surveyID);
-                        Success();                        
-                    }
-                    catch(Exception ex){
-                        Error($"ERROR: {ex.ToString()}");
-                    }
-                    finally{
-                        Console.WriteLine();
-                    }
-                }
-            }
-        }
-    }    
+    //                     Info("Stopping the surveys in LimeSurvey... ", false);
+    //                     ls.ExpireSurvey(surveyID);
+    //                     Success();                        
+    //                 }
+    //                 catch(Exception ex){
+    //                     Error($"ERROR: {ex.ToString()}");
+    //                 }
+    //                 finally{
+    //                     Console.WriteLine();
+    //                 }
+    //             }
+    //         }
+    //     }
+    // }    
 }
 
 void LoadFromTeachingStats(){
@@ -393,10 +401,11 @@ void StartSurveys(){
         Success();
         Console.WriteLine();
 
+        int i = 1;
         foreach(var s in list){
             //Just the non-active surveys (all within the current group, which should be the surveys created with this tool).
             var id = int.Parse((s["sid"] ?? "").ToString());
-            Info($"Starting survey (id={id}): ", true);
+            Info($"Starting survey {i++}/{list.Count} with id={id}...: ", true);
             
             try{
                 Info($"   Activating... ", false);
@@ -421,6 +430,39 @@ void StartSurveys(){
         else{
             Console.WriteLine();
             Success("Process finished, all the non-active surveys within the app group have been activated.");  
+        }  
+    }
+}
+
+void ExpireSurveys(){
+    //This option will start all the 'limesurvey' surveys (only for the surveys within the definded app setting's group, which should be the surveys created with this tool) sending also the email invitations to the participants.
+    
+    using(var ls = new LimeSurvey()){            
+        Info($"   Loading the survey list... ", false);        
+        var list = ls.ListSurveys('Y');
+        Success();
+        Console.WriteLine();
+
+        int i = 1;
+        foreach(var s in list){
+            //Just the non-active surveys (all within the current group, which should be the surveys created with this tool).                        
+            try{
+                var id = int.Parse((s["sid"] ?? "").ToString());
+                Info($"Expiring survey {i++}/{list.Count} with id={id}...: ", false);                
+                ls.ExpireSurvey(id);
+                Success();    
+            }
+            catch(Exception ex){
+                Error($"ERROR: {ex.ToString()}");
+
+                //TODO: wait and retry
+            }            
+        }
+
+        if(list.Count == 0) Warning($"Unable to load any active survey from limesurvey (within the current app group).");
+        else{
+            Console.WriteLine();
+            Success("Process finished, all the non-active surveys within the app group have been expired.");  
         }  
     }
 }
