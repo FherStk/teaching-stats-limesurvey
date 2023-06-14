@@ -1,5 +1,5 @@
 ﻿//Global vars
-var _VERSION = "0.10.1";
+var _VERSION = "0.11.0";
 
 DisplayInfo();
 if(!CheckConfig()) return;
@@ -66,15 +66,18 @@ Console.WriteLine();
 void Help(){
     Console.WriteLine();
     Info("dotnet run [arguments] <FILE_PATH>: ");
-    Info("Allowed arguments: ");
-    Info("  -cs <FILE_PATH>, --create-survey <FILE_PATH>: creates a new survey, a YML file must be provided.");    
-    Info("  -sc <FILE_PATH>, --saga-convert <FILE_PATH>: parses a SAGA's CSV file and creates a YML file which can be used to create new surveys (school, mentoring and subject) on LimeSurvey, a CSV file must be provided.");    
-    Info("  -ss, --start-surveys: enables all the created surveys at limesurvey (just the ones belonging to the defined group at settings) and sends the invitations to the participants.");
-    Info("  -es, --expire-surveys: expires (stops) all the created surveys at limesurvey (just the ones belonging to the defined group at settings) so no pending participants will be able to answer the surveys.");
-    Info("  -si, --send-invitations: send the invitations for already active surveys, but just for whom has not received any yet.");
-    Info("  -sr, --send-reminders: send survey reminders to all the participants (just the ones belonging to the defined group at settings) that still has not responded the surveys.");
-    Info("  -lt, --load-teachingstats: loads all pending reporting data from 'teaching-stats', also stops the survey so no new data would be collected.");
-    Info("  -ll, --load-limesurvey: loads all pending reporting data from 'lime-survey'.");
+    Console.WriteLine();
+    
+    Console.ForegroundColor = ConsoleColor.DarkBlue;        
+    Console.WriteLine("Allowed arguments: ");
+    Highlight("  -cs <FILE_PATH>, --create-survey <FILE_PATH>", "creates a new survey, a YML file must be provided.");
+    Highlight("  -sc <FILE_PATH>, --saga-convert <FILE_PATH>", "parses a SAGA's CSV file and creates a YML file which can be used to create new surveys (school, mentoring and subject) on LimeSurvey, a CSV file must be provided.");
+    Highlight("  -ss, --start-surveys", "enables all the created surveys at limesurvey (just the ones belonging to the defined group at settings) and sends the invitations to the participants.");
+    Highlight("  -es, --expire-surveys", "expires (stops) all the created surveys at limesurvey (just the ones belonging to the defined group at settings) so no pending participants will be able to answer the surveys.");
+    Highlight("  -si, --send-invitations", "send the invitations for already active surveys, but just for whom has not received any yet.");
+    Highlight("  -sr, --send-reminders", "send survey reminders to all the participants (just the ones belonging to the defined group at settings) that still has not responded the surveys.");
+    Highlight("  -lt, --load-teachingstats", "loads all pending reporting data from 'teaching-stats', also stops the survey so no new data would be collected.");
+    Highlight("  -ll, --load-limesurvey", "loads all pending reporting data from 'lime-survey'.");
     Console.WriteLine();    
 }
 
@@ -606,6 +609,13 @@ string Question(string text, string @default = ""){
 
     var response = Console.ReadLine();
     return (string.IsNullOrEmpty(response) ? @default : response);
+}
+
+void Highlight(string high, string description){   
+    Console.ForegroundColor = ConsoleColor.Yellow;        
+    Console.Write(high);
+    Console.ResetColor();
+    Console.WriteLine($": {description}");    
 }
 
 void DisplayInfo(){
