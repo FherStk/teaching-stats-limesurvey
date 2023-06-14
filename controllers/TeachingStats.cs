@@ -190,8 +190,7 @@ public class TeachingStats : System.IDisposable{
                 UPDATE reports.answer SET ""group""='ASIX1A' WHERE ""group""='ASIX1';
                 UPDATE reports.answer SET ""group""='ASIX2A' WHERE ""group""='ASIX2';
                 UPDATE reports.answer SET ""group""='DAM1A' WHERE ""group""='DAM1';
-                UPDATE reports.answer SET ""group""='GA2A' WHERE ""group""='GA2';
-                CREATE INDEX answer_year_idx ON reports.answer (""year"");", this.Connection, trans)){
+                UPDATE reports.answer SET ""group""='GA2A' WHERE ""group""='GA2';", this.Connection, trans)){
                 
                 cmd.ExecuteNonQuery();                
             }
