@@ -202,6 +202,20 @@ public class TeachingStats : System.IDisposable{
             }
 
             using (NpgsqlCommand cmd = new NpgsqlCommand(@"
+                INSERT INTO master.degree (code, name, degree_id, topic_id) VALUES ('MP14', 'FCT', 1, 4);
+                INSERT INTO master.degree (code, name, degree_id, topic_id) VALUES ('MP15', 'FCT', 3, 4);
+                INSERT INTO master.degree (code, name, degree_id, topic_id) VALUES ('MP16', 'Anglès tècnic', 3, 4);
+                INSERT INTO master.degree (code, name, degree_id, topic_id) VALUES ('MP14', 'FCT', 4, 4);
+                INSERT INTO master.degree (code, name, degree_id, topic_id) VALUES ('MP15', 'Anglès tècnic', 4, 4);
+                INSERT INTO master.degree (code, name, degree_id, topic_id) VALUES ('MP13', 'Anglès tècnic', 2, 4);
+                INSERT INTO master.degree (code, name, degree_id, topic_id) VALUES ('MP13', 'FCT', 5, 4);
+
+                UPDATE reports.answer SET ""group""='GA2A' WHERE ""group""='GA2';", this.Connection, trans)){
+                
+                cmd.ExecuteNonQuery();                
+            }
+
+            using (NpgsqlCommand cmd = new NpgsqlCommand(@"
                 DROP VIEW public.forms_subject;
                 DROP VIEW public.forms_student;
                 DROP VIEW reports.participation;
