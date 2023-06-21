@@ -486,6 +486,26 @@ public class TeachingStats : System.IDisposable{
                 cmd.ExecuteNonQuery();                
             }
 
+            using (NpgsqlCommand cmd = new NpgsqlCommand(@"                
+                CREATE OR REPLACE VIEW reports.answer_dept_adm_mp
+                AS SELECT *
+                    FROM reports.answer_dept_adm
+                WHERE topic = 'Assignatura';", this.Connection, trans)){
+                
+                cmd.ExecuteNonQuery();                
+            }
+
+            using (NpgsqlCommand cmd = new NpgsqlCommand(@"                
+                CREATE OR REPLACE VIEW reports.answer_dept_inf_mp
+                AS SELECT *
+                    FROM reports.answer_dept_inf
+                WHERE topic = 'Assignatura';", this.Connection, trans)){
+                
+                cmd.ExecuteNonQuery();                
+            }
+
+
+
             trans.Commit();                
         }
         catch{
