@@ -26,6 +26,12 @@ public class LimeSurvey : IDisposable{
         TEACHERS        
     }
 
+    public enum Status{
+        ACTIVE,
+        EXPIRED,
+        STOPPED
+    }
+
     public string? SessionKey {get; private set;}    
 
     public JsonRPCclient Client {get; private set;}    
@@ -59,7 +65,7 @@ public class LimeSurvey : IDisposable{
         SessionKey = String.Empty;
     }
 #region Survey        
-    public JArray ListSurveys(char activeValue = ' '){
+    public JArray ListSurveys(Status? status = null){
         this.Client.Method = "list_surveys";
         this.Client.Parameters.Add("sSessionKey", this.SessionKey);        
         this.Client.Post();
@@ -78,7 +84,12 @@ public class LimeSurvey : IDisposable{
                 var active = char.Parse((props["active"] ?? "").ToString());
                 var expired = (props["expires"] ?? "").ToString();
 
-                if(string.IsNullOrEmpty(expired) && (activeValue == ' ' || activeValue == active)) filtered.Add(survey);
+                if(status == null) filtered.Add(survey);
+                else{
+                    if(active == 'N' && status == Status.STOPPED) filtered.Add(survey);                    
+                    else if(string.IsNullOrEmpty(expired) && active == 'Y' && status == Status.ACTIVE) filtered.Add(survey);
+                    else if(!string.IsNullOrEmpty(expired) && active == 'Y' && status == Status.EXPIRED) filtered.Add(survey);                    
+                }
             } 
         }
         
@@ -289,20 +300,26 @@ public class LimeSurvey : IDisposable{
         return JArray.Parse(this.ReadClientResult() ?? "");
     }
     
-    public JObject GetSurveyResponses(int surveyID){
+    public JObject? GetSurveyResponses(int surveyID){
         this.Client.Method = "export_responses";
         this.Client.Parameters.Add("sSessionKey", this.SessionKey);
-        this.Client.Parameters.Add("iSurveyID", surveyID);
+        this.Client.Parameters.Add("iSurveyID", surveyID);        
         this.Client.Parameters.Add("sDocumentType", "json");
-        //TODO: The idea was to export also the question name so all the information neede came within a unique JSON but no question statement is beeing exportes... weird...
+        //TODO: The idea was to export also the question name so all the information neede came within a unique JSON but no question statement is beeing exportes... weird...        
         // this.Client.Parameters.Add("sLanguageCode", "");
         // this.Client.Parameters.Add("sHeadingType", "full");
         // this.Client.Parameters.Add("sResponseType", "long");
+        //this.Client.Parameters.Add("sCompletionStatus", "complete"); //fails with "The input is not a valid Base-64 string as it contains a non-base 64 character"
+        //"{\n  \"status\": \"No Data, could not get max id.\"\n}"
         this.Client.Post();
         this.Client.ClearParameters();
 
-        var base64EncodedBytes = System.Convert.FromBase64String(this.ReadClientResult() ?? "");
-        return JObject.Parse(System.Text.Encoding.UTF8.GetString(base64EncodedBytes));
+        var result = (this.ReadClientResult() ?? "");
+        if(string.IsNullOrEmpty(result) || result.Contains("No Data, could not get max id.")) return null;
+        else{
+            var base64EncodedBytes = System.Convert.FromBase64String(result);
+            return JObject.Parse(System.Text.Encoding.UTF8.GetString(base64EncodedBytes));
+        }
     }
 
     public Topic? GetSurveyTopic(int surveyID){      

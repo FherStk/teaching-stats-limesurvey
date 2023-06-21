@@ -23,7 +23,7 @@ public class TeachingStats : System.IDisposable{
         var data = ParseFromLimeSurveyToTeachingStats(questions, answers);
         
         using(var context = new EF.TeachingStatsContext()){
-            var lastID = context.Answers.OrderByDescending(x => x.EvaluationId).Select(x => x.EvaluationId).FirstOrDefault() + 1;            
+            var lastID = context.Answers.OrderByDescending(x => x.EvaluationId).Select(x => x.EvaluationId).FirstOrDefault();            
 
             foreach(var item in data){                
                 item.EvaluationId += lastID;
@@ -72,23 +72,26 @@ public class TeachingStats : System.IDisposable{
             var numeric = data.Children().Where(x => x.GetType() == typeof(JProperty)).Where(x => ((JProperty)x).Name.StartsWith("questions")).Cast<JProperty>().ToList();
             var comments = data.Children().Where(x => x.GetType() == typeof(JProperty)).Where(x => ((JProperty)x).Name.StartsWith("comments")).Cast<JProperty>().ToList();
             
-            //Setup the question shared values            
+            //Setup the question shared values
+            //Unable to get only the completed ones (the API fails on filtering, so it will be filtered here)                                    
             //Timestamp and year
             var timeStamp = (data["submitdate"] ?? "").ToString();
-            var parsedDateTime = DateTime.Now;
-            DateTime.TryParse(timeStamp, out parsedDateTime);
-            var year = parsedDateTime.Year;
-        
-            //Store the splitted answers            
-            short sort = 1;
-            foreach(var answer in numeric.OrderBy(x => x.Name))
-                importData.Add(ParseAnswer(evalID, statements, data, answer, sort++, timeStamp, year, QuestionType.Numeric));
-
-            foreach(var answer in comments.OrderBy(x => x.Name))
-                importData.Add(ParseAnswer(evalID, statements, data, answer, sort++, timeStamp, year, QuestionType.Text));
+            if(!string.IsNullOrEmpty(timeStamp)){
+                var parsedDateTime = DateTime.Now;
+                DateTime.TryParse(timeStamp, out parsedDateTime);
+                var year = parsedDateTime.Year;
             
-            //All the responses from the same group will share the ID;
-            evalID++;                      
+                //Store the splitted answers            
+                short sort = 1;
+                foreach(var answer in numeric.OrderBy(x => x.Name))
+                    importData.Add(ParseAnswer(evalID, statements, data, answer, sort++, timeStamp, year, QuestionType.Numeric));
+
+                foreach(var answer in comments.OrderBy(x => x.Name))
+                    importData.Add(ParseAnswer(evalID, statements, data, answer, sort++, timeStamp, year, QuestionType.Text));
+                
+                //All the responses from the same group will share the ID;
+                evalID++;    
+            }                  
         }
 
         return importData;
@@ -175,7 +178,9 @@ public class TeachingStats : System.IDisposable{
 
             using (NpgsqlCommand cmd = new NpgsqlCommand(@"
                 ALTER VIEW reports.answer RENAME TO answer_all;
-                SELECT * INTO reports.answer FROM reports.answer_all;                        
+                SELECT * INTO reports.answer FROM reports.answer_all;     
+                ALTER TABLE reports.answer ADD id serial NOT NULL;     
+                ALTER TABLE reports.answer ADD CONSTRAINT answer_pk PRIMARY KEY (id);              
                 TRUNCATE TABLE public.forms_answer;
                 TRUNCATE TABLE public.forms_participation;
                 TRUNCATE TABLE public.forms_evaluation CASCADE;                        

@@ -16,10 +16,10 @@
             //"args": ["-ss"],                                                          //--start-surveys
             //"args": ["-sr"],                                                          //--send-reminders
             //"args": ["-si"],                                                          //--send-invitations
-            //"args": ["-ll"],                                                          //--loads data from limesurvey to teaching-stats
+            "args": ["-ll"],                                                            //--loads data from limesurvey to teaching-stats
             //"args": ["-cs", "actions/create-surveys-ASIX1A.yml"],                     //--create-survey (single file)
             //"args": ["-cs", "actions/*.yml"],                                         //--create-survey (batch)
-            //"args": ["-es"],                                                            //--expire-surveys
+            //"args": ["-es"],                                                          //--expire-surveys
             "cwd": "${workspaceFolder}",
             // For more information about the 'console' field, see https://aka.ms/VSCode-CS-LaunchJson-Console
             "console": "integratedTerminal",
