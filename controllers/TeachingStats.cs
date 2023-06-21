@@ -444,21 +444,44 @@ public class TeachingStats : System.IDisposable{
             using (NpgsqlCommand cmd = new NpgsqlCommand(@"
                 CREATE OR REPLACE VIEW reports.answer_all
                 AS SELECT evaluation_id,
-                ""timestamp"",
-                year,
-                level,
-                department,
-                degree,
-                ""group"",
-                subject_code,
-                subject_name,
-                trainer,
-                topic,
-                question_sort,
-                question_type,
-                question_statement,
-                value
+                    ""timestamp"",
+                    year,
+                    level,
+                    department,
+                    degree,
+                    ""group"",
+                    subject_code,
+                    subject_name,
+                    trainer,
+                    topic,
+                    question_sort,
+                    question_type,
+                    question_statement,
+                    value
                 FROM reports.answer;", this.Connection, trans)){
+                
+                cmd.ExecuteNonQuery();                
+            }
+
+            using (NpgsqlCommand cmd = new NpgsqlCommand(@"                
+                CREATE OR REPLACE VIEW reports.answer_dept_inf
+                AS SELECT answer_all.evaluation_id,
+                    answer_all.""timestamp"",
+                    answer_all.year,
+                    answer_all.level,
+                    answer_all.department,
+                    answer_all.degree,
+                    answer_all.""group"",
+                    answer_all.subject_code,
+                    answer_all.subject_name,
+                    answer_all.trainer,
+                    answer_all.topic,
+                    answer_all.question_sort,
+                    answer_all.question_type,
+                    answer_all.question_statement,
+                    answer_all.value
+                    FROM reports.answer_all
+                WHERE answer_all.department in ('Informàtica i comunicacions', 'Informàtica');", this.Connection, trans)){
                 
                 cmd.ExecuteNonQuery();                
             }
