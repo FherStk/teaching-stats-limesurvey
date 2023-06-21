@@ -190,6 +190,7 @@ public class TeachingStats : System.IDisposable{
             }
 
             using (NpgsqlCommand cmd = new NpgsqlCommand(@"
+                UPDATE master.degree SET ""code""='AIF' WHERE ""code""='AF';
                 UPDATE reports.answer SET ""group""='AIF1A' WHERE ""group""='AIF1';
                 UPDATE reports.answer SET ""group""='AIF2A' WHERE ""group""='AIF2';
                 UPDATE reports.answer SET ""group""='ASIX1A' WHERE ""group""='ASIX1';
