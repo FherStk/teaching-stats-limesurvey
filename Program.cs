@@ -1,5 +1,5 @@
 ﻿//Global vars
-var _VERSION = "0.12.0";
+var _VERSION = "0.12.1";
 
 DisplayInfo();
 if(!CheckConfig()) return;
@@ -567,7 +567,6 @@ bool CheckConfig(){
                 Info("   Upgrading the teaching-stats' database... ", false);
                 ts.PerformDataDaseUpgrade();
                 Success();
-                Console.WriteLine();
             }
         }
 

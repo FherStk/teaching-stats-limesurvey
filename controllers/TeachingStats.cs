@@ -441,6 +441,28 @@ public class TeachingStats : System.IDisposable{
                 cmd.ExecuteNonQuery();                
             }
 
+            using (NpgsqlCommand cmd = new NpgsqlCommand(@"
+                CREATE OR REPLACE VIEW reports.answer_all
+                AS SELECT evaluation_id,
+                ""timestamp"",
+                year,
+                level,
+                department,
+                degree,
+                ""group"",
+                subject_code,
+                subject_name,
+                trainer,
+                topic,
+                question_sort,
+                question_type,
+                question_statement,
+                value
+                FROM reports.answer;", this.Connection, trans)){
+                
+                cmd.ExecuteNonQuery();                
+            }
+
             trans.Commit();                
         }
         catch{
