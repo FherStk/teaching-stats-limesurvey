@@ -1,57 +1,30 @@
 data:
-- topic: "SCHOOL"
-  degreeName: "DEGREE NAME"
-  departmentName: "DEPARTMENT NAME"
-  groupName: "GROUP NAME"  
-  participants:
-    - email: "me@example.com"
-      firstname: "Name"
-      lastname: "Surname"
+  - id: "GROUP NAME - MPs"
+    degreeName: "DEGREE NAME"
+    departmentName: "DEPARTMENT NAME"
+    groupName: "GROUP NAME"    
 
-    - email: "me@example.com"
-      firstname: "Another Name"
-      lastname: "Another Surname"
-- topic: "SUBJECT-CCFF"
-  degreeName: "DEGREE NAME"
-  departmentName: "DEPARTMENT NAME"
-  groupName: "GROUP NAME"
-  trainerName: "TRAINER NAME"
-  subjectCode: "MPxx"
-  subjectName: "SUBJECT"
-  participants:
-    - email: "me@example.com"
-      firstname: "Name"
-      lastname: "Surname"
+    topics:
+      - topic: "SCHOOL"      
 
-    - email: "me@example.com"
-      firstname: "Another Name"
-      lastname: "Another Surname"
+      - topic: "MENTORING-1-CCFF" / "MENTORING-2-CCFF"
+        trainerName: "TRAINER NAME"        
 
-- topic: "MENTORING-1-CCFF"
-  degreeName: "DEGREE NAME"
-  departmentName: "DEPARTMENT NAME"
-  groupName: "GROUP NAME"
-  trainerName: "TRAINER NAME"
-  participants:
-    - email: "me@example.com"
-      firstname: "Name"
-      lastname: "Surname"
+      - topic: "SUBJECT-CCFF"      
+        trainerName: "TRAINER NAME X"
+        subjectCode: "MPxx"
+        subjectName: "SUBJECT XXX"
 
-    - email: "me@example.com"
-      firstname: "Another Name"
-      lastname: "Another Surname"
+      - topic: "SUBJECT-CCFF"      
+        trainerName: "TRAINER NAME Y"
+        subjectCode: "MPxx"
+        subjectName: "SUBJECT XXX"
+      
+    participants:
+      - email: "me@example.com"
+        firstname: "Name"
+        lastname: "Surname"
 
-- topic: "MENTORING-2-CCFF"
-  degreeName: "DEGREE NAME"
-  departmentName: "DEPARTMENT NAME"
-  groupName: "GROUP NAME"
-  trainerName: "TRAINER NAME"
-  participants:
-    - email: "me@example.com"
-      firstname: "Name"
-      lastname: "Surname"
-
-    - email: "me@example.com"
-      firstname: "Another Name"
-      lastname: "Another Surname"
-
+      - email: "me@example.com"
+        firstname: "Another Name"
+        lastname: "Another Surname"
