@@ -134,13 +134,13 @@ public class LimeSurvey : IDisposable{
         var template = Path.Combine(Utils.TemplatesFolder, "main-students-ccff.txt");
         var content = File.ReadAllText(template);
 
-        content = content.Replace("{'TITLE'}", $"{data.Id}");
+        content = content.Replace("{'TITLE'}", $"{data.GroupName}");    //TODO: setup the survey name
         content = content.Replace("{'DESCRIPTION'}", $"{data.Id}");
 
         //Setting up each topic template
         var questionID = 4;   //each question must have a unique numerical id, for subject it should star with 4 (400, 4001, 4002...)
         if(data.Topics != null){
-            foreach(var entry in data.Topics.OrderBy(x => x.SubjectCode)){   
+            foreach(var entry in data.Topics.OrderBy(x => x.SubjectCode)){   //TODO: tutorship and school to the end
                 var block = string.Empty;                     
                 var subjectCode = string.Empty;
                 var subjectName = string.Empty;
