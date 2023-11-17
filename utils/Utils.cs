@@ -86,23 +86,17 @@ public static class Utils{
         {
             Data = new List<Survey.SurveyData>(){
                 new Survey.SurveyData(){
-                    Topic = "SUBJECT-CCFF",
+                    Id = "SURVEY-1",
                     DegreeName = "DEGREE",
                     DepartmentName = "DEPTARTMENT",
-                    GroupName = "GROUP",
-                    SubjectCode = "MPxx",
-                    SubjectName = "SUBJECT 1",                    
-                    TrainerName = "TRAINER"
+                    GroupName = "GROUP"
                 },
 
                 new Survey.SurveyData(){
-                    Topic = "SUBJECT-CCFF",
+                    Id = "SURVEY-2",
                     DegreeName = "DEGREE",
                     DepartmentName = "DEPTARTMENT",
-                    GroupName = "GROUP",
-                    SubjectCode = "MPyy",
-                    SubjectName = "SUBJECT 2",                    
-                    TrainerName = "TRAINER"
+                    GroupName = "GROUP"
                 }
             }
         };

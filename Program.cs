@@ -2,7 +2,7 @@
 var _VERSION = "0.12.5";
 
 DisplayInfo();
-if(!CheckConfig()) return;
+//if(!CheckConfig()) return;
 
 //CLI arguments
 var action = string.Empty;
@@ -120,16 +120,116 @@ void ConvertSagaCSVtoImportYML(string filePath){
         //Setting up survey data
         if(degree == null || degree.Subjects == null) throw new IncorrectSettingsException();
         Success();
+
+        //Setting up student's enrollment data
+        Info("   Loading surveys by enrollment data... ", false);
+        var surveyByEnrollment = new Dictionary<string, Survey.SurveyData>();
+
+        using (var reader = new StreamReader(filePath, System.Text.Encoding.UTF8))
+        using (var csv = new CsvHelper.CsvReader(reader, System.Globalization.CultureInfo.InvariantCulture))
+        {  
+            var records = csv.GetRecords<dynamic>();
+            foreach (var r in records)
+            {
+                string completeName = r.NOM;
+                var coma = completeName.IndexOf(",");           
+
+                var p = new Survey.Participant(){
+                    Firstname = completeName.Substring(coma+1).Trim(),
+                    Lastname = completeName.Substring(0, coma).Trim(),
+                    Email = r.EMAIL
+                };
+                                
+                var studentSurveys = new List<Survey.SurveyData>();            
+                var subjects = ((string)r.MATRICULADES).Split(",").Where(x => x.Length > 3).ToList().OrderBy(x => x); //UF codes should be used, when the same MP is coursed along 1st and 2nd course (like DAM M03)
+                var surveyID = $"{currentGroupName}-{string.Join('-', subjects)}";
+                
+                List<Survey.Participant> participants;
+                if(surveyByEnrollment.ContainsKey(surveyID)) participants = surveyByEnrollment[surveyID].Participants ?? new List<Survey.Participant>();
+                else {
+                    //The survey did not exists
+                    var topics = new List<Survey.SurveyTopic>();
+                    foreach(var subjectCode in subjects){
+                        var subjectData = degree.Subjects.SingleOrDefault(x => x.Ids != null && x.Ids.Contains(subjectCode));
+                        if(subjectData == null) throw new Exception($"Unable to find any subject with the code '{subjectCode}'");
+
+                        var trainerName = string.Empty;
+                        if(subjectData.Trainers != null){
+                            var trainerData = subjectData.Trainers.Where(x => x.Groups != null && x.Groups.Contains(currentGroupName)).SingleOrDefault();
+                            trainerName = (trainerData == null ? string.Empty : trainerData.Name ?? string.Empty);
+                        }
+
+                        topics.Add(new Survey.SurveyTopic(){                        
+                            SubjectCode = subjectCode,
+                            SubjectName = subjectData.Name,
+                            Topic = "SUBJECT-CCFF",
+                            TrainerName = trainerName
+                        });
+                    }   
+
+                    participants = new List<Survey.Participant>();
+                    surveyByEnrollment.Add(surveyID, new Survey.SurveyData(){                    
+                        DegreeName = degree.Name,
+                        DepartmentName = degree.Department,
+                        GroupName = currentGroupName,      
+                        Topics = topics,
+                        Participants = participants
+                    });                  
+                }
+
+                participants.Add(p);
+
+                
+
+                // foreach(var id in subjects){
+                //     //MPs (codes like 101) and UFs (codes like 10101), the UFs codes will be used when a subject is for 1st and 2nd course (like DAM M03).
+                //     //Repeated surveys will be added (repeated but same instance, so no memory waste and easy to Distinct())
+                //     if(!surveysByContent.ContainsKey(id)) throw new IncorrectSettingsException($"The content code '{id}' cannot be found within the config file for the group '{currentGroupName}'");
+                //     surveyByGroup = surveysByContent[id];
+
+                //     //The participant will be added to the survey, should be in:
+                //     //  1. Its own group (this is the normal behaviour).
+                //     //  2. A 1st course group if the it's a second course student repeating a 1st course subject (and there's only one 1st course group).
+                //     //  3. More than one 1st course group if the it's a second course student repeating a 1st course subject  (and there's more than one 1st course group). This produces a WARNING.                    
+                //     if(surveyByGroup.ContainsKey(currentGroupName)) studentSurveys.Add(surveyByGroup[currentGroupName]);
+                //     else{
+                //         var first = surveyByGroup.Values.FirstOrDefault(); 
+                //         if(first != null){
+                //             //The user has been added to another group, a warning will be displayed, repeated entries will be added.
+                //             if(!warnings.ContainsKey(r.NOM)) warnings.Add(r.NOM, new List<string>());
+                //             warnings[r.NOM].Add($"{first.SubjectCode}: {first.SubjectName}");                            
+                //             studentSurveys.AddRange(surveyByGroup.Values);
+                //         }
+                //     }
+                // }
+
+                // //At this point, studentSurveys will have all the enrolled ones but repeated (got by content and not by subject)
+                // foreach(var s in studentSurveys.Distinct()){
+                //     if(s.Participants == null) s.Participants = new List<Survey.Participant>(); 
+                //     s.Participants.Add(p);
+                // }
+
+                // //Adding the participant to the school survey
+                // var school = surveysByContent["SCHOOL"].FirstOrDefault().Value;
+                // if(school != null && school.Participants != null) school.Participants.Add(p);
+
+                // //Adding the participants to the mentory survey
+                // var mentoring = surveysByContent[$"MENTORING-{degreeCourse}-CCFF"][currentGroupName];
+                // if(mentoring != null && mentoring.Participants != null) mentoring.Participants.Add(p);
+            }
+        }
+
+        Success();
         
-        Info("   Loading surveys data... ", false);
-        var surveyByGroup = new Dictionary<string, Survey.SurveyData>();
-        surveyByGroup.Add(currentGroupName, new Survey.SurveyData(){                    
-            DegreeName = degree.Name,
-            DepartmentName = degree.Department,
-            GroupName = currentGroupName,      
-            Topics = new List<Survey.SurveyTopic>(),
-            Participants = new List<Survey.Participant>()
-        }); 
+        // Info("   Loading surveys data... ", false);
+        // var surveyByGroup = new Dictionary<string, Survey.SurveyData>();
+        // surveyByGroup.Add(currentGroupName, new Survey.SurveyData(){                    
+        //     DegreeName = degree.Name,
+        //     DepartmentName = degree.Department,
+        //     GroupName = currentGroupName,      
+        //     Topics = new List<Survey.SurveyTopic>(),
+        //     Participants = new List<Survey.Participant>()
+        // }); 
 
         //NOTE: this will be filled from teaching-stats database, once integrated within the IMS (the lack of backoffice for teaching-stats does easier to define all the master data within a YML file).
         // foreach(var s in degree.Subjects){
