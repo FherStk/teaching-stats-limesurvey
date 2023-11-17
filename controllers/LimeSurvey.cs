@@ -221,9 +221,11 @@ public class LimeSurvey : IDisposable{
                     block = block.Replace("{'SUBJECT_NAME'}", "{'" + entry.SubjectName + "'}");
                 }
 
-                content += block;
+                content += block;                
             }              
         }
+
+        File.WriteAllText(Path.Combine(Utils.TemplatesFolder, "test.txt"), content);
                     
         //Encoding
         var plainTextBytes = System.Text.Encoding.UTF8.GetBytes(content);
