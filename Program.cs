@@ -254,7 +254,8 @@ void CreateNewSurveyFromFile(string filePath){
         }
         
         if(importData.Data.Count == 0) Warning($"There is no new survey info within the '{filePath}' YAML file.");
-        else{            
+        else{    
+            Console.WriteLine();        
             Success("Process finished, all the surveys have been created.");        
             Console.WriteLine();
         } 

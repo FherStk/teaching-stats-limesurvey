@@ -134,12 +134,13 @@ public class LimeSurvey : IDisposable{
         var template = Path.Combine(Utils.TemplatesFolder, "main-students-ccff.txt");
         var content = File.ReadAllText(template);
 
-        content = content.Replace("{'TITLE'}", $"{data.GroupName}");
+        content = content.Replace("{'TITLE'}", $"{data.Id}");
         content = content.Replace("{'DESCRIPTION'}", $"{data.Id}");
 
         //Setting up each topic template
+        var questionID = 4;   //each question must have a unique numerical id, for subject it should star with 4 (400, 4001, 4002...)
         if(data.Topics != null){
-            foreach(var entry in data.Topics){   
+            foreach(var entry in data.Topics.OrderBy(x => x.SubjectCode)){   
                 var block = string.Empty;                     
                 var subjectCode = string.Empty;
                 var subjectName = string.Empty;
@@ -219,13 +220,14 @@ public class LimeSurvey : IDisposable{
                 if(topic == Topic.SUBJECT_CCFF){
                     block = block.Replace("{'SUBJECT_CODE'}", "{'" + entry.SubjectCode + "'}");
                     block = block.Replace("{'SUBJECT_NAME'}", "{'" + entry.SubjectName + "'}");
+                    block = block.Replace("{'X'}", (questionID++).ToString());
                 }
 
                 content += block;                
             }              
         }
 
-        File.WriteAllText(Path.Combine(Utils.TemplatesFolder, "test.txt"), content);
+        //File.WriteAllText(Path.Combine(Utils.TemplatesFolder, "test.txt"), content);
                     
         //Encoding
         var plainTextBytes = System.Text.Encoding.UTF8.GetBytes(content);
