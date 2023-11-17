@@ -56,7 +56,7 @@ public static class Utils{
     public static T DeserializeYamlFile<T>(string filePath){
         //Source: https://github.com/aaubry/YamlDotNet
         var deserializer = new DeserializerBuilder()
-        .WithNamingConvention(CamelCaseNamingConvention.Instance)  // see height_in_inches in sample yml 
+        .WithNamingConvention(CamelCaseNamingConvention.Instance)
         .Build();
 
         var yml = File.ReadAllText(filePath);
@@ -89,14 +89,79 @@ public static class Utils{
                     Id = "SURVEY-1",
                     DegreeName = "DEGREE",
                     DepartmentName = "DEPTARTMENT",
-                    GroupName = "GROUP"
+                    GroupName = "GROUP",
+                    Topics = new List<Survey.SurveyTopic>(){
+                        new Survey.SurveyTopic(){
+                            Topic = "SUBJECT-CCFF",
+                            TrainerName = "Teacher 1",
+                            SubjectCode = "MP01",
+                            SubjectName = "Comunicació i atenció al client"
+                        },
+                        new Survey.SurveyTopic(){
+                            Topic = "SUBJECT-CCFF",
+                            TrainerName = "Teacher 2",
+                            SubjectCode = "MP02",
+                            SubjectName = "Gestió de la documentació jurídica i empresarial"
+                        },
+                        new Survey.SurveyTopic(){
+                            Topic = "MENTORING-1-CCFF",
+                            TrainerName = "Teacher 3",
+                        },
+                        new Survey.SurveyTopic(){
+                            Topic = "SCHOOL"
+                        }
+                    },
+                    Participants = new List<Survey.Participant>(){
+                        new Survey.Participant(){
+                            Firstname = "Name 1",
+                            Lastname = "Surname 1",
+                            Email = "name1@domain.com"
+                        },
+                        new Survey.Participant(){
+                            Firstname = "Name 2",
+                            Lastname = "Surname 2",
+                            Email = "name2@domain.com"
+                        }
+                    }
                 },
 
                 new Survey.SurveyData(){
                     Id = "SURVEY-2",
                     DegreeName = "DEGREE",
                     DepartmentName = "DEPTARTMENT",
-                    GroupName = "GROUP"
+                    GroupName = "GROUP",
+                    Topics = new List<Survey.SurveyTopic>(){
+                        new Survey.SurveyTopic(){
+                            Topic = "SUBJECT-CCFF",
+                            TrainerName = "Teacher 7",
+                            SubjectCode = "MP07",
+                            SubjectName = "Procés integral de l’activitat comercial"
+                        },                       
+                        new Survey.SurveyTopic(){
+                            Topic = "MENTORING-2-CCFF",
+                            TrainerName = "Teacher 9",
+                        },
+                        new Survey.SurveyTopic(){
+                            Topic = "SCHOOL"
+                        }                    
+                    },
+                    Participants = new List<Survey.Participant>(){
+                        new Survey.Participant(){
+                            Firstname = "Name 1",
+                            Lastname = "Surname 1",
+                            Email = "name1@domain.com"
+                        },
+                        new Survey.Participant(){
+                            Firstname = "Name 2",
+                            Lastname = "Surname 2",
+                            Email = "name2@domain.com"
+                        },
+                        new Survey.Participant(){
+                            Firstname = "Name 3",
+                            Lastname = "Surname 3",
+                            Email = "name3@domain.com"
+                        }
+                    }
                 }
             }
         };

@@ -3,6 +3,7 @@ var _VERSION = "0.12.5";
 
 DisplayInfo();
 //if(!CheckConfig()) return;
+//Utils.SerializeImportTemplateAsYamlFile();
 
 //Warnings
 Dictionary<Survey.Participant, List<Settings.SubjectData>> enrollmentWarnings;
@@ -194,7 +195,11 @@ void ConvertSagaCSVtoImportYML(string filePath){
         Success();
 
         Info("   Generating the YAML file for the current group... ", false);        
-        Utils.SerializeYamlFile(surveyByEnrollment.Values, Path.Combine(Utils.ActionsFolder, $"create-surveys-{currentGroupName}.yml"));
+        Utils.SerializeYamlFile(
+            new Survey(){
+                Data = surveyByEnrollment.Values.ToList()
+            }, Path.Combine(Utils.ActionsFolder, $"create-surveys-{currentGroupName}.yml")
+        );
 
         if(enrollmentWarnings.Count == 0) Success();    
         else{

@@ -129,85 +129,102 @@ public class LimeSurvey : IDisposable{
         return JObject.Parse(this.ReadClientResult() ?? "");
     }
 
-    public int CreateSurvey(Survey.SurveyData data){    
-        var topic = (LimeSurvey.Topic)Enum.Parse(typeof(LimeSurvey.Topic), (/*data.Topic ?? ""*/"").Replace("-", "_"), true);        
-        var template = $"{Path.Combine(Utils.TemplatesFolder, topic.ToString().ToLower().Replace("_", "-"))}.txt";    
-        var content = File.ReadAllText(template);               
+    public int CreateSurvey(Survey.SurveyData data){  
+        //Setting up the main template
+        var template = Path.Combine(Utils.TemplatesFolder, "main-students-ccff.txt");
+        var content = File.ReadAllText(template);
 
-        //Setting up template values
-        var subjectCode = string.Empty;
-        var subjectName = string.Empty;
-        var surveyName = string.Empty;
-        var description = string.Empty;
-        var captions = (Utils.Settings.Data == null ? null : Utils.Settings.Data.Captions);
-        switch(topic){
-            case Topic.SCHOOL:
-                subjectCode = "Centre";
-                subjectName = "Instal·lacions i estada";
-                surveyName = $"{data.GroupName} {(captions == null ? "SCHOOL" : captions.School)}";
-                description = @"<p><strong>Si us plau, abans de contestar l'enquesta, tingues en compte el següent:</strong></p>
-                                <ol style='text-align: left;'>
-                                    <li>Aquesta enquesta és completament anònima, si us plau, sigues sincer.</li>
-                                    <li>Sigues constructiu, explica'ns quines coses fem bé i com podem millorar.</li>
-                                    <li>Sigues educat i respectuós, així ens ajudes a fer millor el nostre institut.</li>
-                                </ol>";                
-                break;
+        content = content.Replace("{'TITLE'}", $"{data.GroupName}");
+        content = content.Replace("{'DESCRIPTION'}", $"{data.Id}");
 
-            case Topic.MENTORING_1_CCFF:
-                subjectCode = "Tutoria";
-                subjectName = "1er Curs";
-                surveyName = $"{data.GroupName} {(captions == null ? "MENTORING 1ST" : captions.Mentoring1)} ({/*data.TrainerName*/""})";
-                description = @"<p><strong>Si us plau, abans de contestar l'enquesta, tingues en compte el següent:</strong></p>
-                                <ol style='text-align: left;'>
-                                    <li>Aquesta enquesta és completament anònima, si us plau, sigues sincer.</li>
-                                    <li>Sigues constructiu, explica'ns quines coses fem bé i com podem millorar.</li>
-                                    <li>Sigues educat i respectuós, així ens ajudes a fer millor el nostre institut.</li>
-                                </ol>";
-                break;
+        //Setting up each topic template
+        if(data.Topics != null){
+            foreach(var entry in data.Topics){   
+                var block = string.Empty;                     
+                var subjectCode = string.Empty;
+                var subjectName = string.Empty;
+                var blockName = string.Empty;
+                var description = string.Empty;
+                var captions = (Utils.Settings.Data == null ? null : Utils.Settings.Data.Captions);
+                var topic = (LimeSurvey.Topic)Enum.Parse(typeof(LimeSurvey.Topic), (entry.Topic ?? "").Replace("-", "_"), true);        
 
-            case Topic.MENTORING_2_CCFF:
-                subjectCode = "Tutoria";
-                subjectName = "2n Curs";
-                surveyName = $"{data.GroupName} {(captions == null ? "MENTORING 2ND" : captions.Mentoring2)} ({/*data.TrainerName*/""})";
-                description = @"<p><strong>Si us plau, abans de contestar l'enquesta, tingues en compte el següent:</strong></p>
-                                <ol style='text-align: left;'>
-                                    <li>Aquesta enquesta és completament anònima, si us plau, sigues sincer.</li>
-                                    <li>Sigues constructiu, explica'ns quines coses fem bé i com podem millorar.</li>
-                                    <li>Sigues educat i respectuós, així ens ajudes a fer millor el nostre institut.</li>
-                                </ol>";
-                break;
+                switch(topic){
+                    case Topic.SCHOOL:
+                        template = "block-school";
+                        subjectCode = "Centre";
+                        subjectName = "Instal·lacions i estada";
+                        blockName = $"{data.GroupName} {(captions == null ? "SCHOOL" : captions.School)}";
+                        description = @"<p><strong>Si us plau, abans de contestar l'enquesta, tingues en compte el següent:</strong></p>
+                                        <ol style='text-align: left;'>
+                                            <li>Aquesta enquesta és completament anònima, si us plau, sigues sincer.</li>
+                                            <li>Sigues constructiu, explica'ns quines coses fem bé i com podem millorar.</li>
+                                            <li>Sigues educat i respectuós, així ens ajudes a fer millor el nostre institut.</li>
+                                        </ol>";                
+                        break;
 
-            case Topic.SUBJECT_CCFF:
-                surveyName = $"{data.GroupName} {/*data.SubjectCode*/""}: {/*data.SubjectName*/""} ({/*data.TrainerName*/""})";
-                description = @"<p><strong>Si us plau, abans de contestar l'enquesta, tingues en compte el següent:</strong></p>
-                                <ol style='text-align: left;'>
-                                    <li>Si no estàs matriculat d'aquest Mòdul Professional o en trobes a faltar enquestes sobre altres Mòduls que tens matriculats, posa't en contacte amb el teu tutor.</li>
-                                    <li>Aquesta enquesta és completament anònima, si us plau, sigues sincer.</li>
-                                    <li>Sigues constructiu, explica'ns quines coses fem bé i com podem millorar.</li>
-                                    <li>Sigues educat i respectuós, així ens ajudes a fer millor el nostre institut.</li>
-                                </ol>";
-            break;
+                    case Topic.MENTORING_1_CCFF:
+                        template = "block-mentoring-1-ccff";
+                        subjectCode = "Tutoria";
+                        subjectName = "1er Curs";
+                        blockName = $"{data.GroupName} {(captions == null ? "MENTORING 1ST" : captions.Mentoring1)} ({entry.TrainerName})";
+                        description = @"<p><strong>Si us plau, abans de contestar l'enquesta, tingues en compte el següent:</strong></p>
+                                        <ol style='text-align: left;'>
+                                            <li>Aquesta enquesta és completament anònima, si us plau, sigues sincer.</li>
+                                            <li>Sigues constructiu, explica'ns quines coses fem bé i com podem millorar.</li>
+                                            <li>Sigues educat i respectuós, així ens ajudes a fer millor el nostre institut.</li>
+                                        </ol>";
+                        break;
 
-            case Topic.STAFF:
-            case Topic.TEACHERS:
-            default:
-                throw new NotImplementedException();
+                    case Topic.MENTORING_2_CCFF:
+                        template = "block-mentoring-2-ccff";
+                        subjectCode = "Tutoria";
+                        subjectName = "2n Curs";
+                        blockName = $"{data.GroupName} {(captions == null ? "MENTORING 2ND" : captions.Mentoring2)} ({entry.TrainerName})";
+                        description = @"<p><strong>Si us plau, abans de contestar l'enquesta, tingues en compte el següent:</strong></p>
+                                        <ol style='text-align: left;'>
+                                            <li>Aquesta enquesta és completament anònima, si us plau, sigues sincer.</li>
+                                            <li>Sigues constructiu, explica'ns quines coses fem bé i com podem millorar.</li>
+                                            <li>Sigues educat i respectuós, així ens ajudes a fer millor el nostre institut.</li>
+                                        </ol>";
+                        break;
+
+                    case Topic.SUBJECT_CCFF:
+                        template = "block-subject-ccff";
+                        blockName = $"{data.GroupName} {entry.SubjectCode}: {entry.SubjectName} ({entry.TrainerName})";
+                        description = @"<p><strong>Si us plau, abans de contestar l'enquesta, tingues en compte el següent:</strong></p>
+                                        <ol style='text-align: left;'>
+                                            <li>Si no estàs matriculat d'aquest Mòdul Professional o en trobes a faltar enquestes sobre altres Mòduls que tens matriculats, posa't en contacte amb el teu tutor.</li>
+                                            <li>Aquesta enquesta és completament anònima, si us plau, sigues sincer.</li>
+                                            <li>Sigues constructiu, explica'ns quines coses fem bé i com podem millorar.</li>
+                                            <li>Sigues educat i respectuós, així ens ajudes a fer millor el nostre institut.</li>
+                                        </ol>";
+                    break;
+
+                    case Topic.STAFF:
+                    case Topic.TEACHERS:
+                    default:
+                        throw new NotImplementedException();
+                }
+                
+                template = Path.Combine(Utils.TemplatesFolder, $"{template}.txt");
+                block = File.ReadAllText(template);
+
+                block = block.Replace("{'TITLE'}", $"{blockName}");
+                block = block.Replace("{'DESCRIPTION'}", $"{description}");
+                block = block.Replace("{'DEPARTMENT'}", "{'" + data.DepartmentName + "'}");
+                block = block.Replace("{'DEGREE'}", "{'" + data.DegreeName + "'}");
+                block = block.Replace("{'GROUP'}", "{'" + data.GroupName + "'}");
+                block = block.Replace("{'TRAINER'}", "{'" + entry.TrainerName + "'}");
+
+                if(topic == Topic.SUBJECT_CCFF){
+                    block = block.Replace("{'SUBJECT_CODE'}", "{'" + entry.SubjectCode + "'}");
+                    block = block.Replace("{'SUBJECT_NAME'}", "{'" + entry.SubjectName + "'}");
+                }
+
+                content += block;
+            }              
         }
-
-                        
-        //Replacing template values
-        content = content.Replace("{'TITLE'}", $"{surveyName}");
-        content = content.Replace("{'DESCRIPTION'}", $"{description}");
-        content = content.Replace("{'DEPARTMENT'}", "{'" + data.DepartmentName + "'}");
-        content = content.Replace("{'DEGREE'}", "{'" + data.DegreeName + "'}");
-        content = content.Replace("{'GROUP'}", "{'" + data.GroupName + "'}");
-        content = content.Replace("{'TRAINER'}", "{'" + /*data.TrainerName*/"" + "'}");
-
-        if(topic == Topic.SUBJECT_CCFF){
-            content = content.Replace("{'SUBJECT_CODE'}", "{'" + /*data.SubjectCode*/"" + "'}");
-            content = content.Replace("{'SUBJECT_NAME'}", "{'" + /*data.SubjectName*/"" + "'}");
-        }
-
+                    
         //Encoding
         var plainTextBytes = System.Text.Encoding.UTF8.GetBytes(content);
         var base64EncodedBytes =  System.Convert.ToBase64String(plainTextBytes);
