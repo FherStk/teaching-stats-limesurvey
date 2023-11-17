@@ -11,8 +11,8 @@
             "preLaunchTask": "build",
             // If you have changed target frameworks, make sure to update the program path.
             "program": "${workspaceFolder}/bin/Debug/net6.0/teaching-stats-limesurvey.dll",
-            "args": ["-sc", "/home/fher/Descargas/AIF1A.csv"],                          //--saga-create (single file)
-            //"args": ["-sc", "/home/fher/Descargas/input/*.csv"],                      //--saga-create (batch)            
+            //"args": ["-sc", "/home/fher/Descargas/enrollment/ASIX2A.csv"],              //--saga-create (single file)
+            "args": ["-sc", "/home/fher/Descargas/enrollment/*.csv"],                 //--saga-create (batch)            
             //"args": ["-ss"],                                                          //--start-surveys
             //"args": ["-sr"],                                                          //--send-reminders
             //"args": ["-si"],                                                          //--send-invitations
