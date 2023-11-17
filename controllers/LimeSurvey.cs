@@ -1,3 +1,4 @@
+using System.IO.Compression;
 using JsonRPC;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -134,19 +135,23 @@ public class LimeSurvey : IDisposable{
         var template = Path.Combine(Utils.TemplatesFolder, "main-students-ccff.txt");
         var content = File.ReadAllText(template);
 
-        content = content.Replace("{'TITLE'}", $"{data.GroupName}");    //TODO: setup the survey name
-        content = content.Replace("{'DESCRIPTION'}", $"{data.Id}");
+        var captions = (Utils.Settings.Data == null ? null : Utils.Settings.Data.Captions);
+        content = content.Replace("{'DESCRIPTION'}", (captions == null ? data.GroupName : captions.Survey));
+        content = content.Replace("{'TITLE'}", data.Topics == null ? data.GroupName : $"{data.GroupName} | {string.Join(", ", data.Topics.Where(x => !string.IsNullOrEmpty(x.SubjectCode)).Select(x => x.SubjectCode).ToList())}");
 
         //Setting up each topic template
         var questionID = 4;   //each question must have a unique numerical id, for subject it should star with 4 (400, 4001, 4002...)
         if(data.Topics != null){
-            foreach(var entry in data.Topics.OrderBy(x => x.SubjectCode)){   //TODO: tutorship and school to the end
+            //This is the easiest way to order and process the surveys (less code, less methods, etc.)
+            var orderedItems = data.Topics.Where(x => x.Topic == "SUBJECT-CCFF").OrderBy(x => x.SubjectCode).ToList();
+            orderedItems.AddRange(data.Topics.Where(x => x.Topic != "SUBJECT-CCFF").OrderByDescending(x => x.Topic).ToList());
+
+            foreach(var entry in orderedItems){
                 var block = string.Empty;                     
                 var subjectCode = string.Empty;
                 var subjectName = string.Empty;
                 var blockName = string.Empty;
-                var description = string.Empty;
-                var captions = (Utils.Settings.Data == null ? null : Utils.Settings.Data.Captions);
+                var description = string.Empty;                
                 var topic = (LimeSurvey.Topic)Enum.Parse(typeof(LimeSurvey.Topic), (entry.Topic ?? "").Replace("-", "_"), true);        
 
                 switch(topic){
