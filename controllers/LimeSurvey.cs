@@ -137,7 +137,7 @@ public class LimeSurvey : IDisposable{
 
         var captions = (Utils.Settings.Data == null ? null : Utils.Settings.Data.Captions);
         content = content.Replace("{'DESCRIPTION'}", (captions == null ? data.GroupName : captions.Survey));
-        content = content.Replace("{'TITLE'}", data.Topics == null ? data.GroupName : $"{data.GroupName} | {string.Join(", ", data.Topics.Where(x => !string.IsNullOrEmpty(x.SubjectCode)).Select(x => x.SubjectCode).ToList())}");
+        content = content.Replace("{'TITLE'}", data.Topics == null ? data.GroupName : $"{data.GroupName} | {string.Join(", ", data.Topics.Where(x => !string.IsNullOrEmpty(x.SubjectCode)).Select(x => x.SubjectCode).OrderBy(x => x).ToList())}");
 
         //Setting up each topic template
         var questionID = 4;   //each question must have a unique numerical id, for subject it should star with 4 (400, 4001, 4002...)
