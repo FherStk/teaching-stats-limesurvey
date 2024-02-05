@@ -1,5 +1,5 @@
 ﻿//Global vars
-var _VERSION = "0.13.0";
+var _VERSION = "0.13.0";    //Curs 2023-2024
 
 DisplayInfo();
 //if(!CheckConfig()) return;

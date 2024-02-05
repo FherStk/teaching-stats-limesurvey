@@ -38,13 +38,16 @@ public class Settings
     }
 
     public class DegreeData{
+        public string? Code {get; set;}
+        public string? Acronym {get; set;}
         public string? Name {get; set;}
         public string? Department {get; set;}
         public List<SubjectData>? Subjects {get; set;}
     }
 
     public class SubjectData{
-        public string? Code {get; set;}
+        public string? Cod {get; set;}
+        public string? Acronym {get; set;}
         public string? Name {get; set;}
         public List<string>? Ids {get; set;}
         public List<TrainerData>? Trainers {get; set;}
