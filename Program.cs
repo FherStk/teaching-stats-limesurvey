@@ -154,10 +154,10 @@ void ConvertSagaCSVtoImportYML(string filePath){
                     foreach(var subjectCode in subjects){
                         var subjectData = GetSubjectData(degree, subjectCode);                       
                         
-                        if(topics.Where(x => x.SubjectCode == subjectData.Code).Count()  == 0){
+                        if(topics.Where(x => x.SubjectAcronym == subjectData.Acronym).Count()  == 0){
                             //Enrollment data is loaded by UF, but topics must be stored by MP with no duplications.
                             topics.Add(new Survey.SurveyTopic(){                        
-                                SubjectCode = subjectData.Code,
+                                SubjectAcronym = subjectData.Acronym,
                                 SubjectName = subjectData.Name,
                                 Topic = "SUBJECT-CCFF",
                                 TrainerName = GetTrainerName(subjectData, p, currentGroupName)
@@ -207,7 +207,7 @@ void ConvertSagaCSVtoImportYML(string filePath){
             foreach(var student in enrollmentWarnings.Keys){
                 info += $"      - {student.Firstname} {student.Lastname}:\n";                
                 foreach(var subject in enrollmentWarnings[student].Distinct()){
-                    info += $"         - {subject.Code}: {subject.Name}\n";                
+                    info += $"         - {subject.Acronym}: {subject.Name}\n";                
                 }
                 info += "\n";
             }        

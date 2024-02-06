@@ -137,13 +137,13 @@ public class LimeSurvey : IDisposable{
 
         var captions = (Utils.Settings.Data == null ? null : Utils.Settings.Data.Captions);
         content = content.Replace("{'DESCRIPTION'}", (captions == null ? data.GroupName : captions.Survey));
-        content = content.Replace("{'TITLE'}", data.Topics == null ? data.GroupName : $"{data.GroupName} | {string.Join(", ", data.Topics.Where(x => !string.IsNullOrEmpty(x.SubjectCode)).Select(x => x.SubjectCode).OrderBy(x => x).ToList())}");
+        content = content.Replace("{'TITLE'}", data.Topics == null ? data.GroupName : $"{data.GroupName} | {string.Join(", ", data.Topics.Where(x => !string.IsNullOrEmpty(x.SubjectAcronym)).Select(x => x.SubjectAcronym).OrderBy(x => x).ToList())}");
 
         //Setting up each topic template
         var questionID = 4;   //each question must have a unique numerical id, for subject it should star with 4 (400, 4001, 4002...)
         if(data.Topics != null){
             //This is the easiest way to order and process the surveys (less code, less methods, etc.)
-            var orderedItems = data.Topics.Where(x => x.Topic == "SUBJECT-CCFF").OrderBy(x => x.SubjectCode).ToList();
+            var orderedItems = data.Topics.Where(x => x.Topic == "SUBJECT-CCFF").OrderBy(x => x.SubjectAcronym).ToList();
             orderedItems.AddRange(data.Topics.Where(x => x.Topic != "SUBJECT-CCFF").OrderBy(x => x.Topic).ToList());
 
             foreach(var entry in orderedItems){
@@ -196,7 +196,7 @@ public class LimeSurvey : IDisposable{
 
                     case Topic.SUBJECT_CCFF:
                         template = "block-subject-ccff";
-                        blockName = $"{data.GroupName} {entry.SubjectCode}: {entry.SubjectName} ({entry.TrainerName})";
+                        blockName = $"{data.GroupName} {entry.SubjectAcronym}: {entry.SubjectName} ({entry.TrainerName})";
                         description = @"<p><strong>Si us plau, abans de contestar l'enquesta, tingues en compte el següent:</strong></p>
                                         <ol style='text-align: left;'>
                                             <li>Si no estàs matriculat d'aquest Mòdul Professional o en trobes a faltar enquestes sobre altres Mòduls que tens matriculats, posa't en contacte amb el teu tutor.</li>
@@ -223,7 +223,7 @@ public class LimeSurvey : IDisposable{
                 block = block.Replace("{'TRAINER'}", "{'" + entry.TrainerName + "'}");
 
                 if(topic == Topic.SUBJECT_CCFF){
-                    block = block.Replace("{'SUBJECT_CODE'}", "{'" + entry.SubjectCode + "'}");
+                    block = block.Replace("{'SUBJECT_CODE'}", "{'" + entry.SubjectAcronym + "'}");
                     block = block.Replace("{'SUBJECT_NAME'}", "{'" + entry.SubjectName + "'}");
                     block = block.Replace("{'X'}", (questionID++).ToString());
                 }

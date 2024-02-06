@@ -94,13 +94,13 @@ public static class Utils{
                         new Survey.SurveyTopic(){
                             Topic = "SUBJECT-CCFF",
                             TrainerName = "Teacher 1",
-                            SubjectCode = "MP01",
+                            SubjectAcronym = "MP01",
                             SubjectName = "Comunicació i atenció al client"
                         },
                         new Survey.SurveyTopic(){
                             Topic = "SUBJECT-CCFF",
                             TrainerName = "Teacher 2",
-                            SubjectCode = "MP02",
+                            SubjectAcronym = "MP02",
                             SubjectName = "Gestió de la documentació jurídica i empresarial"
                         },
                         new Survey.SurveyTopic(){
@@ -134,7 +134,7 @@ public static class Utils{
                         new Survey.SurveyTopic(){
                             Topic = "SUBJECT-CCFF",
                             TrainerName = "Teacher 7",
-                            SubjectCode = "MP07",
+                            SubjectAcronym = "MP07",
                             SubjectName = "Procés integral de l’activitat comercial"
                         },                       
                         new Survey.SurveyTopic(){

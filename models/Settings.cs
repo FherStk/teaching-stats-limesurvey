@@ -46,7 +46,7 @@ public class Settings
     }
 
     public class SubjectData{
-        public string? Cod {get; set;}
+        public string? Code {get; set;}
         public string? Acronym {get; set;}
         public string? Name {get; set;}
         public List<string>? Ids {get; set;}
