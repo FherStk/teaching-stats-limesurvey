@@ -29,6 +29,10 @@ public class Settings
     public class CaptionsData{
         public string? Survey {get; set;}
         public string? School {get; set;}
+        public string? Services {get; set;}
+        
+        [YamlMember(Alias ="fct", ApplyNamingConventions = false)]
+        public string? FCT {get; set;}
         
         [YamlMember(Alias ="mentoring-1-ccff", ApplyNamingConventions = false)]
         public string? Mentoring1 {get; set;}
