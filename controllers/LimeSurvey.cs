@@ -24,7 +24,9 @@ public class LimeSurvey : IDisposable{
         MENTORING_2_CCFF,
         SUBJECT_CCFF,
         STAFF,
-        TEACHERS        
+        TEACHERS,
+        FCT,
+        SERVICES        
     }
 
     public enum Status{
@@ -204,7 +206,33 @@ public class LimeSurvey : IDisposable{
                                             <li>Sigues constructiu, explica'ns quines coses fem bé i com podem millorar.</li>
                                             <li>Sigues educat i respectuós, així ens ajudes a fer millor el nostre institut.</li>
                                         </ol>";
-                    break;
+                        break;
+
+                    case Topic.FCT:
+                        //Todo: change how the FCT is setup at settings.yaml (should be as mentoring)
+                        template = "block-fct";
+                        blockName = $"{data.GroupName} {(captions == null ? "FCT" : captions.FCT)} ({entry.TrainerName})";
+                        description = @"<p><strong>Si us plau, abans de contestar l'enquesta, tingues en compte el següent:</strong></p>
+                                        <ol style='text-align: left;'>
+                                            <li>Si no has matriculat les FCT o en trobes a faltar enquestes sobre altres Mòduls que tens matriculats, posa't en contacte amb el teu tutor.</li>
+                                            <li>Aquesta enquesta és completament anònima, si us plau, sigues sincer.</li>
+                                            <li>Sigues constructiu, explica'ns quines coses fem bé i com podem millorar.</li>
+                                            <li>Sigues educat i respectuós, així ens ajudes a fer millor el nostre institut.</li>
+                                        </ol>";
+                        break;
+
+                     case Topic.SERVICES:
+                        template = "block-services";
+                        subjectCode = "Centre";
+                        subjectName = "Serveis";
+                        blockName = $"{data.GroupName} {(captions == null ? "SERVICES" : captions.Services)}";
+                        description = @"<p><strong>Si us plau, abans de contestar l'enquesta, tingues en compte el següent:</strong></p>
+                                        <ol style='text-align: left;'>
+                                            <li>Aquesta enquesta és completament anònima, si us plau, sigues sincer.</li>
+                                            <li>Sigues constructiu, explica'ns quines coses fem bé i com podem millorar.</li>
+                                            <li>Sigues educat i respectuós, així ens ajudes a fer millor el nostre institut.</li>
+                                        </ol>";                
+                        break;
 
                     case Topic.STAFF:
                     case Topic.TEACHERS:
