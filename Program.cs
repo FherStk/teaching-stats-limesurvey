@@ -159,7 +159,7 @@ void ConvertSagaCSVtoImportYML(string filePath){
                             topics.Add(new Survey.SurveyTopic(){                        
                                 SubjectAcronym = subjectData.Acronym,
                                 SubjectName = subjectData.Name,
-                                Topic = "SUBJECT-CCFF",
+                                Topic = (subjectData.Acronym == "FCT" ? "FCT" : "SUBJECT-CCFF"),
                                 TrainerName = GetTrainerName(subjectData, p, currentGroupName)
                             });
                         }                        
@@ -168,6 +168,11 @@ void ConvertSagaCSVtoImportYML(string filePath){
                     //Adding the school survey
                     topics.Add(new Survey.SurveyTopic(){                                                    
                         Topic = "SCHOOL"
+                    });
+
+                    //Adding the school survey
+                    topics.Add(new Survey.SurveyTopic(){                                                    
+                        Topic = "SERVICES"
                     });
 
                     //Adding the mentoring survey
