@@ -1,25 +1,30 @@
 teachingStats:
-  host: localhost
+  host: <HOST NAME / IP>
   username: <USERNAME>
   password: <PASSWORD>
 
 limeSurvey:
-  host: https://limesurvey.elpuig.xeill.net
+  host: <HOST NAME / IP>
   username: <USERNAME>
   password: <PASSWORD>
-  group: <GROUP_ID> 
+  group: 1
 
 data:
   captions:
     school: "Centre: Instal·lacions i estada"
     mentoring-1-ccff: "Tutoria: 1er curs"
-    mentoring-2-ccff: "Tutoria: 2n curs"    
-    
+    mentoring-2-ccff: "Tutoria: 2n curs"
+    services: "Centre: Serveis"
+    fct: "FCT: Formació en Centre de Treball"
+
   degrees:
-    - name: "SMX"
+    - acronym: "SMX"
+      name: "Sistemes microinformàtics i xarxes (LOE)"
+      code: "IC10"
       department: "Informàtica"
       subjects:
-        - code: "MP01"
+        - acronym: "MP01"
+          code: "101"
           name: "Muntatge i manteniment d’equips"
           ids:
             - "10101"
@@ -28,1331 +33,1220 @@ data:
             - "10104"
             - "10105"
             - "10106"
-            - "00101"
-            - "00102"
-            - "00103"
-            - "00104"
-            - "00105"
-            - "00106"          
+           
           trainers:
-            - name: <TRAINER>
+            - name: "<TRAINER NAME>"
               groups:
                 - "SMX1A"
-            - name: <TRAINER>
+            - name: "<TRAINER NAME>"
               groups:
                 - "SMX1B"
-            - name: <TRAINER>
+            - name: "<TRAINER NAME>"
               groups:
                 - "SMX1C"
-                - "SMX1D" 
+                - "SMX1D"
 
-        - code: "MP02"
+        - acronym: "MP02"
+          code: "102"
           name: "Sistemes operatius monolloc"
-          ids: 
+          ids:
             - "10201"
             - "10202"
-            - "10203"
-            - "00201"
-            - "00202"
-            - "00203"  
+            - "10203"            
           trainers:
-            - name: <TRAINER>
+            - name: "<TRAINER NAME>"
               groups:
                 - "SMX1A"
                 - "SMX1B"
-                - "SMX1C"
-            - name: <TRAINER>
+            - name: "<TRAINER NAME>"
               groups:
-                - "SMX1D"   
-        
-        - code: "MP03"
+                - "SMX1C"
+                - "SMX1D"
+
+        - acronym: "MP03"
+          code: "103"
           name: "Aplicacions ofimàtiques"
-          ids: 
-            - "00301"
-            - "00302"
-            - "00303"
-            - "00304"
-            - "00305"
-            - "00306"
+          ids:            
             - "10301"
             - "10302"
             - "10303"
             - "10304"
             - "10305"
-            - "10306"
+            - "10306"            
           trainers:
-            - name: <TRAINER>
+            - name: "<TRAINER NAME>"
               groups:
                 - "SMX1A"
                 - "SMX1B"
                 - "SMX1C"
-            - name: <TRAINER>
+            - name: "<TRAINER NAME>"
               groups:
-                - "SMX1D" 
-                
-        - code: "MP04"
+                - "SMX1D"
+
+        - acronym: "MP04"
+          code: "104"
           name: "Sistemes operatius en xarxa"
-          ids: 
-            - "00401"
-            - "00402"
-            - "00403"
-            - "00404"
+          ids:           
             - "10401"
             - "10402"
             - "10403"
-            - "10404"
+            - "10404"           
           trainers:
-            - name: <TRAINER>
+            - name: "<TRAINER NAME>"
               groups:
                 - "SMX2A"
                 - "SMX2B"
-            - name: <TRAINER>
+            - name: "<TRAINER NAME>"
               groups:
                 - "SMX2C"
+            - name: "<TRAINER NAME>"
+              groups:
+                - "SMX2D"
 
-        - code: "MP05"
+        - acronym: "MP05"
+          code: "AOE"
           name: "Xarxes locals"
-          ids: 
-            - "00501"
-            - "00502"
-            - "00503"
+          ids:            
             - "AOEOA"
             - "AOEOB"
-            - "AOEOC"  
+            - "AOEOC"           
           trainers:
-            - name: <TRAINER>
+            - name: "<TRAINER NAME>"
               groups:
                 - "SMX1A"
                 - "SMX1B"
-            - name: <TRAINER>
+            - name: "<TRAINER NAME>"
               groups:
                 - "SMX1C"
                 - "SMX1D"
-        
-        - code: "MP06"
+
+        - acronym: "MP06"
+          code: "AOF"
           name: "Seguretat informàtica"
-          ids: 
-            - "00601"
-            - "00602"
-            - "00603"
-            - "00604"
-            - "00605"
+          ids:            
             - "AOFOA"
             - "AOFOB"
             - "AOFOC"
             - "AOFOD"
-            - "AOFOE"
+            - "AOFOE"           
           trainers:
-            - name: <TRAINER>
+            - name: "<TRAINER NAME>"
               groups:
                 - "SMX2A"
                 - "SMX2B"
-            - name: <TRAINER>
+            - name: "<TRAINER NAME>"
               groups:
-                - "SMX2C"        
+                - "SMX2C"
+                - "SMX2D"
 
-        - code: "MP07"
+        - acronym: "MP07"
+          code: "AOG"
           name: "Serveis de xarxa"
-          ids: 
-            - "00701"
-            - "00702"
-            - "00703"
-            - "00704"
+          ids:           
             - "AOGOA"
             - "AOGOB"
             - "AOGOC"
-            - "AOGOD" 
+            - "AOGOD"            
           trainers:
-            - name: <TRAINER>
+            - name: "<TRAINER NAME>"
               groups:
                 - "SMX2A"
                 - "SMX2B"
-            - name: <TRAINER>
+            - name: "<TRAINER NAME>"
               groups:
-                - "SMX2C"        
+                - "SMX2C"
+            - name: "<TRAINER NAME>"
+              groups:
+                - "SMX2D"
 
-        - code: "MP08"
+        - acronym: "MP08"
+          code: "AOH"
           name: "Aplicacions web"
-          ids: 
+          ids:
             - "AOHOA"
             - "AOHOB"
             - "AOHOC"
             - "AOHOD"
-            - "AOHOE"
-            - "00801"
-            - "00802"
-            - "00803"
-            - "00804"
-            - "00805" 
+            - "AOHOE"            
           trainers:
-            - name: <TRAINER>
+            - name: "<TRAINER NAME>"
               groups:
                 - "SMX2A"
-            - name: <TRAINER>
+            - name: "<TRAINER NAME>"
               groups:
                 - "SMX2B"
-            - name: <TRAINER>
+            - name: "<TRAINER NAME>"
               groups:
                 - "SMX2C"
-        
-        - code: "MP09"
+            - name: "<TRAINER NAME>"
+              groups:
+                - "SMX2D"
+
+        - acronym: "MP09"
+          code: "AOI"
           name: "Formació i orientació laboral"
-          ids: 
-            - "00901"
-            - "00902"
+          ids:            
             - "AOIOA"
-            - "AOIOB"
+            - "AOIOB"           
           trainers:
-            - name: <TRAINER>
+            - name: "<TRAINER NAME>"
               groups:
                 - "SMX1A"
                 - "SMX1B"
+            - name: "<TRAINER NAME>"
+              groups:
                 - "SMX1C"
-            - name: <TRAINER>
+                - "SMX1D"
+
+        - acronym: "MP10"
+          code: "110"
+          name: "Empresa i iniciativa emprenedora"
+          ids:            
+            - "11001"            
+          trainers:
+            - name: "<TRAINER NAME>"
+              groups:
+                - "SMX2A"
+                - "SMX2B"
+                - "SMX2C"
+            - name: "<TRAINER NAME>"
+              groups:
+                - "SMX2D"
+
+        - acronym: "MP11"
+          code: "111"
+          name: "Anglès tècnic"
+          ids:            
+            - "11101"
+          trainers:
+            - name: "<TRAINER NAME>"
+              groups:
+                - "SMX1A"
+                - "SMX1B"
+            - name: "<TRAINER NAME>"
+              groups:
+                - "SMX1C"
+            - name: "<TRAINER NAME>"
               groups:
                 - "SMX1D"
-        
-        - code: "MP10"
-          name: "Empresa i iniciativa emprenedora"
-          ids: 
-            - "01001"
-            - "11001"
-          trainers:
-            - name: <TRAINER>
-              groups:
-                - "SMX2A"
-                - "SMX2B"
-            - name: <TRAINER>
-              groups:
-                - "SMX2C"        
-                            
-        - code: "MP11"
-          name: "Anglès tècnic"
-          ids: 
-            - "01201" 
-            - "11101" 
-          trainers:
-            - name: <TRAINER>
-              groups:
-                - "SMX1A"
-                - "SMX1B"
-                - "SMX1C"
-            - name: <TRAINER>
-              groups:
-                - "SMX1D"  
-                
-        - code: "MP12"
-          name: "Síntesi"
-          ids: 
-            - "01101" 
-            - "11201" 
-          trainers:
-            - name: <TRAINER>
-              groups:
-                - "SMX2A"
-                - "SMX2B"
-            - name: <TRAINER>
-              groups:
-                - "SMX2C"   
 
-        - code: "MP13"
+        - acronym: "MP12"
+          code: "112"
+          name: "Síntesi"
+          ids:            
+            - "11201"
+          trainers:
+            - name:"<TRAINER NAME>"
+              groups:
+                - "SMX2A"                
+            - name: "<TRAINER NAME>"
+              groups:
+                - "SMX2B"
+            - name: "<TRAINER NAME>"
+              groups:
+                - "SMX2C"
+            - name: "<TRAINER NAME>"
+              groups:
+                - "SMX2D"
+
+        - acronym: "FCT"
+          code: "AOJ"
           name: "FCT"
-          ids: 
-            - "01301"
+          ids:            
             - "AOJOA"
           trainers:
-            - name: <TRAINER>
+            - name: "<TRAINER NAME>"
               groups:
                 - "SMX2A"
                 - "SMX2B"
                 - "SMX2C"
-          
-        - code: "MP14"
+                - "SMX2D"
+
+        - acronym: "MP14"
+          code: "BOB"
           name: "Anglès tècnic avançat"
-          ids: 
+          ids:
             - "BOBOA"
           trainers:
-            - name: <TRAINER>
-              groups:
-                - "SMX1A"
-                - "SMX1B"
-                - "SMX1C"
-            - name: <TRAINER>
-              groups:
-                - "SMX1D"
-          
-        - code: "MENTORING-1-CCFF"
-          name: "MENTORING-1-CCFF"
-          ids: 
-            - "MENTORING-1-CCFF"
-          trainers:
-            - name: <TRAINER>
-              groups:
-                - "SMX1A"
-                - "SMX1B"
-            - name: <TRAINER>
-              groups:
-                - "SMX1C"
-            - name: <TRAINER>
-              groups:
-                - "SMX1D"
-
-        - code: "MENTORING-2-CCFF"
-          name: "MENTORING-2-CCFF"
-          ids: 
-            - "MENTORING-2-CCFF"
-          trainers:
-            - name: <TRAINER>
+            - name: "<TRAINER NAME>"
               groups:
                 - "SMX2A"
                 - "SMX2B"
-            - name: <TRAINER>
-              groups:
-                - "SMX2C"            
+                - "SMX2C"
+                - "SMX2D"                
 
-    - name: "GA"
+        - acronym: "MENTORING-1-CCFF"
+          code: "MENTORING-1-CCFF"
+          name: "MENTORING-1-CCFF"
+          ids:
+            - "MENTORING-1-CCFF"
+          trainers:
+            - name: "<TRAINER NAME>"
+              groups:
+                - "SMX1A"
+                - "SMX1B"
+            - name: "<TRAINER NAME>"
+              groups:
+                - "SMX1C"
+            - name: "<TRAINER NAME>"
+              groups:
+                - "SMX1D"
+
+        - acronym: "MENTORING-2-CCFF"
+          code: "MENTORING-2-CCFF"
+          name: "MENTORING-2-CCFF"
+          ids:
+            - "MENTORING-2-CCFF"
+          trainers:
+            - name: "<TRAINER NAME>"
+              groups:
+                - "SMX2A"
+                - "SMX2B"
+            - name: "<TRAINER NAME>"
+              groups:
+                - "SMX2C"
+            - name: "<TRAINER NAME>"
+              groups:
+                - "SMX2D"
+
+    - acronym: "GA"
+      name: "Gestió administrativa (LOE)"
+      code: "AG10"
       department: "Administració i gestió"
-      subjects:          
-        - code: "MP01"
-          name: "Comunicació empresarial i atenció al client (Llengües estrangeres)"
-          ids: 
+      subjects:
+        - acronym: "MP01"
+          code: "AOA"
+          name: "Comunicació empresarial i atenció al client"
+          ids:
             - "AOAOA"
             - "AOAOB"
             - "AOAOC"
-            - "AOAOD"              
+            - "AOAOD"
           trainers:
-            - name: <TRAINER>
+            - name: "<TRAINER NAME>"
               groups:
                 - "GA1A"
-                - "GA1B"
-          
-        - code: "MP01"
-          name: "Comunicació empresarial i atenció al client (UF1, UF2, UF4)"
-          ids: 
-            - "00101"
-            - "00102"
-            - "00104"
-          trainers:
-            - name: <TRAINER>
-              groups:
-                - "GA2A"
-          
-        - code: "MP01"
-          name: "Comunicació empresarial i atenció al client (UF3)"
-          ids: 
+                - "GA1B"      
+
+        - acronym: "MP01"
+          code: "001"
+          name: "Comunicació empresarial i atenció al client [UF3]"
+          ids:
             - "00103"
           trainers:
-            - name: <TRAINER>
+            - name: "<TRAINER NAME>"
               groups:
                 - "GA2A"
-          
-        - code: "MP02"
+
+        - acronym: "MP02"
+          code: "AOB"
           name: "Operacions administratives de compravenda"
-          ids: 
+          ids:
             - "AOBOA"
             - "AOBOB"
             - "AOBOC"
-            - "00201"
-            - "00202"
-            - "00203"
           trainers:
-            - name: <TRAINER>
+            - name: "<TRAINER NAME>"
               groups:
                 - "GA1A"
                 - "GA1B"
-          
-        - code: "MP03"
+
+        - acronym: "MP03"
+          code: "103"
           name: "Operacions administratives de recursos humans"
-          ids: 
+          ids:
             - "10301"
             - "10302"
             - "10303"
-            - "00301"
-            - "00302"
-            - "00303"   
           trainers:
-            - name: <TRAINER>
+            - name: "<TRAINER NAME>"
               groups:
                 - "GA1A"
                 - "GA1B"
-          
-        - code: "MP04"
+
+        - acronym: "MP04"
+          code: "104"
           name: "Operacions auxiliars de gestió de tresoreria"
-          ids: 
+          ids:
             - "10401"
             - "10402"
             - "10403"
-            - "00401"
-            - "00402"
-            - "00403"
           trainers:
-            - name: <TRAINER>
+            - name: "<TRAINER NAME>"
               groups:
                 - "GA2A"
-          
-        - code: "MP05"
+
+        - acronym: "MP05"
+          code: "105"
           name: "Tècnica comptable"
-          ids: 
+          ids:
             - "10501"
             - "10502"
             - "10503"
-            - "00501"
-            - "00502"
-            - "00503"  
           trainers:
-            - name: <TRAINER>
+            - name: "<TRAINER NAME>"
               groups:
                 - "GA1A"
                 - "GA1B"
-          
-        - code: "MP06"
+
+        - acronym: "MP06"
+          code: "AOF"
           name: "Tractament de la documentació comptable"
-          ids: 
+          ids:
             - "AOFOA"
             - "AOFOB"
             - "AOFOC"
             - "AOFOD"
-            - "00601"
-            - "00602"
-            - "00603"
-            - "00604"
           trainers:
-            - name: <TRAINER>
+            - name: "<TRAINER NAME>"
               groups:
                 - "GA2A"
-           
-        - code: "MP07"
-          name: "Tractament informàtic de la informació (UF1, UF2, UF6)"
-          ids: 
-            - "00701"
-            - "00702"
-            - "00706"
-            - "00707"
+
+        - acronym: "MP07"
+          code: "107"
+          name: "Tractament informàtic de la informació [UF1, UF2, UF6]"
+          ids:            
             - "10701"
             - "10702"
             - "10706"
           trainers:
-            - name: <TRAINER>
+            - name: "<TRAINER NAME>"
               groups:
                 - "GA1A"
                 - "GA1B"
-         
-        - code: "MP07"
-          name: "Tractament informàtic de la informació (UF3, UF4, UF5)"
-          ids: 
+
+        - acronym: "MP07"
+          code: "107"
+          name: "Tractament informàtic de la informació [UF3, UF4, UF5]"
+          ids:
             - "10703"
             - "10704"
             - "10705"
-            - "00703"
-            - "00704"
-            - "00705"  
-            - "00708" 
           trainers:
-            - name: <TRAINER>
+            - name: "<TRAINER NAME>"
               groups:
                 - "GA2A"
-          
-        - code: "MP08"
+
+        - acronym: "MP08"
+          code: "108"
           name: "Anglès"
-          ids: 
-            - "10801"       
+          ids:
+            - "10801"
           trainers:
-            - name: <TRAINER>
+            - name: "<TRAINER NAME>"
               groups:
                 - "GA1A"
-                - "GA1B"
-          
-        - code: "MP08"
-          name: "Operacions administratives de suport"
-          ids: 
-            - "00801"
-            - "00802"               
-          trainers:
-            - name: <TRAINER>
-              groups:
-                - "GA2A"
-          
-        - code: "MP09"
+                - "GA1B"       
+
+        - acronym: "MP09"
+          code: "109"
           name: "Empresa i Administració"
-          ids: 
+          ids:
             - "10901"
             - "10902"
             - "10903"
-            - "10904" 
+            - "10904"
           trainers:
-            - name: <TRAINER>
+            - name: "<TRAINER NAME>"
               groups:
                 - "GA1A"
                 - "GA1B"
-          
-        - code: "MP09"
-          name: "Anglès"
-          ids: 
-            - "00901"                 
-          trainers:
-            - name: <TRAINER>
-              groups:
-                - "GA1A"
-                - "GA1B"
-          
-        - code: "MP10"
+
+        - acronym: "MP10"
+          code: "110"
           name: "Empresa a l’aula"
-          ids: 
-            - "11001"     
+          ids:
+            - "11001"
           trainers:
-            - name: <TRAINER>
+            - name: "<TRAINER NAME>"
               groups:
                 - "GA2A"
-          
-        - code: "MP10"
-          name: "Empresa i Administració"
-          ids: 
-            - "01001"
-            - "01002"
-            - "01003"
-            - "01004"  
-          trainers:
-            - name: <TRAINER>
-              groups:
-                - "GA1A"
-                - "GA1B"
-          
-        - code: "MP11"
+
+        - acronym: "MP11"
+          code: "AOG"
           name: "Formació i orientació laboral"
-          ids: 
+          ids:
             - "AOGOA"
           trainers:
-            - name: <TRAINER>
+            - name: "<TRAINER NAME>"
               groups:
                 - "GA1A"
                 - "GA1B"
-          
-        - code: "MP11"
-          name: "Empresa a l’aula"
-          ids: 
-            - "01101"
-          trainers:
-            - name: <TRAINER>
-              groups:
                 - "GA2A"
-          
-        - code: "MP12"
-          name: "Formació i orientació laboral"
-          ids: 
-            - "01201"
-            - "01202"  
-          trainers:
-            - name: <TRAINER>
-              groups:
-                - "GA1A"
-                - "GA1B"
-          
-        - code: "MP12"
-          name: "FCT"     
-          ids: 
+
+        - acronym: "MP12"
+          code: "AOI"
+          name: "FCT"
+          ids:
             - "AOIOA"
           trainers:
-            - name: <TRAINER>
+            - name: "<TRAINER NAME>"
               groups:
                 - "GA2A"
-          
-        - code: "MP13"
-          name: "FCT"       
-          ids: 
-            - "01301"
-          trainers:
-            - name: <TRAINER>
-              groups:
-                - "GA2A"
-                  
-        - code: "MP13"
-          name: "Anglès Tècnic"
-          ids: 
-            - "AOHOA"       
-          trainers:
-            - name: <TRAINER>
-              groups:
-                - "GA1A"
-                - "GA1B"
-          
-        - code: "MP14"
+
+        - acronym: "MP14"
+          code: "AOJ"
           name: Anglès tècnic avançat
-          ids: 
-            - "AOJOA"  
+          ids:
+            - "AOJOA"
           trainers:
-            - name: <TRAINER>
+            - name: "<TRAINER NAME>"
               groups:
-                - "GA1A"
-                - "GA1B"
-          
-        - code: "MENTORING-1-CCFF"
+                - "GA2A"
+
+        - acronym: "MENTORING-1-CCFF"
+          code: "MENTORING-1-CCFF"
           name: "MENTORING-1-CCFF"
-          ids: 
+          ids:
             - "MENTORING-1-CCFF"
           trainers:
-            - name: <TRAINER>
+            - name: "<TRAINER NAME>"
               groups:
                 - "GA1A"
                 - "GA1B"
 
-        - code: "MENTORING-2-CCFF"
+        - acronym: "MENTORING-2-CCFF"
+          code: "MENTORING-2-CCFF"
           name: "MENTORING-2-CCFF"
-          ids: 
+          ids:
             - "MENTORING-2-CCFF"
           trainers:
-            - name: <TRAINER>
+            - name: "<TRAINER NAME>"
               groups:
-                - "GA2A"                
+                - "GA2A"
 
-    - name: "AIF"
+    - acronym: "AIF"
+      name: "Administració i finances (LOE)"
+      code: "AGB0"
       department: "Administració i gestió"
-      subjects:          
-        - code: "MP01"
+      subjects:
+        - acronym: "MP01"
+          code: "101"
           name: "Comunicació i atenció al client"
-          ids: 
+          ids:
             - "10101"
             - "10102"
-            - "10103"            
-            - "00101"
-            - "00102"
-            - "00103"
-            - "00104"
-            - "00105"
-            - "00106"
-            - "00107"
+            - "10103"
           trainers:
-            - name: <TRAINER>
-              groups:
-                - "AIF1A"
-          
-        - code: "MP02"
-          name: "Gestió de la documentació jurídica i empresarial"
-          ids: 
-            - "10201"
-            - "10202"
-            - "10203"
-            - "00201"
-            - "00202"
-            - "00203"
-            - "01501"
-            - "01502"
-            - "01503"
-          trainers:
-            - name: <TRAINER>
-              groups:
-                - "AIF1A"   
-            - name: <TRAINER>
-              groups:
-                - "AIF2A"          
-          
-        - code: "MP03"
-          name: "Procés integral de l’activitat comercial"
-          ids: 
-            - "AOCOA"
-            - "AOCOB"
-            - "AOCOC"
-            - "AOCOD"
-            - "00301"
-            - "00302"
-            - "00303"
-            - "00304"
-            - "00305"
-          trainers:
-            - name: <TRAINER>
-              groups:
-                - "AIF1A"
-          
-        - code: "MP04"
-          name: "Recursos humans i responsabilitat social corporativa"
-          ids: 
-            - "10401"
-            - "10402"
-            - "00401"
-            - "00402"              
-          trainers:
-            - name: <TRAINER>
-              groups:
-                - "AIF2A"         
-          
-        - code: "MP05"
-          name: "Ofimàtica i procés de la informació"
-          ids: 
-            - "10501"
-            - "10502"
-            - "10503"
-            - "00501"
-            - "00502"
-            - "00503"
-            - "01601"
-            - "01602"
-            - "01603"
-          trainers:
-            - name: <TRAINER>
-              groups:
-                - "AIF1A"
-          
-        - code: "MP06"
-          name: "Anglès"
-          ids: 
-            - "10601"                
-            - "00601"            
-          trainers:
-            - name: <TRAINER>
-              groups:
-                - "AIF1A"
-            - name: <TRAINER>
-              groups:
-                - "AIF2A"          
-          
-        - code: "MP07"
-          name: "Gestió de recursos humans"
-          ids: 
-            - "10701"
-            - "10702"                
-            - "00701"
-            - "00702"            
-          trainers:
-            - name: <TRAINER>
-              groups:
-                - "AIF1A"
-          
-        - code: "MP08"
-          name: "Gestió financera"
-          ids: 
-            - "10801"
-            - "10802"
-            - "10803"
-            - "00801"
-            - "00802"
-            - "00803"
-          trainers:
-            - name: <TRAINER>
-              groups:
-                - "AIF2A"          
-          
-        - code: "MP09"
-          name: "Comptabilitat i fiscalitat (UF1, UF2)"
-          ids: 
-            - "10901"
-            - "10902"
-            - "00901"
-            - "00902"
-          trainers:
-            - name: <TRAINER>
-              groups:
-                - "AIF2A"
-          
-        - code: "MP09"
-          name: "Comptabilitat i fiscalitat (UF3)"
-          ids: 
-            - "10903"
-            - "00903"
-          trainers:
-            - name: <TRAINER>
-              groups:
-                - "AIF2A"                 
-          
-        - code: "MP10"
-          name: "Gestió logística i comercial"
-          ids: 
-            - "AAOOA"
-            - "AAOOB"
-            - "AAOOC"
-            - "01001"
-            - "01002"
-            - "01003"
-          trainers:
-            - name: <TRAINER>
-              groups:
-                - "AIF2A"          
-          
-        - code: "MP11"
-          name: "Simulació empresarial"
-          ids: 
-            - "AAAOA"                
-            - "01101"
-          trainers:
-            - name: <TRAINER>
-              groups:
-                - "AIF2A"            
-                    
-        - code: "MP12"
-          name: "Formació i orientació laboral"
-          ids: 
-            - "AABOA"
-            - "AABOB"
-            - "01201"
-            - "01202"
-          trainers:
-            - name: <TRAINER>
-              groups:
-                - "AIF1A"
-            - name: <TRAINER>
-              groups:
-                - "AIF2A"
-          
-        - code: "MP13"
-          name: "Projecte d’administració i finances"
-          ids: 
-            - "11301"
-            - "01301"
-          trainers:
-            - name: <TRAINER>
-              groups:
-                - "AIF2A"            
-          
-        - code: "MP14"
-          name: "FCT"   
-          ids: 
-            - "AACOA"
-            - "01401"
-          trainers:
-            - name: <TRAINER>
-              groups:
-                - "AIF2A"
-          
-        - code: "MENTORING-1-CCFF"
-          name: "MENTORING-1-CCFF"
-          ids: 
-            - "MENTORING-1-CCFF"
-          trainers:
-            - name: <TRAINER>
+            - name: "<TRAINER NAME>"
               groups:
                 - "AIF1A"
                 - "AIF1B"
 
-        - code: "MENTORING-2-CCFF"
-          name: "MENTORING-2-CCFF"
-          ids: 
-            - "MENTORING-2-CCFF"
-          trainers:
-            - name: <TRAINER>
-              groups:
-                - "AIF2A"                
-
-    - name: "ASIX"
-      department: "Informàtica"
-      subjects:          
-        - code: "MP01"
-          name: "Sistemes informàtics (UF1, UF2, UF3)"
-          ids: 
-            - "10101"
-            - "10102"
-            - "10103"
-            - "00101"
-            - "00102"
-            - "00103"
-          trainers:
-            - name: <TRAINER>
-              groups:
-                - "ASIX1A"
-          
-        - code: "MP02"
-          name: "Bases de dades (UF1, UF2, +UF1 M10)"
-          ids: 
+        - acronym: "MP02"
+          code: "102"
+          name: "Gestió de la documentació jurídica i empresarial"
+          ids:
             - "10201"
             - "10202"
-            - "00201"
-            - "00202"  
-            - "AAOOA"  
-            - "01001"                      
+            - "10203"
           trainers:
-            - name: <TRAINER>
+            - name: "<TRAINER NAME>"
               groups:
-                - "ASIX1A"
-          
-        - code: "MP03"
-          name: "Programació bàsica"
-          ids: 
+                - "AIF1A"
+                - "AIF1B"            
+                
+        - acronym: "MP03"
+          code: "AOC"
+          name: "Procés integral de l’activitat comercial"
+          ids:
             - "AOCOA"
             - "AOCOB"
             - "AOCOC"
-            - "00301" 
-            - "00302"
-            - "00303"  
+            - "AOCOD"
           trainers:
-            - name: <TRAINER>
+            - name: "<TRAINER NAME>"
               groups:
-                - "ASIX1A"
-            - name: <TRAINER>
-              groups:
-                - "ASIX2A"
-                - "ASIX2B"  
-          
-        - code: "MP04"
-          name: "Llenguatges de marques i sistemes de gestió empresarial"
-          ids: 
+                - "AIF1A"
+                - "AIF1B"
+
+        - acronym: "MP04"
+          code: "104"
+          name: "Recursos humans i responsabilitat social corporativa"
+          ids:
             - "10401"
             - "10402"
-            - "10403"
-            - "00401" 
-            - "00402" 
-            - "00403" 
-            - "00404" 
           trainers:
-            - name: <TRAINER>
+            - name: "<TRAINER NAME>"
               groups:
-                - "ASIX1A"
-          
-        - code: "MP05"
-          name: "Fonaments de maquinari"
-          ids: 
+                - "AIF2A"
+
+        - acronym: "MP05"
+          code: "105"
+          name: "Ofimàtica i procés de la informació"
+          ids:
             - "10501"
             - "10502"
             - "10503"
-            - "00501"
-            - "00502"
-            - "00503"
           trainers:
-            - name: <TRAINER>
+            - name: "<TRAINER NAME>"
+              groups:
+                - "AIF1A"
+                - "AIF1B"
+
+        - acronym: "MP06"
+          code: "106"
+          name: "Anglès"
+          ids:
+            - "10601"
+          trainers:
+            - name: "<TRAINER NAME>"
+              groups:
+                - "AIF1A"
+                - "AIF1B"            
+
+        - acronym: "MP07"
+          code: "107"
+          name: "Gestió de recursos humans"
+          ids:
+            - "10701"
+            - "10702"
+          trainers:
+            - name: "<TRAINER NAME>"
+              groups:
+                - "AIF1A"
+                - "AIF1B"
+
+        - acronym: "MP08"
+          code: "108"
+          name: "Gestió financera"
+          ids:
+            - "10801"
+            - "10802"
+            - "10803"
+          trainers:
+            - name: "<TRAINER NAME>"
+              groups:
+                - "AIF2A"
+
+        - acronym: "MP09"
+          code: "109"
+          name: "Comptabilitat i fiscalitat"
+          ids:
+            - "10901"
+            - "10902"
+            - "10903"
+          trainers:
+            - name: "<TRAINER NAME>"
+              groups:
+                - "AIF2A"
+
+        - acronym: "MP10"
+          code: "AAO"
+          name: "Gestió logística i comercial"
+          ids:
+            - "AAOOA"
+            - "AAOOB"
+            - "AAOOC"
+          trainers:
+            - name: "<TRAINER NAME>"
+              groups:
+                - "AIF2A"
+
+        - acronym: "MP11"
+          code: "AAA"
+          name: "Simulació empresarial"
+          ids:
+            - "AAAOA"
+          trainers:
+            - name: "<TRAINER NAME>"
+              groups:
+                - "AIF2A"
+
+        - acronym: "MP12"
+          code: "AAB"
+          name: "Formació i orientació laboral"
+          ids:
+            - "AABOA"
+            - "AABOB"
+          trainers:
+            - name: "<TRAINER NAME>"
+              groups:
+                - "AIF1A"
+                - "AIF1B"            
+
+        - acronym: "MP13"
+          code: "113"
+          name: "Projecte d’administració i finances"
+          ids:
+            - "11301"
+          trainers:
+            - name: "<TRAINER NAME>"
+              groups:
+                - "AIF2A"
+
+        - acronym: "FCT"
+          code: "AAC"
+          name: "FCT"
+          ids:
+            - "AACOA"
+          trainers:
+            - name: "<TRAINER NAME>"
+              groups:
+                - "AIF2A"
+
+        - acronym: "MENTORING-1-CCFF"
+          code: "MENTORING-1-CCFF"
+          name: "MENTORING-1-CCFF"
+          ids:
+            - "MENTORING-1-CCFF"
+          trainers:
+            - name: "<TRAINER NAME>"
+              groups:
+                - "AIF1A"
+                - "AIF1B"
+
+        - acronym: "MENTORING-2-CCFF"
+          code: "MENTORING-2-CCFF"
+          name: "MENTORING-2-CCFF"
+          ids:
+            - "MENTORING-2-CCFF"
+          trainers:
+            - name: "<TRAINER NAME>"
+              groups:
+                - "AIF2A"
+
+    - acronym: "ASIX"
+      name: "Administració de sistemes informàtics en xarxa (LOE)"
+      code: "ACA0"
+      department: "Informàtica"
+      subjects:
+        - acronym: "MP01"
+          code: "101"
+          name: "Implantació de sistemes operatius [UF1, UF2, UF3]"
+          ids:
+            - "10101"
+            - "10102"
+            - "10103"
+          trainers:
+            - name: "<TRAINER NAME>"
+              groups:
+                - "ASIX1A"
+
+        - acronym: "MP02"
+          code: "102"
+          name: "Gestió de bases de dades [UF1, UF2, +UF1 M10]"
+          ids:
+            - "10201"
+            - "10202"
+            - "AAOOA"
+          trainers:
+            - name: "<TRAINER NAME>"
+              groups:
+                - "ASIX1A"
+
+        - acronym: "MP02"
+          code: "102"
+          name: "Gestió de bases de dades [UF3]"
+          ids:
+            - "10203"
+          trainers:            
+            - name: "<TRAINER NAME>"
               groups:
                 - "ASIX2A"
-            - name: <TRAINER>
+                - "ASIX2B"
+
+        - acronym: "MP03"
+          code: "AOC"
+          name: "Programació bàsica"
+          ids:
+            - "AOCOA"
+            - "AOCOB"
+            - "AOCOC"
+          trainers:
+            - name: "<TRAINER NAME>"
+              groups:
+                - "ASIX1A"            
+
+        - acronym: "MP04"
+          code: "104"
+          name: "Llenguatges de marques i sistemes de gestió d'informació"
+          ids:
+            - "10401"
+            - "10402"
+            - "10403"
+          trainers:
+            - name: "<TRAINER NAME>"
+              groups:
+                - "ASIX1A"
+
+        - acronym: "MP05"
+          code: "105"
+          name: "Fonaments de maquinari"
+          ids:
+            - "10501"
+            - "10502"
+            - "10503"
+          trainers:
+            - name: "<TRAINER NAME>"
+              groups:
+                - "ASIX2A"
+            - name: "<TRAINER NAME>"
               groups:
                 - "ASIX2B"
-          
-        - code: "MP06"
-          name: "Administració de sistemes operatius (+UF4 MP01)"
-          ids: 
+
+        - acronym: "MP06"
+          code: "AOF"
+          name: "Administració de sistemes operatius [+UF4 MP01]"
+          ids:
             - "AOFOA"
             - "AOFOB"
-            - "00601"
-            - "00602"                
             - "10104"
-            - "00104"
           trainers:
-            - name: <TRAINER>
+            - name: "<TRAINER NAME>"
               groups:
                 - "ASIX2A"
-            - name: <TRAINER>
+            - name: "<TRAINER NAME>"
               groups:
-                - "ASIX2B"          
-          
-        - code: "MP07"
+                - "ASIX2B"
+
+        - acronym: "MP07"
+          code: "107"
           name: "Planificació i administració de xarxes"
-          ids: 
+          ids:
             - "10701"
             - "10702"
             - "10703"
-            - "00701"                
-            - "00702"
-            - "00703"
           trainers:
-            - name: <TRAINER>
+            - name: "<TRAINER NAME>"
               groups:
-                - "ASIX1A"
-            - name: <TRAINER>
-              groups:
-                - "ASIX2A"
-            - name: <TRAINER>
-              groups:
-                - "ASIX2B"
-          
-        - code: "MP08"
+                - "ASIX1A"            
+
+        - acronym: "MP08"
+          code: "108"
           name: "Serveis de xarxa i Internet"
-          ids: 
+          ids:
             - "10801"
             - "10802"
             - "10803"
             - "10804"
-            - "00801"                
-            - "00802"
-            - "00803"
-            - "00804"
           trainers:
-            - name: <TRAINER>
+            - name: "<TRAINER NAME>"
               groups:
                 - "ASIX2A"
-            - name: <TRAINER>
-              groups:
-                - "ASIX2B"                
-          
-        - code: "MP09"
+                - "ASIX2B"            
+
+        - acronym: "MP09"
+          code: "109"
           name: "Implantació d'aplicacions web"
-          ids: 
+          ids:
             - "10901"
             - "10902"
-            - "00901"
-            - "00902"
           trainers:
-            - name: <TRAINER>
+            - name: "<TRAINER NAME>"
               groups:
                 - "ASIX2A"
-            - name: <TRAINER>
-              groups:
-                - "ASIX2B"
-                    
-        - code: "MP10"
-          name: "Gestió i Administració d'SGBDs (UF3 MP02 + UF2 MP10)"
-          ids: 
-            - "01002"
-            - "10203"
-            - "00203"
-          trainers:
-            - name: <TRAINER>
-              groups:
-                - "ASIX2A"
-            - name: <TRAINER>
-              groups:
-                - "ASIX2B"         
-          
-        - code: "MP11"
+                - "ASIX2B"            
+       
+        - acronym: "MP11"
+          code: "111"
           name: "Seguretat i alta disponibilitat"
-          ids: 
+          ids:
             - "11101"
             - "11102"
             - "11103"
             - "11104"
-            - "01101"
-            - "01102"
-            - "01103"
-            - "01104"
           trainers:
-            - name: <TRAINER>
+            - name: "<TRAINER NAME>"
               groups:
-                - "ASIX2A"
-            - name: <TRAINER>
-              groups:
+                - "ASIX2A"           
                 - "ASIX2B"
-          
-        - code: "MP12"
+
+        - acronym: "MP12"
+          code: "AAP"
           name: "Formació i orientació laboral"
-          ids: 
+          ids:
             - "AAPOA"
             - "AAPOB"
-            - "01201"
-            - "01202"                
           trainers:
-            - name: <TRAINER>
-              groups:
-                - "ASIX1A"          
-          
-        - code: "MP13"
-          name: "Empresa i iniciativa emprenedora"
-          ids: 
-            - "11301"
-            - "01301"
-          trainers:
-            - name: <TRAINER>
-              groups:
-                - "ASIX1A"          
-          
-        - code: "MP14"
-          name: "Projecte"
-          ids: 
-            - "11401"
-            - "01401"
-          trainers:
-            - name: <TRAINER>
-              groups:
-                - "ASIX2A"            
-            - name: <TRAINER>
-              groups:
-                - "ASIX2B"          
-          
-        - code: "MP15"
-          name: "FCT"  
-          ids: 
-            - "AAQOA"
-            - "01501"
-          trainers:
-            - name: <TRAINER>
-              groups:
-                - "ASIX2A"
-                - "ASIX2B"
-          
-        - code: "MP16"
-          name: "Anglès tècnic"
-          ids: 
-            - "BOAOA"
-          trainers:
-            - name: <TRAINER>
-              groups:
-                - "ASIX1A"
-          
-        - code: "MP17"
-          name: "Anglès tècnic avançat"
-          ids: 
-            - "BOBOA" 
-          trainers:
-            - name: <TRAINER>
-              groups:
-                - "ASIX1A"
-          
-        - code: "MENTORING-1-CCFF"
-          name: "MENTORING-1-CCFF"
-          ids: 
-            - "MENTORING-1-CCFF"
-          trainers:
-            - name: <TRAINER>
+            - name: "<TRAINER NAME>"
               groups:
                 - "ASIX1A"
 
-        - code: "MENTORING-2-CCFF"
-          name: "MENTORING-2-CCFF"
-          ids: 
-            - "MENTORING-2-CCFF"
+        - acronym: "MP13"
+          code: "113"
+          name: "Empresa i iniciativa emprenedora"
+          ids:
+            - "11301"
           trainers:
-            - name: <TRAINER>
+            - name: "<TRAINER NAME>"
+              groups:
+                - "ASIX1A"
+
+        - acronym: "MP14"
+          code: "114"
+          name: "Projecte"
+          ids:
+            - "11401"
+          trainers:
+            - name:"<TRAINER NAME>"
               groups:
                 - "ASIX2A"
-                - "ASIX2B"            
+            - name: "<TRAINER NAME>"
+              groups:
+                - "ASIX2B"
+
+        - acronym: "FCT"
+          code: "AAQ"
+          name: "FCT"
+          ids:
+            - "AAQOA"
+          trainers:
+            - name: "<TRAINER NAME>"
+              groups:
+                - "ASIX2A"
+                - "ASIX2B"
       
-    - name: "DAM"
+        - acronym: "MP16"
+          code: "BOB"
+          name: "Anglès tècnic"
+          ids:
+            - "BOBOA"
+          trainers:
+            - name: "<TRAINER NAME>"
+              groups:
+                - "ASIX2A"
+                - "ASIX2B"
+
+        - acronym: "MENTORING-1-CCFF"
+          code: "MENTORING-1-CCFF"
+          name: "MENTORING-1-CCFF"
+          ids:
+            - "MENTORING-1-CCFF"
+          trainers:
+            - name: "<TRAINER NAME>"
+              groups:
+                - "ASIX1A"
+
+        - acronym: "MENTORING-2-CCFF"
+          code: "MENTORING-2-CCFF"
+          name: "MENTORING-2-CCFF"
+          ids:
+            - "MENTORING-2-CCFF"
+          trainers:
+            - name: "<TRAINER NAME>"
+              groups:
+                - "ASIX2A"
+                - "ASIX2B"
+
+    - acronym: "DAM"
+      name: "Desenvolupament d'aplicacions multiplataforma (LOE)"
+      code: "ICB0"
       department: "Informàtica"
-      subjects:          
-        - code: "MP01"
+      subjects:
+        - acronym: "MP01"
+          code: "101"
           name: "Sistemes informàtics"
-          ids: 
+          ids:
             - "10101"
             - "10102"
             - "10103"
-            - "00101"
-            - "00102"
-            - "00103"
           trainers:
-            - name: <TRAINER>
+            - name: "<TRAINER NAME>"
               groups:
-                - "DAM1A"        
-          
-        - code: "MP02"
-          name: "Bases de dades (UF1, UF2, UF3)"
-          ids: 
+                - "DAM1A"
+
+        - acronym: "MP02"
+          code: "102"
+          name: "Bases de dades [UF1, UF2, UF3]"
+          ids:
             - "10201"
             - "10202"
             - "10203"
-            - "00201"
-            - "00202"
-            - "00203"
           trainers:
-            - name: <TRAINER>
-              groups:
-                - "DAM1A"          
-          
-        - code: "MP03"
-          name: "Programació bàsica (UF1, UF2, UF3)"
-          ids: 
-            - "AOCOA"
-            - "AOCOB"
-            - "AOCOC"                
-            - "00301" 
-            - "00302"
-            - "00303"            
-          trainers:
-            - name: <TRAINER>
+            - name: "<TRAINER NAME>"
               groups:
                 - "DAM1A"
-            - name: <TRAINER>
+
+        - acronym: "MP03"
+          code: "AOC"
+          name: "Programació bàsica [UF1, UF2, UF3]"
+          ids:
+            - "AOCOA"
+            - "AOCOB"
+            - "AOCOC"
+          trainers:
+            - name: "<TRAINER NAME>"
+              groups:
+                - "DAM1A"            
+
+        - acronym: "MP03"
+          code: "AOC"
+          name: "Programació bàsica [UF4, UF5, UF6]"
+          ids:
+            - "AOCOD"
+            - "AOCOE"
+            - "AOCOF"
+          trainers:
+            - name: "<TRAINER NAME>"
               groups:
                 - "DAM2A"
                 - "DAM2B"
 
-        - code: "MP03"
-          name: "Programació bàsica (UF4, UF5, UF6)"
-          ids: 
-            - "AOCOD"
-            - "AOCOE"
-            - "AOCOF"                
-            - "00304" 
-            - "00305"
-            - "00306"
-          trainers:
-            - name: <TRAINER>
-              groups:
-                - "DAM2A"
-                - "DAM2B"                       
-          
-        - code: "MP04"
+        - acronym: "MP04"
+          code: "104"
           name: "Llenguatges de marques i sistemes de gestió empresarial"
-          ids: 
+          ids:
             - "10401"
             - "10402"
             - "10403"
-            - "00401" 
-            - "00402" 
-            - "00403" 
-            - "00404" 
           trainers:
-            - name: <TRAINER>
+            - name: "<TRAINER NAME>"
               groups:
                 - "DAM1A"
-          
-        - code: "MP05"
+
+        - acronym: "MP05"
+          code: "105"
           name: "Entorns de desenvolupament"
-          ids: 
+          ids:
             - "10501"
             - "10502"
             - "10503"
-            - "00501" 
-            - "00502" 
-            - "00503" 
           trainers:
-            - name: <TRAINER>
+            - name: "<TRAINER NAME>"
               groups:
                 - "DAM1A"
+            - name: "<TRAINER NAME>"
+              groups:
                 - "DAM2A"
-                - "DAM2B"         
-          
-        - code: "MP06"
-          name: "Accés a dades (+UF4 MP02)"
-          ids: 
+                - "DAM2B"
+
+        - acronym: "MP06"
+          code: "106"
+          name: "Accés a dades [+UF4 MP02]"
+          ids:
             - "10601"
             - "10602"
             - "10603"
             - "10604"
-            - "00601" 
-            - "00602" 
-            - "00603" 
-            - "00604" 
             - "10204"
-            - "00204"
           trainers:
-            - name: <TRAINER>
+            - name: "<TRAINER NAME>"
               groups:
                 - "DAM2A"
 
-            - name: <TRAINER>
+            - name: "<TRAINER NAME>"
               groups:
                 - "DAM2B"
-          
-        - code: "MP07"
+
+        - acronym: "MP07"
+          code: "107"
           name: "Desenvolupament d'interfícies"
-          ids: 
+          ids:
             - "10701"
             - "10702"
-            - "00701"
-            - "00702"
           trainers:
-            - name: <TRAINER>
+            - name: "<TRAINER NAME>"
               groups:
                 - "DAM2A"
                 - "DAM2B"
-                   
-        - code: "MP08"
+
+        - acronym: "MP08"
+          code: "AOH"
           name: "Programació multimèdia i dispositius mòbils"
-          ids: 
+          ids:
             - "AOHOA"
             - "AOHOB"
             - "AOHOC"
-            - "00801"
-            - "00802"
-            - "00803"
           trainers:
-            - name: <TRAINER>
+            - name: "<TRAINER NAME>"
               groups:
                 - "DAM2A"
-                - "DAM2B"          
-          
-        - code: "MP09"
+                - "DAM2B"
+
+        - acronym: "MP09"
+          code: "109"
           name: "Programació de serveis i processos"
-          ids: 
+          ids:
             - "10901"
             - "10902"
             - "10903"
-            - "00901"
-            - "00902"
-            - "00903"
           trainers:
-            - name: <TRAINER>
+            - name: "<TRAINER NAME>"
               groups:
                 - "DAM2A"
-                - "DAM2B"          
-          
-        - code: "MP10"
+                - "DAM2B"
+
+        - acronym: "MP10"
+          code: "AAO"
           name: "Sistemes de gestió empresarial"
-          ids: 
+          ids:
             - "AAOOA"
             - "AAOOB"
-            - "01001"
-            - "01002"
           trainers:
-            - name: <TRAINER>
+            - name: "<TRAINER NAME>"
               groups:
-                - "DAM1A"
-            - name: <TRAINER>
-              groups:
-                - "DAM2A"
-                - "DAM2B"
-          
-        - code: "MP11"
+                - "DAM1A"            
+
+        - acronym: "MP11"
+          code: "AAP"
           name: "Formació i orientació laboral"
-          ids: 
+          ids:
             - "AAPOA"
             - "AAPOB"
-            - "01101"
-            - "01102"
           trainers:
-            - name: <TRAINER>
-              groups:
-                - "DAM1A"         
-          
-        - code: "MP12"
-          name: "Empresa i iniciativa emprenedora"
-          ids: 
-            - "11201"
-            - "01201"                  
-          trainers:
-            - name: <TRAINER>
-              groups:
-                - "DAM1A"
-                    
-        - code: "MP13"
-          name: "Projecte"
-          ids: 
-            - "11301"
-            - "01301"  
-          trainers:
-            - name: <TRAINER>
-              groups:
-                - "DAM2A"            
-            - name: <TRAINER>
-              groups:
-                - "DAM2B"          
-          
-        - code: "MP14"
-          name: "FCT"  
-          ids: 
-            - "AAQOA"
-            - "01401"
-          trainers:
-            - name: <TRAINER>
-              groups:
-                - "DAM2A"
-                - "DAM2B"
-                    
-        - code: "MP15"
-          name: "Anglès tècnic"
-          ids: 
-            - "BOAOA"
-          trainers:
-            - name: <TRAINER>
-              groups:
-                - "DAM1A"
-          
-        - code: "MP16"
-          name: "Anglès tècnic avançat"
-          ids: 
-            - "BOBOA"
-          trainers:
-            - name: <TRAINER>
-              groups:
-                - "DAM1A"
-          
-        - code: "MENTORING-1-CCFF"
-          name: "MENTORING-1-CCFF"
-          ids: 
-            - "MENTORING-1-CCFF"
-          trainers:
-            - name: <TRAINER>
+            - name: "<TRAINER NAME>"
               groups:
                 - "DAM1A"
 
-        - code: "MENTORING-2-CCFF"
-          name: "MENTORING-2-CCFF"
-          ids: 
-            - "MENTORING-2-CCFF"
+        - acronym: "MP12"
+          code: "112"
+          name: "Empresa i iniciativa emprenedora"
+          ids:
+            - "11201"
           trainers:
-            - name: <TRAINER>
+            - name: "<TRAINER NAME>"
+              groups:
+                - "DAM1A"
+
+        - acronym: "MP13"
+          code: "113"
+          name: "Projecte"
+          ids:
+            - "11301"
+          trainers:
+            - name: "<TRAINER NAME>"
               groups:
                 - "DAM2A"
-                - "DAM2B"            
+            - name: "<TRAINER NAME>"
+              groups:
+                - "DAM2B"
+        
+        - acronym: "MP15"
+          code: "BOA"
+          name: "Anglès tècnic"
+          ids:
+            - "BOAOA"
+          trainers:
+            - name: "<TRAINER NAME>"
+              groups:
+                - "DAM2A"
+                - "DAM2B"
+
+        - acronym: "FCT"
+          code: "AAQ"
+          name: "FCT"
+          ids:
+            - "AAQOA"
+          trainers:
+            - name: "<TRAINER NAME>"
+              groups:
+                - "DAM2A"
+                - "DAM2B"
+
+        - acronym: "MENTORING-1-CCFF"
+          code: "MENTORING-1-CCFF"
+          name: "MENTORING-1-CCFF"
+          ids:
+            - "MENTORING-1-CCFF"
+          trainers:
+            - name: "<TRAINER NAME>"
+              groups:
+                - "DAM1A"
+
+        - acronym: "MENTORING-2-CCFF"
+          code: "MENTORING-2-CCFF"
+          name: "MENTORING-2-CCFF"
+          ids:
+            - "MENTORING-2-CCFF"
+          trainers:
+            - name: "<TRAINER NAME>"
+              groups:
+                - "DAM2A"
+                - "DAM2B"
+
+    - acronym: "DAW"
+      name: "Desenvolupament d'aplicacions web (LOE)"
+      code: "ICC0"
+      department: "Informàtica"
+      subjects:
+        - acronym: "MP01"
+          code: "101"
+          name: "Sistemes informàtics"
+          ids:
+            - "10101"
+            - "10102"
+            - "10103"           
+          trainers:
+            - name: "<TRAINER NAME>"
+              groups:
+                - "DAW1A"
+
+        - acronym: "MP02"
+          code: "102"
+          name: "Bases de dades [UF1, UF2, UF3]"
+          ids:
+            - "10201"
+            - "10202"
+            - "10203"           
+          trainers:
+            - name: "<TRAINER NAME>"
+              groups:
+                - "DAW1A"
+
+        - acronym: "MP03"
+          code: "AOC"
+          name: "Programació bàsica [UF1, UF2, UF3]"
+          ids:
+            - "AOCOA"
+            - "AOCOB"
+            - "AOCOC"           
+          trainers:
+            - name: "<TRAINER NAME>"
+              groups:
+                - "DAW1A"            
+       
+        - acronym: "MP04"
+          code: "104"
+          name: "Llenguatges de marques i sistemes de gestió empresarial"
+          ids:
+            - "10401"
+            - "10402"
+            - "10403"           
+          trainers:
+            - name: "<TRAINER NAME>"
+              groups:
+                - "DAW1A"
+
+        - acronym: "MP05"
+          code: "105"
+          name: "Entorns de desenvolupament"
+          ids:
+            - "10501"
+            - "10502"
+            - "10503"            
+          trainers:
+            - name: "<TRAINER NAME>"
+              groups:
+                - "DAW1A"                    
+
+        - acronym: "MP10"
+          code: "AOH"
+          name: "Formació i orientació laboral"
+          ids:
+            - "AOHOA"
+            - "AOHOB"            
+          trainers:
+            - name: "<TRAINER NAME>"
+              groups:
+                - "DAW1A"
+
+        - acronym: "MP11"
+          code: "111"
+          name: "Empresa i iniciativa emprenedora"
+          ids:
+            - "11101"            
+          trainers:
+            - name: "<TRAINER NAME>"
+              groups:
+                - "DAW1A"
+
+        - acronym: "MENTORING-1-CCFF"
+          code: "MENTORING-1-CCFF"
+          name: "MENTORING-1-CCFF"
+          ids:
+            - "MENTORING-1-CCFF"
+          trainers:
+            - name: "<TRAINER NAME>"
+              groups:
+                - "DAW1A"

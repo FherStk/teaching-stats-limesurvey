@@ -1,30 +1,57 @@
 data:
-  - id: "GROUP NAME - MPs"
-    degreeName: "DEGREE NAME"
-    departmentName: "DEPARTMENT NAME"
-    groupName: "GROUP NAME"    
-
-    topics:
-      - topic: "SCHOOL"      
-
-      - topic: "MENTORING-1-CCFF" / "MENTORING-2-CCFF"
-        trainerName: "TRAINER NAME"        
-
-      - topic: "SUBJECT-CCFF"      
-        trainerName: "TRAINER NAME X"
-        subjectCode: "MPxx"
-        subjectName: "SUBJECT XXX"
-
-      - topic: "SUBJECT-CCFF"      
-        trainerName: "TRAINER NAME Y"
-        subjectCode: "MPxx"
-        subjectName: "SUBJECT XXX"
-      
-    participants:
-      - email: "me@example.com"
-        firstname: "Name"
-        lastname: "Surname"
-
-      - email: "me@example.com"
-        firstname: "Another Name"
-        lastname: "Another Surname"
+- id: DAW1A-10101-10102-10103-10201-10202-10203-10401-10402-10403-10501-10502-10503-11101-AOCOA-AOCOB-AOCOC-AOHOA-AOHOB
+  degreeName: Desenvolupament d'aplicacions web (LOE)
+  departmentName: Informàtica
+  groupName: DAW1A
+  topics:
+  - topic: SUBJECT-CCFF
+    trainerName: <TRAINER NAME>
+    subjectAcronym: MP01
+    subjectName: Sistemes informàtics
+  - topic: SUBJECT-CCFF
+    trainerName: <TRAINER NAME>
+    subjectAcronym: MP02
+    subjectName: Bases de dades [UF1, UF2, UF3]
+  - topic: SUBJECT-CCFF
+    trainerName: <TRAINER NAME>
+    subjectAcronym: MP04
+    subjectName: Llenguatges de marques i sistemes de gestió empresarial
+  - topic: SUBJECT-CCFF
+    trainerName: <TRAINER NAME>
+    subjectAcronym: MP05
+    subjectName: Entorns de desenvolupament
+  - topic: SUBJECT-CCFF
+    trainerName: <TRAINER NAME>
+    subjectAcronym: MP11
+    subjectName: Empresa i iniciativa emprenedora
+  - topic: SUBJECT-CCFF
+    trainerName: <TRAINER NAME>
+    subjectAcronym: MP03
+    subjectName: Programació bàsica [UF1, UF2, UF3]
+  - topic: SUBJECT-CCFF
+    trainerName: <TRAINER NAME>
+    subjectAcronym: MP10
+    subjectName: Formació i orientació laboral
+  - topic: SCHOOL
+    trainerName: 
+    subjectAcronym: 
+    subjectName: 
+  - topic: SERVICES
+    trainerName: 
+    subjectAcronym: 
+    subjectName: 
+  - topic: MENTORING-1-CCFF
+    trainerName: <TRAINER NAME>
+    subjectAcronym: 
+    subjectName: 
+  participants:
+  - firstname: <STUDENT NAME>
+    lastname: <STUDENT SURNAME>
+    email: <STUDENT EMAIL>
+  - firstname: <STUDENT NAME>
+    lastname: <STUDENT SURNAME>
+    email: <STUDENT EMAIL>
+  - firstname: <STUDENT NAME>
+    lastname: <STUDENT SURNAME>
+    email: <STUDENT EMAIL>
+  
