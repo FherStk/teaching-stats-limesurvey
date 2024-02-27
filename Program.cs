@@ -22,12 +22,12 @@ else{
         switch(arg){    
             case "--saga-convert":
             case "-sc":                
-                SetupConvertSagaCSVtoImportYML(Directory.GetFiles(Path.GetDirectoryName(args[i+1]) ?? "", Path.GetFileName(args[i+1])));                
+                BatchSagaCsvToYml(Directory.GetFiles(Path.GetDirectoryName(args[i+1]) ?? "", Path.GetFileName(args[i+1])));                
                 break;  
 
-            case "--create-survey":
+            case "--create-surveys":
             case "-cs":
-                SetupCreateNewSurveyFromFile(Directory.GetFiles(Path.GetDirectoryName(args[i+1]) ?? "", Path.GetFileName(args[i+1])));
+                BatchYmlToLimeSurvey(Directory.GetFiles(Path.GetDirectoryName(args[i+1]) ?? "", Path.GetFileName(args[i+1])));
                 break;    
 
             case "--start-surveys":
@@ -52,12 +52,12 @@ else{
 
             case "--load-teachingstats":
             case "-lt":
-                LoadFromTeachingStats();
+                TeachingStatsToMetabase();
                 break;  
 
             case "--load-limesurvey":
             case "-ll":
-                LoadFromLimeSurvey();
+                LimeSurveyToMetabase();
                 break;     
         }  
 
@@ -74,19 +74,19 @@ void Help(){
     
     Console.ForegroundColor = ConsoleColor.DarkBlue;        
     Console.WriteLine("Allowed arguments: ");
-    Highlight("  -cs <FILE_PATH>, --create-survey <FILE_PATH>", "creates a new survey, a YML file must be provided.");
-    Highlight("  -sc <FILE_PATH>, --saga-convert <FILE_PATH>", "parses a SAGA's CSV file and creates a YML file which can be used to create new surveys (school, mentoring and subject) on LimeSurvey, a CSV file must be provided.");
+    Highlight("  -sc <FILE_PATH>, --saga-convert <FILE_PATH>", "parses SAGA's CSV files and creates some YML file which can be used to create new surveys (school, mentoring and subject) on LimeSurvey, a CSV file must be provided.");
+    Highlight("  -cs <FILE_PATH>, --create-surveys <FILE_PATH>", "creates a new survey, a YML file must be provided.");    
     Highlight("  -ss, --start-surveys", "enables all the surveys at limesurvey (just the ones belonging to the defined group at settings) and sends the invitations to the participants.");
     Highlight("  -es, --expire-surveys", "expires all the surveys at limesurvey (just the ones belonging to the defined group at settings) so no pending participants will be able to answer the surveys.");
     Highlight("  -si, --send-invitations", "send the invitations for already active surveys, but just for whom has not received any yet.");
     Highlight("  -sr, --send-reminders", "send survey reminders to all the participants (just the ones belonging to the defined group at settings) that still has not responded the surveys.");
-    Highlight("  -lt, --load-teachingstats", "loads all pending reporting data from 'teaching-stats'.");
-    Highlight("  -ll, --load-limesurvey", "loads all pending reporting data from expired surveys in 'lime-survey'.");
+    Highlight("  -lt, --load-teachingstats", "loads to Metabase all pending reporting data from 'teaching-stats'.");
+    Highlight("  -ll, --load-limesurvey", "loads to Metabase all pending reporting data from expired surveys in 'lime-survey'.");
     //TODO: clear (stop) surveys
     Console.WriteLine();    
 }
 
-void SetupConvertSagaCSVtoImportYML(string[] files){ 
+void BatchSagaCsvToYml(string[] files){ 
     if(files.Length == 0) Error("Unable to find the specified file");
     else{
         foreach (var f in files.OrderBy(x => x))
@@ -94,16 +94,16 @@ void SetupConvertSagaCSVtoImportYML(string[] files){
             //Conversions must be done first for 1st level (which generates the 1st level file) and then for 2nd level (which
             //generates the 2nd level file and updates the 1st level ones).
             if(!File.Exists(f)) throw new FileNotFoundException("File not found!", f);
-            ConvertSagaCSVtoImportYML(f);                    
+            SagaCsvToYml(f);                    
         }     
     }                                   
 }
 
-void ConvertSagaCSVtoImportYML(string filePath){     
+void SagaCsvToYml(string filePath){     
     var currentGroupName = Path.GetFileNameWithoutExtension(filePath);  //Must be like ASIX2B
     enrollmentWarnings = new Dictionary<Survey.Participant, List<Settings.SubjectData>>();
     
-    Info($"Converting from CSV to a LimeSurvey compatible YAML file ({Path.GetFileName(filePath)}):");
+    Info($"Converting from SAGA's CSV to a LimeSurvey compatible YAML file ({Path.GetFileName(filePath)}):");
     try{
         Info("   Loading degree data... ", false);
         var degreeName = string.Empty;
@@ -117,7 +117,7 @@ void ConvertSagaCSVtoImportYML(string filePath){
         }   
         
         if(Utils.Settings.Data == null || Utils.Settings.Data.Degrees == null) throw new IncorrectSettingsException();
-        var degree = Utils.Settings.Data.Degrees.Where(x => x.Name == degreeName).SingleOrDefault();    
+        var degree = Utils.Settings.Data.Degrees.Where(x => x.Acronym == degreeName).SingleOrDefault();    
 
         //Setting up survey data
         if(degree == null || degree.Subjects == null) throw new IncorrectSettingsException();
@@ -226,7 +226,7 @@ void ConvertSagaCSVtoImportYML(string filePath){
     Console.WriteLine();
 }
 
-void SetupCreateNewSurveyFromFile(string[] files){ 
+void BatchYmlToLimeSurvey(string[] files){ 
     if(files.Length == 0) Error("Unable to find the specified file");
     else{
         foreach (var f in files.OrderBy(x => x))
@@ -234,12 +234,12 @@ void SetupCreateNewSurveyFromFile(string[] files){
             //Conversions must be done first for 1st level (which generates the 1st level file) and then for 2nd level (which
             //generates the 2nd level file and updates the 1st level ones).
             if(!File.Exists(f)) throw new FileNotFoundException("File not found!", f);
-            CreateNewSurveyFromFile(f);                    
+            YmlToLimeSurvey(f);                    
         }     
     }                                   
 }
 
-void CreateNewSurveyFromFile(string filePath){
+void YmlToLimeSurvey(string filePath){
     //This option will create new 'limesurvey' surveyss using the provided YML file (template at 'actions/create-survey.yml.template')
     Info($"Creating new surveys ({Path.GetFileName(filePath)}):");
     var importData = Utils.DeserializeYamlFile<Survey>(filePath);
@@ -267,7 +267,7 @@ void CreateNewSurveyFromFile(string filePath){
     }
 }
 
-void LoadFromLimeSurvey(){        
+void LimeSurveyToMetabase(){        
     Info($"Loading data from LimeSurvey:");
     using(var ls = new LimeSurvey()){
         Info($"   Loading the survey list... ", false);        
@@ -283,7 +283,7 @@ void LoadFromLimeSurvey(){
                 
                 // if(type != null){
                 var id = int.Parse((s["sid"] ?? "").ToString());
-                Info($"Importing all pending answers from LimeSurvey to Teaching-Stats, {i++}/{list.Count} with id={id}:");
+                Info($"Importing all pending answers from LimeSurvey to Metabase, {i++}/{list.Count} with id={id}:");
                 
                 try{
                     Info("   Downloading data from LimeSurvey... ", false);
@@ -294,7 +294,7 @@ void LoadFromLimeSurvey(){
                         var questions = ls.GetSurveyQuestions(surveyID);
                         Success();
 
-                        Info("   Importing data into Teaching-Stats... ", false);
+                        Info("   Importing data into Metabase... ", false);
                         ts.ImportFromLimeSurvey(questions, answers);
                     }
                     
@@ -312,7 +312,7 @@ void LoadFromLimeSurvey(){
     }    
 }
 
-void LoadFromTeachingStats(){
+void TeachingStatsToMetabase(){
     //DEPRECATED: theaching-stats should not be used anymore in order to generate surveys.
     var response = Question("This option will load all the current 'teaching-stats' responses into the report tables, cleaning the original tables (evaluation, answer and participation). This opperation cannot be undone, do you want no continue? [Y/n]", "y");
     if(response == "n") Error("Operation cancelled.");
