@@ -68,22 +68,25 @@ public class LimeSurvey : IDisposable{
         SessionKey = String.Empty;
     }
 #region Survey        
-    public JArray ListSurveys(Status? status = null){
+    public JArray ListSurveys(int group = 0, Status? status = null){
         this.Client.Method = "list_surveys";
         this.Client.Parameters.Add("sSessionKey", this.SessionKey);        
         this.Client.Post();
         this.Client.ClearParameters();
-        
-        var group = (Utils.Settings.LimeSurvey == null ? 0 : Utils.Settings.LimeSurvey.Group);
-        var list = JArray.Parse(this.ReadClientResult() ?? "");
-        
+                
+        var list = JArray.Parse(this.ReadClientResult() ?? "");        
         var filtered = new JArray();
+    
+        var groups = new Dictionary<int, string?>();
+        if(group > 0) groups.Add(0, "ALL");
+        else groups = (Utils.Settings.LimeSurvey == null || Utils.Settings.LimeSurvey.Groups == null ? new Dictionary<int, string?>() : Utils.Settings.LimeSurvey.Groups.ToDictionary(x => x.Group, x => x.Degree));
+        
         foreach(var survey in list){
             var id = int.Parse((survey["sid"] ?? "").ToString());
             var props = GetSurveyProperties(id);
             var gsid = int.Parse((props["gsid"] ?? "").ToString());
 
-            if(gsid == group){
+            if(groups.ContainsKey(gsid)){
                 var active = char.Parse((props["active"] ?? "").ToString());
                 var expired = (props["expires"] ?? "").ToString();
 
@@ -276,7 +279,7 @@ public class LimeSurvey : IDisposable{
 
         //Returing the new survey's ID
         int newID = int.Parse(this.ReadClientResult() ?? "");
-        SetSurveyProperties(newID, JObject.Parse(@"{'gsid': " + (Utils.Settings.LimeSurvey == null ? 1 : Utils.Settings.LimeSurvey.Group) + "}"));
+        SetSurveyProperties(newID, JObject.Parse(@"{'gsid': " + (Utils.Settings.LimeSurvey == null ? 1 : data.DegreeName) + "}"));
 
         //Creating the participants table
         this.Client.Method = "activate_tokens";

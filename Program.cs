@@ -331,8 +331,8 @@ void TeachingStatsToMetabase(){
     }
 }
 
-void StartSurveys(){
-    //This option will start all the 'limesurvey' surveys (only for the surveys within the definded app setting's group, which should be the surveys created with this tool) sending also the email invitations to the participants.
+void StartSurveys(int group){
+    //This option will start all the 'limesurvey' surveys (only for the surveys within the definded group, 0 means all) sending also the email invitations to the participants.
     Info($"Starting surveys from LimeSurvey:");
     using(var ls = new LimeSurvey()){            
         Info($"   Loading the survey list... ", false);        
@@ -374,7 +374,7 @@ void StartSurveys(){
 }
 
 void ExpireSurveys(){
-    //This option will start all the 'limesurvey' surveys (only for the surveys within the definded app setting's group, which should be the surveys created with this tool) sending also the email invitations to the participants.
+    //This option will expire (stop) all the 'limesurvey' surveys (only for the surveys within the definded app setting's group, which should be the surveys created with this tool).
     Info($"Expiring surveys from LimeSurvey:");
     using(var ls = new LimeSurvey()){            
         Info($"   Loading the survey list... ", false);        

@@ -18,6 +18,11 @@ public class Settings
         public string? Host {get; set;}
         public string? Username {get; set;}
         public string? Password {get; set;}
+        public List<GroupsData>? Groups {get; set;}
+    }
+
+    public class GroupsData{
+        public string? Degree {get; set;}
         public int Group {get; set;}
     }
 
