@@ -361,7 +361,7 @@ internal class Program
             Utils.SerializeYamlFile(
                 new Survey(){
                     Data = surveyByEnrollment.Values.ToList()
-                }, Path.Combine(Utils.ActionsFolder, $"create-surveys-{currentGroupName}.yml")
+                }, Path.Combine(Utils.DataFolder, $"create-surveys-{currentGroupName}.yml")
             );
 
             if(EnrollmentWarnings.Count == 0) Success();    
@@ -402,7 +402,7 @@ internal class Program
     }
 
     /// <summary>
-    /// Imports to LimeSurvey the provided YAML file, creating a new survey within a concrete survey group (check the relation between students groups and the survey groups at 'settings.yml'). Actions files can be also created manually, follow the 'actions/create-survey.yml.template' as a template.
+    /// Imports to LimeSurvey the provided YAML file, creating a new survey within a concrete survey group (check the relation between students groups and the survey groups at 'settings.yml'). YAML data files can be also created manually, follow the 'data/create-survey.yml.template' as a template.
     /// </summary>
     /// <param name="files">A single YAML file path.</param>
     private static void YmlToLimeSurvey(string filePath){

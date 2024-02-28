@@ -5,6 +5,7 @@ public static class Utils{
     private static string? _configFolder;
     private static string? _templatesFolder;
     private static string? _surveysFolder;
+    private static string? _dataFolder;
     public static string ConfigFolder {
         get{
             if(string.IsNullOrEmpty(_configFolder)) _configFolder = GetConfigFolder();
@@ -39,14 +40,14 @@ public static class Utils{
     }
 
 
-    public static string ActionsFolder {
+    public static string DataFolder {
         get{
-            if(string.IsNullOrEmpty(_templatesFolder)) _templatesFolder = GetConfigFolder().Replace("config", "actions");
-            return _templatesFolder;
+            if(string.IsNullOrEmpty(_dataFolder)) _dataFolder = GetConfigFolder().Replace("config", "data");
+            return _dataFolder;
         }
         
         private set{
-            _templatesFolder = value;
+            _dataFolder = value;
         }
     }
 
