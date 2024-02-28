@@ -77,16 +77,16 @@ public class LimeSurvey : IDisposable{
         var list = JArray.Parse(this.ReadClientResult() ?? "");        
         var filtered = new JArray();
     
-        var groups = new Dictionary<int, string?>();
-        if(group > 0) groups.Add(0, "ALL");
-        else groups = (Utils.Settings.LimeSurvey == null || Utils.Settings.LimeSurvey.Groups == null ? new Dictionary<int, string?>() : Utils.Settings.LimeSurvey.Groups.ToDictionary(x => x.Group, x => x.Degree));
+        var groups = new HashSet<int>();
+        if(group > 0) groups.Add(group);
+        else groups = (Utils.Settings.LimeSurvey == null || Utils.Settings.LimeSurvey.Groups == null ? new HashSet<int>() : Utils.Settings.LimeSurvey.Groups.Select(x => x.Id).Distinct().ToHashSet());
         
         foreach(var survey in list){
             var id = int.Parse((survey["sid"] ?? "").ToString());
             var props = GetSurveyProperties(id);
             var gsid = int.Parse((props["gsid"] ?? "").ToString());
 
-            if(groups.ContainsKey(gsid)){
+            if(groups.Contains(gsid)){
                 var active = char.Parse((props["active"] ?? "").ToString());
                 var expired = (props["expires"] ?? "").ToString();
 
@@ -135,7 +135,7 @@ public class LimeSurvey : IDisposable{
         return JObject.Parse(this.ReadClientResult() ?? "");
     }
 
-    public int CreateSurvey(Survey.SurveyData data){  
+    public int CreateSurvey(Survey.SurveyData data){          
         //Setting up the main template
         var template = Path.Combine(Utils.TemplatesFolder, "main-students-ccff.txt");
         var content = File.ReadAllText(template);
@@ -240,6 +240,7 @@ public class LimeSurvey : IDisposable{
                     case Topic.STAFF:
                     case Topic.TEACHERS:
                     default:
+                        //TODO: implement this.
                         throw new NotImplementedException();
                 }
                 
@@ -277,9 +278,12 @@ public class LimeSurvey : IDisposable{
         this.Client.Post();
         this.Client.ClearParameters();
 
-        //Returing the new survey's ID
+        //Retreibing the newly created survey UD
         int newID = int.Parse(this.ReadClientResult() ?? "");
-        SetSurveyProperties(newID, JObject.Parse(@"{'gsid': " + (Utils.Settings.LimeSurvey == null ? 1 : data.DegreeName) + "}"));
+
+        //Setting up the group
+        int grp = GetSurveyGroup(data.GroupName ?? "");
+        SetSurveyProperties(newID, JObject.Parse(@"{'gsid': " + grp + "}"));
 
         //Creating the participants table
         this.Client.Method = "activate_tokens";
@@ -495,7 +499,7 @@ public class LimeSurvey : IDisposable{
 
     
 #endregion
-#region Private
+#region Private helpers
     private static string GetSessionKey(){
         var executionFolder = Path.TrimEndingDirectorySeparator(AppContext.BaseDirectory);
         var appFolder = executionFolder.Substring(0, executionFolder.IndexOf("bin"));
@@ -506,6 +510,16 @@ public class LimeSurvey : IDisposable{
     private string? ReadClientResult(){
         if(this.Client.Response != null && this.Client.Response.result != null) return this.Client.Response.result.ToString();
         else return null;
+    }
+
+    private int GetSurveyGroup(string groupName){
+        int id = 1; //the default one
+        if(Utils.Settings.LimeSurvey != null && Utils.Settings.LimeSurvey.Groups != null){
+            var grp = Utils.Settings.LimeSurvey.Groups.Where(x => x.Group == groupName).SingleOrDefault();
+            if(grp != null) id = grp.Id;
+        }
+        
+        return id;
     }
 #endregion 
 }

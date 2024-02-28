@@ -22,8 +22,8 @@ public class Settings
     }
 
     public class GroupsData{
-        public string? Degree {get; set;}
-        public int Group {get; set;}
+        public string? Group {get; set;}
+        public int Id {get; set;}
     }
 
     public class MasterData{
