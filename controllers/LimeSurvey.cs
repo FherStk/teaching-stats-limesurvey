@@ -135,7 +135,8 @@ public class LimeSurvey : IDisposable{
         return JObject.Parse(this.ReadClientResult() ?? "");
     }
 
-    public int CreateSurvey(Survey.SurveyData data){          
+    public int CreateSurvey(Survey.SurveyData data){  
+        //Note: the import process can be done without file generation, but this helps in order to fix possible import errors.        
         string file = GenerateSurveyTxtFile(data);
         return CreateSurvey(file, data.Participants);
     }
