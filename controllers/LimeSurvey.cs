@@ -135,14 +135,58 @@ public class LimeSurvey : IDisposable{
         return JObject.Parse(this.ReadClientResult() ?? "");
     }
 
+    public int CreateSurvey(string file, List<Survey.Participant>? participants){      
+        //Encoding
+        var fileContent = File.ReadAllText(file);
+        var plainTextBytes = System.Text.Encoding.UTF8.GetBytes(fileContent);
+        var base64EncodedBytes =  System.Convert.ToBase64String(plainTextBytes);
+        
+        //Import
+        this.Client.Method = "import_survey";
+        this.Client.Parameters.Add("sSessionKey", this.SessionKey);
+        this.Client.Parameters.Add("sImportData", base64EncodedBytes);
+        this.Client.Parameters.Add("sImportDataType", "txt");   
+        this.Client.Post();
+        this.Client.ClearParameters();
+
+        //Retreibing the newly created survey UD
+        int newID = int.Parse(this.ReadClientResult() ?? "0");
+        if(newID == 0) throw new UnableToCreateSurveyException();
+
+        //Setting up the group, for some reason, the gsid field is not working
+        fileContent = fileContent.Substring(fileContent.IndexOf("gsid") + 6);
+        fileContent = fileContent.Substring(0, fileContent.IndexOf("\t"));
+        SetSurveyProperties(newID, JObject.Parse(@"{'gsid': " + fileContent + "}"));
+
+        //Creating the participants table
+        this.Client.Method = "activate_tokens";
+        this.Client.Parameters.Add("sSessionKey", this.SessionKey);
+        this.Client.Parameters.Add("iSurveyID", newID);        
+        this.Client.Post();
+        this.Client.ClearParameters();
+
+        //Adding participants
+        if(participants != null && participants.Count > 0) AddSurveyParticipants(newID, participants);
+
+        return newID;
+    }
+
     public int CreateSurvey(Survey.SurveyData data){          
+        string file = GenerateSurveyTxtFile(data);
+        return CreateSurvey(file, data.Participants);
+    }
+
+    public string GenerateSurveyTxtFile(Survey.SurveyData data){          
         //Setting up the main template
         var template = Path.Combine(Utils.TemplatesFolder, "main-students-ccff.txt");
         var content = File.ReadAllText(template);
-
+        
         var captions = (Utils.Settings.Data == null ? null : Utils.Settings.Data.Captions);
         content = content.Replace("{'DESCRIPTION'}", (captions == null ? data.GroupName : captions.Survey));
         content = content.Replace("{'TITLE'}", data.Topics == null ? data.GroupName : $"{data.GroupName} | {string.Join(", ", data.Topics.Where(x => !string.IsNullOrEmpty(x.SubjectAcronym)).Select(x => x.SubjectAcronym).OrderBy(x => x).ToList())}");
+
+        var grp = GetSurveyGroup(data.GroupName ?? "");
+        content = content.Replace("{'GSID'}", grp.ToString());
 
         //Setting up each topic template
         var questionID = 4;   //each question must have a unique numerical id, for subject it should star with 4 (400, 4001, 4002...)
@@ -264,38 +308,10 @@ public class LimeSurvey : IDisposable{
             }              
         }
 
-        //File.WriteAllText(Path.Combine(Utils.TemplatesFolder, "test.txt"), content);
-                    
-        //Encoding
-        var plainTextBytes = System.Text.Encoding.UTF8.GetBytes(content);
-        var base64EncodedBytes =  System.Convert.ToBase64String(plainTextBytes);
-        
-        //Import
-        this.Client.Method = "import_survey";
-        this.Client.Parameters.Add("sSessionKey", this.SessionKey);
-        this.Client.Parameters.Add("sImportData", base64EncodedBytes);
-        this.Client.Parameters.Add("sImportDataType", "txt");   
-        this.Client.Post();
-        this.Client.ClearParameters();
+        string file = Path.Combine(Utils.SurveysFolder, $"{data.GroupName ?? "UNKNOWN"}.txt");
+        File.WriteAllText(file, content);    
 
-        //Retreibing the newly created survey UD
-        int newID = int.Parse(this.ReadClientResult() ?? "");
-
-        //Setting up the group
-        int grp = GetSurveyGroup(data.GroupName ?? "");
-        SetSurveyProperties(newID, JObject.Parse(@"{'gsid': " + grp + "}"));
-
-        //Creating the participants table
-        this.Client.Method = "activate_tokens";
-        this.Client.Parameters.Add("sSessionKey", this.SessionKey);
-        this.Client.Parameters.Add("iSurveyID", newID);        
-        this.Client.Post();
-        this.Client.ClearParameters();
-
-        //Adding participants
-        if(data.Participants != null && data.Participants.Count > 0) AddSurveyParticipants(newID, data.Participants);
-
-        return newID;
+        return file;                        
     }
 
     public JArray AddSurveyParticipants(int surveyID, List<Survey.Participant> parts){

@@ -4,6 +4,7 @@ using YamlDotNet.Serialization.NamingConventions;
 public static class Utils{        
     private static string? _configFolder;
     private static string? _templatesFolder;
+    private static string? _surveysFolder;
     public static string ConfigFolder {
         get{
             if(string.IsNullOrEmpty(_configFolder)) _configFolder = GetConfigFolder();
@@ -25,6 +26,18 @@ public static class Utils{
             _templatesFolder = value;
         }
     }
+
+    public static string SurveysFolder {
+        get{
+            if(string.IsNullOrEmpty(_surveysFolder)) _surveysFolder = GetConfigFolder().Replace("config", "surveys");
+            return _surveysFolder;
+        }
+        
+        private set{
+            _surveysFolder = value;
+        }
+    }
+
 
     public static string ActionsFolder {
         get{
