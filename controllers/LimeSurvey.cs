@@ -135,6 +135,11 @@ public class LimeSurvey : IDisposable{
         return JObject.Parse(this.ReadClientResult() ?? "");
     }
 
+    public int CreateSurvey(Survey.SurveyData data){          
+        string file = GenerateSurveyTxtFile(data);
+        return CreateSurvey(file, data.Participants);
+    }
+
     public int CreateSurvey(string file, List<Survey.Participant>? participants){      
         //Encoding
         var fileContent = File.ReadAllText(file);
@@ -170,12 +175,7 @@ public class LimeSurvey : IDisposable{
 
         return newID;
     }
-
-    public int CreateSurvey(Survey.SurveyData data){          
-        string file = GenerateSurveyTxtFile(data);
-        return CreateSurvey(file, data.Participants);
-    }
-
+    
     public string GenerateSurveyTxtFile(Survey.SurveyData data){          
         //Setting up the main template
         var template = Path.Combine(Utils.TemplatesFolder, "main-students-ccff.txt");
