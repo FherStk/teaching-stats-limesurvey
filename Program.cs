@@ -37,7 +37,10 @@ internal class Program
 
                     case "--start-surveys":
                     case "-ss":
-                        StartSurveys();
+                        if(args.Length > i+1){
+                            if (int.TryParse(args[i + 1], out int id)) StartSurveys(id);
+                            else StartSurveys(args[i + 1]);
+                        }
                         break;  
 
                     case "--expire-surveys":
@@ -508,12 +511,20 @@ internal class Program
     /// <summary>
     /// Starts all the surveys sending also the email invitations to the participants.
     /// </summary>
-    /// <param name="group">Only the surveys within this group will be affected (0 means all).</param>
-    private static void StartSurveys(int group = 0){
+    /// <param name="groupName">Only the surveys within this group will be affected (an empty string means all).</param>
+    private static void StartSurveys(string groupName){
+        StartSurveys(GetLimeSurveyGroupID(groupName));
+    }
+
+    /// <summary>
+    /// Starts all the surveys sending also the email invitations to the participants.
+    /// </summary>
+    /// <param name="groupID">Only the surveys within this group will be affected (0 means all).</param>
+    private static void StartSurveys(int groupID = 0){
         Info($"Starting surveys from LimeSurvey:");
         using(var ls = new LimeSurvey()){            
             Info($"   Loading the survey list... ", false);        
-            var list = ls.ListSurveys(group, LimeSurvey.Status.STOPPED);
+            var list = ls.ListSurveys(groupID, LimeSurvey.Status.STOPPED);
             Success();
             Console.WriteLine();
 
@@ -665,6 +676,20 @@ internal class Program
     }
 #endregion
 #region Helpers 
+    /// <summary>
+    /// Translates the group name to the LimeSurvey0s group ID
+    /// </summary>
+    /// <param name="group">The group's name (like DAW1A)</param>
+    /// <returns>The group ID</returns>
+    private static int GetLimeSurveyGroupID(string group){
+        if(string.IsNullOrEmpty(group)) return 0;
+        else  if(Utils.Settings.LimeSurvey == null || Utils.Settings.LimeSurvey.Groups == null) return -1;
+        else {
+            var grp = Utils.Settings.LimeSurvey.Groups.SingleOrDefault(x => x.Group == group);
+            return grp == null ? -1 : grp.Id;
+        }         
+    }
+    
     /// <summary>
     /// Returns the subject data.
     /// </summary>

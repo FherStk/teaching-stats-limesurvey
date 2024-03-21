@@ -91,7 +91,7 @@ public static class Utils{
         var appFolder = executionFolder.Substring(0, executionFolder.IndexOf("bin"));
         appFolder = Path.TrimEndingDirectorySeparator(appFolder);
         return Path.Combine(appFolder, "config");
-    }
+    }    
     
     public static void SerializeImportTemplateAsYamlFile(){
         //This is just a test method
