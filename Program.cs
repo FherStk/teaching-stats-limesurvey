@@ -2,7 +2,7 @@
 
 internal class Program
 {
-    public const string Version = "2023-2024.0.0";
+    public const string Version = "2023-2024.1.0";
     public static Dictionary<Survey.Participant, List<Settings.SubjectData>>? EnrollmentWarnings {get; private set;}
 
     static void Main(string[] args)
@@ -37,7 +37,8 @@ internal class Program
 
                     case "--start-surveys":
                     case "-ss":
-                        if(args.Length > i+1){
+                        if(args.Length <= i+1) StartSurveys();
+                        else {
                             if (int.TryParse(args[i + 1], out int id)) StartSurveys(id);
                             else StartSurveys(args[i + 1]);
                         }
@@ -45,17 +46,29 @@ internal class Program
 
                     case "--expire-surveys":
                     case "-es":
-                        ExpireSurveys();
+                        if(args.Length <= i+1) ExpireSurveys();
+                        else {
+                            if (int.TryParse(args[i + 1], out int id)) ExpireSurveys(id);
+                            else ExpireSurveys(args[i + 1]);
+                        }
                         break;  
 
                     case "--send-invitations":
                     case "-si":
-                        SendInvitations();
+                        if(args.Length <= i+1) SendInvitations();
+                        else {
+                            if (int.TryParse(args[i + 1], out int id)) SendInvitations(id);
+                            else SendInvitations(args[i + 1]);
+                        }
                         break; 
 
                     case "--send-reminders":
                     case "-sr":
-                        SendReminders();
+                        if(args.Length <= i+1) SendReminders();
+                        else {
+                            if (int.TryParse(args[i + 1], out int id)) SendReminders(id);
+                            else SendReminders(args[i + 1]);
+                        }
                         break; 
 
                     // case "--load-teachingstats":
@@ -64,8 +77,12 @@ internal class Program
                     //     break;  
 
                     case "--load-limesurvey":
-                    case "-ll":
-                        LimeSurveyToMetabase();
+                    case "-ll":                    
+                        if(args.Length <= i+1) LimeSurveyToMetabase();
+                        else {
+                            if (int.TryParse(args[i + 1], out int id)) LimeSurveyToMetabase(id);
+                            else LimeSurveyToMetabase(args[i + 1]);
+                        }
                         break;     
                 }  
 
@@ -115,12 +132,12 @@ internal class Program
         Console.WriteLine("Allowed arguments: ");
         Highlight("  -sc <FILE_PATH>, --saga-convert <FILE_PATH>", "parses SAGA's CSV files and creates some YML file which can be used to create new surveys (school, mentoring and subject) on LimeSurvey, a CSV file must be provided.");
         Highlight("  -cs <FILE_PATH>, --create-surveys <FILE_PATH>", "creates a new survey, a YML file must be provided.");    
-        Highlight("  -ss, --start-surveys", "enables all the surveys at limesurvey (just the ones belonging to the defined group at settings) and sends the invitations to the participants.");
-        Highlight("  -es, --expire-surveys", "expires all the surveys at limesurvey (just the ones belonging to the defined group at settings) so no pending participants will be able to answer the surveys.");
-        Highlight("  -si, --send-invitations", "send the invitations for already active surveys, but just for whom has not received any yet.");
-        Highlight("  -sr, --send-reminders", "send survey reminders to all the participants (just the ones belonging to the defined group at settings) that still has not responded the surveys.");
+        Highlight("  -ss, --start-surveys", "enables all the surveys at limesurvey for the given group (none means all) and sends the invitations to the participants.");
+        Highlight("  -es, --expire-surveys", "stops and expires all the surveys at limesurvey for the given group (none means all) so no pending participants will be able to answer the surveys (no data will be removed).");
+        Highlight("  -si, --send-invitations", "send the invitations for the given group (none means all), but just for whom has not received any yet (and only active surveys).");
+        Highlight("  -sr, --send-reminders", "send survey reminders to all the participants for the given group (none means all) that still has not responded the surveys.");
         //Highlight("  -lt, --load-teachingstats", "loads to Metabase all pending reporting data from 'teaching-stats'.");
-        Highlight("  -ll, --load-limesurvey", "loads to Metabase all pending reporting data from expired surveys in 'lime-survey'.");
+        Highlight("  -ll, --load-limesurvey", "loads to Metabase for the given group (none means all) all pending reporting data from expired surveys in 'lime-survey'.");
         //TODO: remove surveys
         Console.WriteLine();    
     }
@@ -295,7 +312,8 @@ internal class Program
                 foreach (var r in records)
                 {
                     string completeName = r.NOM;
-                    var coma = completeName.IndexOf(",");           
+                    var coma = completeName.IndexOf(",");                               
+                    if(coma == -1) throw new InvalidDataException("NAME fields should be formated as 'Surname(s), Name'");
 
                     var p = new Survey.Participant(){
                         Firstname = completeName.Substring(coma+1).Trim(),
@@ -439,12 +457,20 @@ internal class Program
     /// <summary>
     /// Imports all the LimeSurvey's results to Metabase.
     /// </summary>
-    /// <param name="group">The survey group to process.</param>
-    private static void LimeSurveyToMetabase(int group = 0){        
+    /// <param name="groupName">Only the surveys within this group will be affected (an empty string means all).</param>
+    private static void LimeSurveyToMetabase(string groupName){
+        LimeSurveyToMetabase(GetLimeSurveyGroupID(groupName));
+    }
+    
+    /// <summary>
+    /// Imports all the LimeSurvey's results to Metabase.
+    /// </summary>
+    /// <param name="groupID">The survey group to process.</param>
+    private static void LimeSurveyToMetabase(int groupID = 0){        
         Info($"Loading data from LimeSurvey:");
         using(var ls = new LimeSurvey()){
             Info($"   Loading the survey list... ", false);        
-            var list = ls.ListSurveys(group, LimeSurvey.Status.EXPIRED);
+            var list = ls.ListSurveys(groupID, LimeSurvey.Status.EXPIRED);
             Success();
             Console.WriteLine();
 
@@ -564,12 +590,20 @@ internal class Program
     /// <summary>
     /// Expires (stops) all the surveys.
     /// </summary>
-    /// <param name="group">Only the surveys within this group will be affected (0 means all).</param>
-    private static void ExpireSurveys(int group = 0){
+    /// <param name="groupName">Only the surveys within this group will be affected (an empty string means all).</param>
+    private static void ExpireSurveys(string groupName){
+        ExpireSurveys(GetLimeSurveyGroupID(groupName));
+    }
+
+    /// <summary>
+    /// Expires (stops) all the surveys.
+    /// </summary>
+    /// <param name="groupID">Only the surveys within this group will be affected (0 means all).</param>
+    private static void ExpireSurveys(int groupID = 0){
         Info($"Expiring surveys from LimeSurvey:");
         using(var ls = new LimeSurvey()){            
             Info($"   Loading the survey list... ", false);        
-            var list = ls.ListSurveys(group, LimeSurvey.Status.ACTIVE);
+            var list = ls.ListSurveys(groupID, LimeSurvey.Status.ACTIVE);
             Success();
             Console.WriteLine();
 
@@ -601,13 +635,21 @@ internal class Program
     /// <summary>
     /// Sends the invitations for all the surveys.
     /// </summary>
-    /// <param name="group">Only the surveys within this group will be affected (0 means all).</param>
-    private static void SendInvitations(int group = 0){
+    /// <param name="groupName">Only the surveys within this group will be affected (an empty string means all).</param>
+    private static void SendInvitations(string groupName){
+        SendInvitations(GetLimeSurveyGroupID(groupName));
+    }
+
+    /// <summary>
+    /// Sends the invitations for all the surveys.
+    /// </summary>
+    /// <param name="groupID">Only the surveys within this group will be affected (0 means all).</param>
+    private static void SendInvitations(int groupID = 0){
         Info($"Sending invitations from LimeSurvey:");
 
         using(var ls = new LimeSurvey()){    
             Info($"   Loading the survey list... ", false);        
-            var list = ls.ListSurveys(group, LimeSurvey.Status.ACTIVE);
+            var list = ls.ListSurveys(groupID, LimeSurvey.Status.ACTIVE);
             Success();
             Console.WriteLine();
 
@@ -639,14 +681,22 @@ internal class Program
     /// <summary>
     /// Sends the reminders for all the surveys.
     /// </summary>
-    /// <param name="group">Only the surveys within this group will be affected (0 means all).</param>
-    private static void SendReminders(int group = 0){
+    /// <param name="groupName">Only the surveys within this group will be affected (an empty string means all).</param>
+    private static void SendReminders(string groupName){
+        SendReminders(GetLimeSurveyGroupID(groupName));
+    }
+
+    /// <summary>
+    /// Sends the reminders for all the surveys.
+    /// </summary>
+    /// <param name="groupID">Only the surveys within this group will be affected (0 means all).</param>
+    private static void SendReminders(int groupID = 0){
         //This option will start all the 'limesurvey' surveys (only for the surveys within the definded app setting's group, which should be the surveys created with this tool) sending also the email invitations to the participants.
         Info($"Sending reminders from LimeSurvey:");
         
         using(var ls = new LimeSurvey()){           
             Info($"   Loading the survey list... ", false);        
-            var list = ls.ListSurveys(group, LimeSurvey.Status.ACTIVE);
+            var list = ls.ListSurveys(groupID, LimeSurvey.Status.ACTIVE);
             Success();
             Console.WriteLine();
 
