@@ -11,14 +11,16 @@
             "preLaunchTask": "build",
             // If you have changed target frameworks, make sure to update the program path.
             "program": "${workspaceFolder}/bin/Debug/net6.0/teaching-stats-limesurvey.dll",
-            //"args": ["-sc", "/home/fher/Descargas/Enrollment/3. Dades alumnat/DAW1A.csv"],               //--saga-convert (single file)
+            "args": ["-sc", "/home/fher/Descargas/ASIX1A.csv"],                           //--saga-convert (single file)
             //"args": ["-sc", "/home/fher/Descargas/enrollment/*.csv"],                 //--saga-convert (batch)            
+
+            //"args": ["-cs", "data/create-surveys-DAW1A.yml"],                         //--create-survey (single file)
+            //"args": ["-cs", "data/*.yml"],                                            //--create-survey (batch)
+            
             //"args": ["-ss"],                                                          //--start-surveys
             //"args": ["-sr"],                                                          //--send-reminders
             //"args": ["-si"],                                                          //--send-invitations
-            //"args": ["-ll"],                                                          //--loads data from limesurvey to teaching-stats
-            "args": ["-cs", "data/create-surveys-DAW1A.yml"],                      //--create-survey (single file)
-            //"args": ["-cs", "data/*.yml"],                                         //--create-survey (batch)
+            //"args": ["-ll"],                                                          //--loads data from limesurvey to teaching-stats            
             //"args": ["-es"],                                                          //--expire-surveys
             "cwd": "${workspaceFolder}",
             // For more information about the 'console' field, see https://aka.ms/VSCode-CS-LaunchJson-Console
