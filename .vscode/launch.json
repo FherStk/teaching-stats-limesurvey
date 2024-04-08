@@ -70,6 +70,31 @@
             // ### START SURVEY (ALSO SEND INVITATIONS) ###
                 //"args": ["-ss"],
 
+                //"args": ["-ss", "AIF1A"],
+                //"args": ["-ss", "AIF2A"],
+
+                //"args": ["-ss", "ASIX1A"],
+                //"args": ["-ss", "ASIX2A"],
+                //"args": ["-ss", "ASIX2B"],
+
+                //"args": ["-ss", "DAM1A"],
+                //"args": ["-ss", "DAM2A"],
+                //"args": ["-ss", "DAM2B"],
+
+                //"args": ["-ss", "DAW1A"],
+
+                //"args": ["-ss", "GA1A"],
+                //"args": ["-ss", "GA2A"],
+
+                //"args": ["-ss", "SMX1A"],
+                //"args": ["-ss", "SMX1B"],
+                //"args": ["-ss", "SMX1C"],
+                //"args": ["-ss", "SMX1D"],
+                //"args": ["-ss", "SMX2A"],
+                //"args": ["-ss", "SMX2B"],
+                //"args": ["-ss", "SMX2C"],
+                //"args": ["-ss", "SMX2D"],
+
             // ### SEND PENDING INVITATIONS ###
                 //"args": ["-si"],
 
