@@ -12,3 +12,8 @@ public class UnableToCreateSurveyException : System.Exception{
     public UnableToCreateSurveyException() : this("The LimeSurvey instance did not returned any ID for the requested survey creation."){}
     public UnableToCreateSurveyException(string message, Exception? innerException = null) : base(message, innerException){}
 }
+
+public class UnableToFindGroupException : System.Exception{
+    public UnableToFindGroupException() : this("Unable to find the specified group."){}
+    public UnableToFindGroupException(string message, Exception? innerException = null) : base(message, innerException){}
+}

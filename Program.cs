@@ -736,7 +736,8 @@ internal class Program
         else  if(Utils.Settings.LimeSurvey == null || Utils.Settings.LimeSurvey.Groups == null) return -1;
         else {
             var grp = Utils.Settings.LimeSurvey.Groups.SingleOrDefault(x => x.Group == group);
-            return grp == null ? -1 : grp.Id;
+            if(grp == null) throw new UnableToFindGroupException($"Unable to find a LimeSurvey group ID for the given group name '{group}'.");
+            else return grp.Id;
         }         
     }
     
