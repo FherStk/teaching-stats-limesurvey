@@ -101,6 +101,31 @@
             // ### SEND REMINDERS ###
                 //"args": ["-sr"],
 
+                //"args": ["-sr", "AIF1A"],
+                //"args": ["-sr", "AIF2A"],
+
+                //"args": ["-sr", "ASIX1A"],
+                //"args": ["-sr", "ASIX2A"],
+                //"args": ["-sr", "ASIX2B"],
+
+                //"args": ["-sr", "DAM1A"],
+                //"args": ["-sr", "DAM2A"],
+                //"args": ["-sr", "DAM2B"],
+
+                //"args": ["-sr", "DAW1A"],
+
+                //"args": ["-sr", "GA1A"],
+                //"args": ["-sr", "GA2A"],
+
+                //"args": ["-sr", "SMX1A"],
+                //"args": ["-sr", "SMX1B"],
+                //"args": ["-sr", "SMX1C"],
+                //"args": ["-sr", "SMX1D"],
+                //"args": ["-sr", "SMX2A"],
+                //"args": ["-sr", "SMX2B"],
+                //"args": ["-sr", "SMX2C"],
+                //"args": ["-sr", "SMX2D"],
+
             // ### EXPIRE SURVEYS (NO MORE ANSWERS ALLOWED) ###
                 //"args": ["-es"],
             
