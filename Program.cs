@@ -2,7 +2,7 @@
 
 internal class Program
 {
-    public const string Version = "2023-2024.1.1";
+    public const string Version = "2023-2024.1.2";
     public static Dictionary<Survey.Participant, List<Settings.SubjectData>>? EnrollmentWarnings {get; private set;}
 
     static void Main(string[] args)
@@ -179,7 +179,7 @@ internal class Program
             Error(ex.Message);
         }
         catch(Exception ex){
-            Error("Error: " + ex.ToString());
+            Error($"ERROR: {ex}");
         }
         
         Console.WriteLine();
@@ -440,7 +440,7 @@ internal class Program
                     Success($"OK (id={id})");
                 }
                 catch(Exception ex){
-                    Error($"ERROR: {ex.ToString()}");
+                    Error($"ERROR: {ex}");
                 }
             }
             
@@ -500,7 +500,7 @@ internal class Program
                         Success();                  
                     }
                     catch(Exception ex){
-                        Error($"ERROR: {ex.ToString()}");
+                        Error($"ERROR: {ex}");
                     }
                     finally{
                         Console.WriteLine();
@@ -526,7 +526,7 @@ internal class Program
                     Success();     
                 }
                 catch(Exception ex){                               
-                    Error("Error: " + ex.ToString());
+                    Error($"ERROR: {ex}");
                 }        
 
             }     
@@ -570,7 +570,7 @@ internal class Program
                     Success();
                 }
                 catch(Exception ex){
-                    Error($"ERROR: {ex.ToString()}");
+                    Error($"ERROR: {ex}");
 
                     //TODO: wait and retry
                 }
@@ -618,7 +618,7 @@ internal class Program
                     Success();    
                 }
                 catch(Exception ex){
-                    Error($"ERROR: {ex.ToString()}");
+                    Error($"ERROR: {ex}");
 
                     //TODO: wait and retry
                 }            
@@ -664,7 +664,7 @@ internal class Program
                     Success();
                 }
                 catch(Exception ex){
-                    Error($"ERROR: {ex.ToString()}");
+                    Error($"ERROR: {ex}");
 
                     //TODO: wait and retry
                 }            
@@ -712,7 +712,7 @@ internal class Program
                     Success();
                 }
                 catch(Exception ex){
-                    Error($"ERROR: {ex.ToString()}");
+                    Error($"ERROR: {ex}");
                     Console.WriteLine();
                 }            
             }
