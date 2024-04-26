@@ -171,7 +171,7 @@
                 //"args": ["-ll", "DAW1A"],
 
                 //"args": ["-ll", "GA1A"],
-                //"args": ["-ll", "GA2A"],
+                "args": ["-ll", "GA2A"],
 
                 //"args": ["-ll", "SMX1A"],
                 //"args": ["-ll", "SMX1B"],

@@ -54,7 +54,14 @@ public class TeachingStats : System.IDisposable{
         var statements = new Dictionary<string, string>();
         foreach(var q in questions){
             var title = (q["title"] ?? "").ToString();
-            if(title.StartsWith("SQ") || title == "comments") statements.Add(title, (q["question"] ?? "").ToString());
+            var parentID = int.Parse((q["parent_qid"] ?? "0").ToString());
+            
+            /*
+                Questions that should be added are:
+                    Comments -> Title contains "comments.
+                    Questions -> parent_quid != "0"
+            */
+            if(title.Contains("comments") || parentID > 0) statements.Add(title, (q["question"] ?? "").ToString());
         }            
 
         //Setting up responses
@@ -68,30 +75,35 @@ public class TeachingStats : System.IDisposable{
             if(item.First == null || item.First.First == null) throw new Exception("Unable to parse, the 'responses' array seems to be empty.");
             var data = item.First.First;            
 
-            //Load the responses
-            var numeric = data.Children().Where(x => x.GetType() == typeof(JProperty)).Where(x => ((JProperty)x).Name.StartsWith("questions")).Cast<JProperty>().ToList();
-            var comments = data.Children().Where(x => x.GetType() == typeof(JProperty)).Where(x => ((JProperty)x).Name.StartsWith("comments")).Cast<JProperty>().ToList();
-            
-            //Setup the question shared values
-            //Unable to get only the completed ones (the API fails on filtering, so it will be filtered here)                                    
-            //Timestamp and year
-            var timeStamp = (data["submitdate"] ?? "").ToString();
-            if(!string.IsNullOrEmpty(timeStamp)){
-                var parsedDateTime = DateTime.Now;
-                DateTime.TryParse(timeStamp, out parsedDateTime);
-                var year = parsedDateTime.Year;
-            
-                //Store the splitted answers            
-                short sort = 1;
-                foreach(var answer in numeric.OrderBy(x => x.Name))
-                    importData.Add(ParseAnswer(evalID, statements, data, answer, sort++, timeStamp, year, QuestionType.Numeric));
+            //Group by question type (SUBx, FCT, MNT, SCH, SRV), in order to correctly set the "sort" and the "evalID".
+            var subjects = data.Children().Where(x => x.GetType() == typeof(JProperty)).Where(x => ((JProperty)x).Name.StartsWith("SUB")).GroupBy(x => ((JProperty)x).Name.Substring(0, 4));
+            var topics = subjects.Concat(data.Children().Where(x => x.GetType() == typeof(JProperty)).Where(x => ((JProperty)x).Name.StartsWith("FCT") || ((JProperty)x).Name.StartsWith("MNT") || ((JProperty)x).Name.StartsWith("SCH") || ((JProperty)x).Name.StartsWith("SRV")).GroupBy(x => ((JProperty)x).Name.Substring(0, 3))).ToDictionary(x => x.Key);
 
-                foreach(var answer in comments.OrderBy(x => x.Name))
-                    importData.Add(ParseAnswer(evalID, statements, data, answer, sort++, timeStamp, year, QuestionType.Text));
+            foreach(var key in topics.Keys){                                
+                var numeric = topics[key].Where(x => ((JProperty)x).Name.Contains("questions")).Cast<JProperty>().ToList();
+                var comments = topics[key].Where(x => ((JProperty)x).Name.Contains("comments")).Cast<JProperty>().ToList();                             
+
+                //Setup the question shared values
+                //Unable to get only the completed ones (the API fails on filtering, so it will be filtered here) using the timestamp field.            
+                var timeStamp = (data["submitdate"] ?? "").ToString();
+
+                if(!string.IsNullOrEmpty(timeStamp)){
+                    var parsedDateTime = DateTime.Now;
+                    DateTime.TryParse(timeStamp, out parsedDateTime);
+                    var year = parsedDateTime.Year;
                 
-                //All the responses from the same group will share the ID;
-                evalID++;    
-            }                  
+                    //Store the splitted answers            
+                    short sort = 1;
+                    foreach(var answer in numeric.OrderBy(x => x.Name))
+                        importData.Add(ParseAnswer(evalID, statements, data, answer, sort++, timeStamp, year, QuestionType.Numeric));
+
+                    foreach(var answer in comments.OrderBy(x => x.Name))
+                        importData.Add(ParseAnswer(evalID, statements, data, answer, sort++, timeStamp, year, QuestionType.Text));
+                    
+                    //All the responses from the same group will share the ID;
+                    evalID++;    
+                }  
+            }                
         }
 
         return importData;
@@ -99,6 +111,8 @@ public class TeachingStats : System.IDisposable{
 
     private EF.Answer ParseAnswer(int evalID, Dictionary<string, string> statements, JToken data, JProperty answer, short sort, string timeStamp, int year, QuestionType type){
         var code = (type == QuestionType.Numeric ? answer.Name.Split(new char[]{'[', ']'})[1] : answer.Name);
+        var prefix = code.Substring(0, 3);
+        if(prefix == "SUB") prefix = code.Substring(0, 4);
 
         //Note: the answers will come as teaching-stats database needs, because has been setup like this within the 'equation' property.
         return new EF.Answer(){
@@ -109,14 +123,14 @@ public class TeachingStats : System.IDisposable{
             Value = answer.Value.ToString(),
             QuestionStatement = statements[code],
             QuestionType = type.ToString(),
-            Degree = (data["degree"] ?? "").ToString(),
-            Department = (data["department"] ?? "").ToString(),
-            Group = (data["group"] ?? "").ToString(),
-            Level = (data["level"] ?? "").ToString(),
-            SubjectCode = (data["subjectcode"] ?? "").ToString(),
-            SubjectName = (data["subjectname"] ?? "").ToString(),
-            Topic = (data["topic"] ?? "").ToString(),
-            Trainer = (data["trainer"] ?? "").ToString()
+            Degree = (data[$"{prefix}degree"] ?? "").ToString(),
+            Department = (data[$"{prefix}department"] ?? "").ToString(),
+            Group = (data[$"{prefix}group"] ?? "").ToString(),
+            Level = (data[$"{prefix}level"] ?? "").ToString(),
+            SubjectCode = (data[$"{prefix}subjectcode"] ?? "").ToString(),
+            SubjectName = (data[$"{prefix}subjectname"] ?? "").ToString(),
+            Topic = (data[$"{prefix}topic"] ?? "").ToString(),
+            Trainer = (data[$"{prefix}trainer"] ?? "").ToString()
         };
     }
 
