@@ -126,11 +126,61 @@
                 //"args": ["-sr", "SMX2C"],
                 //"args": ["-sr", "SMX2D"],
 
-            // ### EXPIRE SURVEYS (NO MORE ANSWERS ALLOWED) ###
+            // ### EXPIRE SURVEYS (NO MORE ANSWERS ALLOWED BUT NOTHING REMOVED) ###
                 //"args": ["-es"],
+
+                //"args": ["-es", "AIF1A"],
+                //"args": ["-es", "AIF2A"],
+
+                //"args": ["-es", "ASIX1A"],
+                //"args": ["-es", "ASIX2A"],
+                //"args": ["-es", "ASIX2B"],
+
+                //"args": ["-es", "DAM1A"],
+                //"args": ["-es", "DAM2A"],
+                //"args": ["-es", "DAM2B"],
+
+                //"args": ["-es", "DAW1A"],
+
+                //"args": ["-es", "GA1A"],
+                //"args": ["-es", "GA2A"],
+
+                //"args": ["-es", "SMX1A"],
+                //"args": ["-es", "SMX1B"],
+                //"args": ["-es", "SMX1C"],
+                //"args": ["-es", "SMX1D"],
+                //"args": ["-es", "SMX2A"],
+                //"args": ["-es", "SMX2B"],
+                //"args": ["-es", "SMX2C"],
+                //"args": ["-es", "SMX2D"],
             
-            // ### LOAD DATA FROM LimeSurvey TO TeachingStats BBDD ###
+            // ### LOAD DATA FROM LimeSurvey TO TeachingStats BBDD (BEWARE: DO NOT LOAD ALREADY LOADED SURVEYS, DUPED DATA WILL BE CREATED) ###
                 //"args": ["-ll"],
+
+                //"args": ["-ll", "AIF1A"],
+                //"args": ["-ll", "AIF2A"],
+
+                //"args": ["-ll", "ASIX1A"],
+                //"args": ["-ll", "ASIX2A"],
+                //"args": ["-ll", "ASIX2B"],
+
+                //"args": ["-ll", "DAM1A"],
+                //"args": ["-ll", "DAM2A"],
+                //"args": ["-ll", "DAM2B"],
+
+                //"args": ["-ll", "DAW1A"],
+
+                //"args": ["-ll", "GA1A"],
+                //"args": ["-ll", "GA2A"],
+
+                //"args": ["-ll", "SMX1A"],
+                //"args": ["-ll", "SMX1B"],
+                //"args": ["-ll", "SMX1C"],
+                //"args": ["-ll", "SMX1D"],
+                //"args": ["-ll", "SMX2A"],
+                //"args": ["-ll", "SMX2B"],
+                //"args": ["-ll", "SMX2C"],
+                //"args": ["-ll", "SMX2D"],
                         
             "cwd": "${workspaceFolder}",
             // For more information about the 'console' field, see https://aka.ms/VSCode-CS-LaunchJson-Console
