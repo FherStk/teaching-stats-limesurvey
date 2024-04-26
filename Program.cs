@@ -2,7 +2,7 @@
 
 internal class Program
 {
-    public const string Version = "2023-2024.1.2";
+    public const string Version = "2023-2024.1.3";
     public static Dictionary<Survey.Participant, List<Settings.SubjectData>>? EnrollmentWarnings {get; private set;}
 
     static void Main(string[] args)
@@ -482,7 +482,7 @@ internal class Program
                     
                     // if(type != null){
                     var id = int.Parse((s["sid"] ?? "").ToString());
-                    Info($"Importing all pending answers from LimeSurvey to Metabase, {i++}/{list.Count} with id={id}:");
+                    Info($"Importing all answers from LimeSurvey to Metabase, {i++}/{list.Count} with id={id}:");
                     
                     try{
                         Info("   Downloading data from LimeSurvey... ", false);
@@ -582,7 +582,7 @@ internal class Program
             if(list.Count == 0) Warning($"Unable to load any non-active survey from limesurvey (within the current app group).");
             else{
                 Console.WriteLine();
-                Success("Process finished, all the non-active surveys within the app group have been activated.");  
+                Success("Process finished, all the non-active surveys for the given group have been activated.");  
             }  
         }
     }
@@ -627,7 +627,7 @@ internal class Program
             if(list.Count == 0) Warning($"Unable to load any active survey from limesurvey (within the current app group).");
             else{
                 Console.WriteLine();
-                Success("Process finished, all the non-active surveys within the app group have been expired.");  
+                Success("Process finished, all the non-active surveys for the given group have been expired.");  
             }  
         }
     }
