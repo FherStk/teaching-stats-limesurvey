@@ -112,8 +112,20 @@ public class TeachingStats : System.IDisposable{
     private EF.Answer ParseAnswer(int evalID, Dictionary<string, string> statements, JToken data, JProperty answer, short sort, string timeStamp, int year, QuestionType type){
         var code = (type == QuestionType.Numeric ? answer.Name.Split(new char[]{'[', ']'})[1] : answer.Name);
         var prefix = code.Substring(0, 3);
-        if(prefix == "SUB") prefix = code.Substring(0, 4);
+        if(prefix == "SUB"){
+            //SUB1xxx -> SUB1 or SUB11xxx -> SUB11            
+            var a = answer.Name.Split(new char[]{'[', ']'})[0].ToCharArray();
+            var cut = a.Length;
+            for(int i=3; i<a.Length; i++){
+                if(!char.IsNumber(a[i])){
+                    cut = i;
+                    break;
+                }
+            }
 
+            prefix = code.Substring(0, cut);            
+        }
+        
         //Note: the answers will come as teaching-stats database needs, because has been setup like this within the 'equation' property.
         return new EF.Answer(){
             EvaluationId = evalID,
