@@ -112,10 +112,11 @@ public class TeachingStats : System.IDisposable{
     private EF.Answer ParseAnswer(int evalID, Dictionary<string, string> statements, JToken data, JProperty answer, short sort, string timeStamp, int year, QuestionType type){
         var code = (type == QuestionType.Numeric ? answer.Name.Split(new char[]{'[', ']'})[1] : answer.Name);
         var prefix = code.Substring(0, 3);
+        var cut = 0;
         if(prefix == "SUB"){
             //SUB1xxx -> SUB1 or SUB11xxx -> SUB11            
             var a = answer.Name.Split(new char[]{'[', ']'})[0].ToCharArray();
-            var cut = a.Length;
+            cut = a.Length;
             for(int i=3; i<a.Length; i++){
                 if(!char.IsNumber(a[i])){
                     cut = i;
@@ -125,7 +126,19 @@ public class TeachingStats : System.IDisposable{
 
             prefix = code.Substring(0, cut);            
         }
-        
+
+        //TODO: For the 2024-2025 course -> degreeName and degreeAcronym should be sent to the YML file. The acronym should be setup into the "degree" field in order to avoid this transformation.
+        var degree = (data[$"{prefix}group"] ?? "").ToString();
+        var dArray = degree.ToCharArray();  
+        cut = degree.Length;
+        for(int i=0; i<degree.Length; i++){
+            if(char.IsNumber(dArray[i])){
+                cut = i;
+                break;
+            }
+        }
+        degree = degree.Substring(0, cut);
+
         //Note: the answers will come as teaching-stats database needs, because has been setup like this within the 'equation' property.
         return new EF.Answer(){
             EvaluationId = evalID,
@@ -135,7 +148,7 @@ public class TeachingStats : System.IDisposable{
             Value = answer.Value.ToString(),
             QuestionStatement = statements[code],
             QuestionType = type.ToString(),
-            Degree = (data[$"{prefix}degree"] ?? "").ToString(),
+            Degree = degree,
             Department = (data[$"{prefix}department"] ?? "").ToString(),
             Group = (data[$"{prefix}group"] ?? "").ToString(),
             Level = (data[$"{prefix}level"] ?? "").ToString(),
