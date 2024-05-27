@@ -70,15 +70,15 @@ public class TeachingStats : System.IDisposable{
 
         int evalID = 1;
         var importData = new List<EF.Answer>();
-        foreach(var item in list){
-            //TODO: check this "1" for multiple responses
+        foreach(var item in list){            
             if(item.First == null || item.First.First == null) throw new Exception("Unable to parse, the 'responses' array seems to be empty.");
             var data = item.First.First;            
 
             //Group by question type (SUBx, FCT, MNT, SCH, SRV), in order to correctly set the "sort" and the "evalID".
             var subjects = data.Children().Where(x => x.GetType() == typeof(JProperty)).Where(x => ((JProperty)x).Name.StartsWith("SUB")).GroupBy(x => ((JProperty)x).Name.Substring(0, 4));
             var topics = subjects.Concat(data.Children().Where(x => x.GetType() == typeof(JProperty)).Where(x => ((JProperty)x).Name.StartsWith("FCT") || ((JProperty)x).Name.StartsWith("MNT") || ((JProperty)x).Name.StartsWith("SCH") || ((JProperty)x).Name.StartsWith("SRV")).GroupBy(x => ((JProperty)x).Name.Substring(0, 3))).ToDictionary(x => x.Key);
-
+            
+            //TODO: GROUPBY is not working properly, check with ASIX2B
             foreach(var key in topics.Keys){                                
                 var numeric = topics[key].Where(x => ((JProperty)x).Name.Contains("questions")).Cast<JProperty>().ToList();
                 var comments = topics[key].Where(x => ((JProperty)x).Name.Contains("comments")).Cast<JProperty>().ToList();                             
