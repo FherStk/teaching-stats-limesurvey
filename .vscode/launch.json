@@ -156,7 +156,6 @@
             
             // ### LOAD DATA FROM LimeSurvey TO TeachingStats BBDD (BEWARE: DO NOT LOAD ALREADY LOADED SURVEYS, DUPED DATA WILL BE CREATED) ###
                 //"args": ["-ll"],
-                //"args": ["-ll", "AIF1A,AIF2A,ASIX1A,ASIX2A,ASIX2B,DAM1A,DAM2A,DAM2B,DAW1A,GA1A,GA2A,SMX1A,SMX1B,SMX1C,SMX1D,SMX2A,SMX2B,SMX2C,SMX2D"],
 
                 //"args": ["-ll", "AIF1A"],
                 //"args": ["-ll", "AIF2A"],

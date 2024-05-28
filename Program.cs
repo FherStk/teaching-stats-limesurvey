@@ -461,16 +461,6 @@ internal class Program
     private static void LimeSurveyToMetabase(string groupName){
         LimeSurveyToMetabase(GetLimeSurveyGroupID(groupName));
     }
-
-    /// <summary>
-    /// Imports all the LimeSurvey's results to Metabase.
-    /// </summary>
-    /// <param name="groupIDs">The survey groups to process.</param>
-    private static void LimeSurveyToMetabase(List<int> groupIDs){ 
-        foreach(var id in groupIDs){
-            LimeSurveyToMetabase(id);
-        }
-    }
     
     /// <summary>
     /// Imports all the LimeSurvey's results to Metabase.
@@ -555,16 +545,6 @@ internal class Program
     /// <summary>
     /// Starts all the surveys sending also the email invitations to the participants.
     /// </summary>
-    /// <param name="groupIDs">The survey groups to process.</param>
-    private static void StartSurveys(List<int> groupIDs){ 
-        foreach(var id in groupIDs){
-            StartSurveys(id);
-        }
-    }
-
-    /// <summary>
-    /// Starts all the surveys sending also the email invitations to the participants.
-    /// </summary>
     /// <param name="groupID">Only the surveys within this group will be affected (0 means all).</param>
     private static void StartSurveys(int groupID = 0){
         Info($"Starting surveys from LimeSurvey:");
@@ -618,16 +598,6 @@ internal class Program
     /// <summary>
     /// Expires (stops) all the surveys.
     /// </summary>
-    /// <param name="groupIDs">The survey groups to process.</param>
-    private static void ExpireSurveys(List<int> groupIDs){ 
-        foreach(var id in groupIDs){
-            ExpireSurveys(id);
-        }
-    }
-
-    /// <summary>
-    /// Expires (stops) all the surveys.
-    /// </summary>
     /// <param name="groupID">Only the surveys within this group will be affected (0 means all).</param>
     private static void ExpireSurveys(int groupID = 0){
         Info($"Expiring surveys from LimeSurvey:");
@@ -668,16 +638,6 @@ internal class Program
     /// <param name="groupName">Only the surveys within this group will be affected (an empty string means all).</param>
     private static void SendInvitations(string groupName){
         SendInvitations(GetLimeSurveyGroupID(groupName));
-    }
-
-    /// <summary>
-    /// Sends the invitations for all the surveys.
-    /// </summary>
-    /// <param name="groupIDs">The survey groups to process.</param>
-    private static void SendInvitations(List<int> groupIDs){ 
-        foreach(var id in groupIDs){
-            SendInvitations(id);
-        }
     }
 
     /// <summary>
@@ -729,16 +689,6 @@ internal class Program
     /// <summary>
     /// Sends the reminders for all the surveys.
     /// </summary>
-    /// <param name="groupIDs">The survey groups to process.</param>
-    private static void SendReminders(List<int> groupIDs){ 
-        foreach(var id in groupIDs){
-            SendReminders(id);
-        }
-    }
-
-    /// <summary>
-    /// Sends the reminders for all the surveys.
-    /// </summary>
     /// <param name="groupID">Only the surveys within this group will be affected (0 means all).</param>
     private static void SendReminders(int groupID = 0){
         //This option will start all the 'limesurvey' surveys (only for the surveys within the definded app setting's group, which should be the surveys created with this tool) sending also the email invitations to the participants.
@@ -779,21 +729,15 @@ internal class Program
     /// <summary>
     /// Translates the group name to the LimeSurvey0s group ID
     /// </summary>
-    /// <param name="groups">The group names separated with commas (like DAW1A,DAM2B)</param>
-    /// <returns>The group IDs</returns>
-    private static List<int> GetLimeSurveyGroupID(string groups){
-        if(string.IsNullOrEmpty(groups)) return new List<int>(){0};
-        else  if(Utils.Settings.LimeSurvey == null || Utils.Settings.LimeSurvey.Groups == null) return new List<int>(){-1};
+    /// <param name="group">The group's name (like DAW1A)</param>
+    /// <returns>The group ID</returns>
+    private static int GetLimeSurveyGroupID(string group){
+        if(string.IsNullOrEmpty(group)) return 0;
+        else  if(Utils.Settings.LimeSurvey == null || Utils.Settings.LimeSurvey.Groups == null) return -1;
         else {
-            
-            var ids = new List<int>();
-            foreach(var name in groups.Split(",")){
-                var grp = Utils.Settings.LimeSurvey.Groups.SingleOrDefault(x => x.Group == name.Trim());
-                if(grp == null) throw new UnableToFindGroupException($"Unable to find a LimeSurvey group ID for the given group name '{name.Trim()}'.");
-                else ids.Add(grp.Id);
-            }
-            
-            return ids;
+            var grp = Utils.Settings.LimeSurvey.Groups.SingleOrDefault(x => x.Group == group);
+            if(grp == null) throw new UnableToFindGroupException($"Unable to find a LimeSurvey group ID for the given group name '{group}'.");
+            else return grp.Id;
         }         
     }
     
