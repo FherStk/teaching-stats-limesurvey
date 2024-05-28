@@ -65,27 +65,28 @@ public class TeachingStats : System.IDisposable{
         }            
 
         //Setting up responses
-        var list = answers["responses"];
-        if(list == null) throw new Exception("Unable to parse, the 'responses' array seems to be missing.");
+        var responses = answers["responses"];
+        if(responses == null) throw new Exception("Unable to parse, the 'responses' array seems to be missing.");
 
         int evalID = 1;
         var importData = new List<EF.Answer>();
-        foreach(var item in list){            
-            if(item.First == null || item.First.First == null) throw new Exception("Unable to parse, the 'responses' array seems to be empty.");
-            var data = item.First.First;            
+        foreach(var response in responses){            
+            if(response.First == null || response.First.First == null) throw new Exception("Unable to parse, the 'responses' array seems to be empty.");
+            var allAnswersFromOneUser = response.First.First;            
 
-            //Group by question type (SUBx, FCT, MNT, SCH, SRV), in order to correctly set the "sort" and the "evalID".
-            var subjects = data.Children().Where(x => x.GetType() == typeof(JProperty)).Where(x => ((JProperty)x).Name.StartsWith("SUB")).GroupBy(x => ((JProperty)x).Name.Substring(0, 4));
-            var topics = subjects.Concat(data.Children().Where(x => x.GetType() == typeof(JProperty)).Where(x => ((JProperty)x).Name.StartsWith("FCT") || ((JProperty)x).Name.StartsWith("MNT") || ((JProperty)x).Name.StartsWith("SCH") || ((JProperty)x).Name.StartsWith("SRV")).GroupBy(x => ((JProperty)x).Name.Substring(0, 3))).ToDictionary(x => x.Key);
+            //TODO: 2024-2025 -> SUB1 should be SUB01 -> SUB1 vs SUB11 -> SUB01 vs SUB11. This will simplify A LOT of work. (substring(0,5) for all SUB) 
+                //Group by question type (SUBx, FCT, MNT, SCH, SRV), in order to correctly set the "sort" and the "evalID".
+                //var subjects = allAnswersFromOneUser.Children().Where(x => x.GetType() == typeof(JProperty)).Where(x => ((JProperty)x).Name.StartsWith("SUB")).GroupBy(x => ((JProperty)x).Name.Substring(0, 4));
+                //var topics = subjects.Concat(allAnswersFromOneUser.Children().Where(x => x.GetType() == typeof(JProperty)).Where(x => ((JProperty)x).Name.StartsWith("FCT") || ((JProperty)x).Name.StartsWith("MNT") || ((JProperty)x).Name.StartsWith("SCH") || ((JProperty)x).Name.StartsWith("SRV")).GroupBy(x => ((JProperty)x).Name.Substring(0, 3))).ToDictionary(x => x.Key);
             
-            //TODO: GROUPBY is not working properly, check with ASIX2B
+            var topics = GroupAnswersByTopic(allAnswersFromOneUser);
             foreach(var key in topics.Keys){                                
-                var numeric = topics[key].Where(x => ((JProperty)x).Name.Contains("questions")).Cast<JProperty>().ToList();
-                var comments = topics[key].Where(x => ((JProperty)x).Name.Contains("comments")).Cast<JProperty>().ToList();                             
+                var numeric = topics[key].Where(x => x.Name.Contains("questions")).Cast<JProperty>().ToList();
+                var comments = topics[key].Where(x => x.Name.Contains("comments")).Cast<JProperty>().ToList();                             
 
                 //Setup the question shared values
                 //Unable to get only the completed ones (the API fails on filtering, so it will be filtered here) using the timestamp field.            
-                var timeStamp = (data["submitdate"] ?? "").ToString();
+                var timeStamp = (allAnswersFromOneUser["submitdate"] ?? "").ToString();
 
                 if(!string.IsNullOrEmpty(timeStamp)){
                     var parsedDateTime = DateTime.Now;
@@ -95,10 +96,10 @@ public class TeachingStats : System.IDisposable{
                     //Store the splitted answers            
                     short sort = 1;
                     foreach(var answer in numeric.OrderBy(x => x.Name))
-                        importData.Add(ParseAnswer(evalID, statements, data, answer, sort++, timeStamp, year, QuestionType.Numeric));
+                        importData.Add(ParseAnswer(evalID, statements, allAnswersFromOneUser, answer, sort++, timeStamp, year, QuestionType.Numeric));
 
                     foreach(var answer in comments.OrderBy(x => x.Name))
-                        importData.Add(ParseAnswer(evalID, statements, data, answer, sort++, timeStamp, year, QuestionType.Text));
+                        importData.Add(ParseAnswer(evalID, statements, allAnswersFromOneUser, answer, sort++, timeStamp, year, QuestionType.Text));
                     
                     //All the responses from the same group will share the ID;
                     evalID++;    
@@ -109,11 +110,39 @@ public class TeachingStats : System.IDisposable{
         return importData;
     }
 
+    private Dictionary<string, List<JProperty>> GroupAnswersByTopic(JToken allAnswersFromOneUser){
+        var groups = new Dictionary<string, List<JProperty>>();
+
+        foreach(var answer in allAnswersFromOneUser.Children().Where(x => x.GetType() == typeof(JProperty)).Where(x => ((JProperty)x).Name.StartsWith("SUB"))){           
+            var name = ((JProperty)answer).Name;
+            var cut = name.Length;
+            for(int i=3; i < name.Length; i++){
+                if(!char.IsNumber(name[i])){
+                    cut = i;
+                    break;
+                }
+            }
+
+            var prefix = name.Substring(0, cut);  
+            if(!groups.ContainsKey(prefix)) groups.Add(prefix, new List<JProperty>());
+            groups[prefix].Add((JProperty)answer);            
+        }
+
+        foreach(var answer in allAnswersFromOneUser.Children().Where(x => x.GetType() == typeof(JProperty)).Where(x => ((JProperty)x).Name.StartsWith("FCT") || ((JProperty)x).Name.StartsWith("MNT") || ((JProperty)x).Name.StartsWith("SCH") || ((JProperty)x).Name.StartsWith("SRV"))){
+            var prefix = ((JProperty)answer).Name.Substring(0,3);                        
+            if(!groups.ContainsKey(prefix)) groups.Add(prefix, new List<JProperty>());
+            groups[prefix].Add((JProperty)answer);            
+        }    
+
+        return groups;    
+    }
+
     private EF.Answer ParseAnswer(int evalID, Dictionary<string, string> statements, JToken data, JProperty answer, short sort, string timeStamp, int year, QuestionType type){
         var code = (type == QuestionType.Numeric ? answer.Name.Split(new char[]{'[', ']'})[1] : answer.Name);
         var prefix = code.Substring(0, 3);
         var cut = 0;
         if(prefix == "SUB"){
+            //TODO: 2024-2025 -> SUB1 should be SUB01 -> SUB1 vs SUB11 -> SUB01 vs SUB11. This will simplify A LOT of work. 
             //SUB1xxx -> SUB1 or SUB11xxx -> SUB11            
             var a = answer.Name.Split(new char[]{'[', ']'})[0].ToCharArray();
             cut = a.Length;
