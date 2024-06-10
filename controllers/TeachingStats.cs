@@ -115,8 +115,8 @@ public class TeachingStats : System.IDisposable{
                             data.Add(ParseAnswerFromGoogleForms(evalID, dt.Columns, row, limit, limit+1, QuestionType.Text, group, "Centre"));  
                         }
                         else{    
-                            int newLimit = limit + 7;
-                            data.Add(ParseAnswerFromGoogleForms(evalID, dt.Columns, row, limit, newLimit+1, QuestionType.Text, group, "Centre"));
+                            int newLimit = limit + 8;
+                            data.Add(ParseAnswerFromGoogleForms(evalID, dt.Columns, row, limit, newLimit, QuestionType.Text, group, "Centre"));
                             
                             //+ 7 numeric questions (services)                            
                             evalID++;
