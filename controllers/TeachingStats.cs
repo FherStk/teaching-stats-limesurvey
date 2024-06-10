@@ -245,7 +245,7 @@ public class TeachingStats : System.IDisposable{
         string? value = data[column].ToString();
         if(timestamp.Year > 2022 && type == QuestionType.Numeric){
             //Range [1,5] should be transformed into [0-10]
-            value = (int.Parse(data[column].ToString() ?? "-1") / 5 * 10).ToString();
+            value = (float.Parse(data[column].ToString() ?? "-1") / 5 * 10).ToString();
         }
 
         return new EF.Answer(){
