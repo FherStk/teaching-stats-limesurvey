@@ -1,6 +1,8 @@
 using Npgsql;
 using System;
 using Newtonsoft.Json.Linq;
+using System.Runtime.InteropServices;
+using System.Data;
 
 public class TeachingStats : System.IDisposable{    
     public NpgsqlConnection Connection {get; private set;}
@@ -20,35 +22,7 @@ public class TeachingStats : System.IDisposable{
     public void ImportFromLimeSurvey(JArray questions, JObject answers){
         //TODO: with the new "import CSV survey" mechanism, no quesion data will be needed. Everything will come at answer level.
         //      the only problem with the "import CSV mechanism" is that the "survey group/section" cannot be assigned automatically.
-        var data = ParseFromLimeSurveyToTeachingStats(questions, answers);
-        
-        using(var context = new EF.TeachingStatsContext()){
-            var lastID = context.Answers.OrderByDescending(x => x.EvaluationId).Select(x => x.EvaluationId).FirstOrDefault();            
-
-            foreach(var item in data){                
-                item.EvaluationId += lastID;
-                item.Level = Cut(item.Level ?? "", 3);
-                item.Department = Cut(item.Department ?? "", 75);
-                item.Degree = Cut(item.Degree ?? "", 4);
-                item.Group = Cut(item.Group ?? "", 11);
-                item.SubjectCode = Cut(item.SubjectCode ?? "", 10);
-                item.SubjectName = Cut(item.SubjectName ?? "", 75);
-                item.Trainer = Cut(item.Trainer ?? "", 75);
-                item.Topic = Cut(item.Topic ?? "", 25);
-                item.QuestionType = Cut(item.QuestionType ?? "", 25);
-            }
-            
-            context.Answers.AddRange(data);
-            context.SaveChanges();
-        }
-    }
-
-    private string Cut(string text, int maxLength){
-        return (!string.IsNullOrEmpty(text) && text.Length > maxLength ? text.Substring(0, maxLength) : text);        
-    }
-
-    private List<EF.Answer> ParseFromLimeSurveyToTeachingStats(JArray questions, JObject answers){
-        //NOTE: the questions json is needed because the LimeSurvey API is not exporting the question statement even when requested for...
+       //NOTE: the questions json is needed because the LimeSurvey API is not exporting the question statement even when requested for...
         
         //Setup global data
         var statements = new Dictionary<string, string>();
@@ -69,7 +43,7 @@ public class TeachingStats : System.IDisposable{
         if(responses == null) throw new Exception("Unable to parse, the 'responses' array seems to be missing.");
 
         int evalID = 1;
-        var importData = new List<EF.Answer>();
+        var data = new List<EF.Answer>();
         foreach(var response in responses){            
             if(response.First == null || response.First.First == null) throw new Exception("Unable to parse, the 'responses' array seems to be empty.");
             var allAnswersFromOneUser = response.First.First;            
@@ -96,18 +70,90 @@ public class TeachingStats : System.IDisposable{
                     //Store the splitted answers            
                     short sort = 1;
                     foreach(var answer in numeric.OrderBy(x => x.Name))
-                        importData.Add(ParseAnswer(evalID, statements, allAnswersFromOneUser, answer, sort++, timeStamp, year, QuestionType.Numeric));
+                        data.Add(ParseAnswerFromLimeSurvey(evalID, statements, allAnswersFromOneUser, answer, sort++, timeStamp, year, QuestionType.Numeric));
 
                     foreach(var answer in comments.OrderBy(x => x.Name))
-                        importData.Add(ParseAnswer(evalID, statements, allAnswersFromOneUser, answer, sort++, timeStamp, year, QuestionType.Text));
+                        data.Add(ParseAnswerFromLimeSurvey(evalID, statements, allAnswersFromOneUser, answer, sort++, timeStamp, year, QuestionType.Text));
                     
                     //All the responses from the same group will share the ID;
                     evalID++;    
                 }  
             }                
         }
+        
+        StoreDataIntoTeachingStatsBBDD(data);        
+    }
 
-        return importData;
+    public void ImportFromGoogleFormsCSV(string csvFilePath){  
+        var data = new List<EF.Answer>();
+
+        using (var reader = new StreamReader(csvFilePath, System.Text.Encoding.UTF8))
+            using (var csv = new CsvHelper.CsvReader(reader, System.Globalization.CultureInfo.InvariantCulture))
+            {  
+
+                // Do any configuration to `CsvReader` before creating CsvDataReader.
+                using (var dr = new CsvHelper.CsvDataReader(csv))
+                {		
+                    var dt = new System.Data.DataTable();
+                    dt.Load(dr);
+                    
+                    int evalID = 1;                                        
+                    var group = Path.GetFileNameWithoutExtension(csvFilePath);
+
+                    foreach (DataRow row in dt.Rows)
+                    {
+                        //5 numeric questions (schools) 
+                        for(short sort = 1; sort < 6; sort++){                            
+                            data.Add(ParseAnswerFromGoogleForms(evalID, dt.Columns, row, sort, QuestionType.Numeric, group, "Centre"));
+                        }                                                
+
+                        var timestamp = DateTime.Parse(row[0].ToString() ?? "");
+                        if(timestamp.Year < 2024){
+                            data.Add(ParseAnswerFromGoogleForms(evalID, dt.Columns, row, 6, QuestionType.Text, group, "Centre"));
+                        }
+                        else{
+                            data.Add(ParseAnswerFromGoogleForms(evalID, dt.Columns, row, 14, QuestionType.Text, group, "Centre"));
+                            
+                            //+ 7 numeric questions (services)
+                            evalID++;
+                            for(short sort = 6; sort < 14; sort++){
+                                data.Add(ParseAnswerFromGoogleForms(evalID, dt.Columns, row, sort, QuestionType.Numeric, group, "Serveis"));
+                            }                             
+                        }
+                        
+                        evalID++;
+                    }
+                }                                
+            }
+            
+        StoreDataIntoTeachingStatsBBDD(data);    
+    }
+
+
+    private void StoreDataIntoTeachingStatsBBDD(List<EF.Answer> data){
+        using(var context = new EF.TeachingStatsContext()){
+            var lastID = context.Answers.OrderByDescending(x => x.EvaluationId).Select(x => x.EvaluationId).FirstOrDefault();            
+
+            foreach(var item in data){                
+                item.EvaluationId += lastID;
+                item.Level = Cut(item.Level ?? "", 3);
+                item.Department = Cut(item.Department ?? "", 75);
+                item.Degree = Cut(item.Degree ?? "", 4);
+                item.Group = Cut(item.Group ?? "", 11);
+                item.SubjectCode = Cut(item.SubjectCode ?? "", 10);
+                item.SubjectName = Cut(item.SubjectName ?? "", 75);
+                item.Trainer = Cut(item.Trainer ?? "", 75);
+                item.Topic = Cut(item.Topic ?? "", 25);
+                item.QuestionType = Cut(item.QuestionType ?? "", 25);
+            }
+            
+            context.Answers.AddRange(data);
+            context.SaveChanges();
+        }
+    }
+
+    private string Cut(string text, int maxLength){
+        return (!string.IsNullOrEmpty(text) && text.Length > maxLength ? text.Substring(0, maxLength) : text);        
     }
 
     private Dictionary<string, List<JProperty>> GroupAnswersByTopic(JToken allAnswersFromOneUser){
@@ -137,7 +183,7 @@ public class TeachingStats : System.IDisposable{
         return groups;    
     }
 
-    private EF.Answer ParseAnswer(int evalID, Dictionary<string, string> statements, JToken data, JProperty answer, short sort, string timeStamp, int year, QuestionType type){
+    private EF.Answer ParseAnswerFromLimeSurvey(int evalID, Dictionary<string, string> statements, JToken data, JProperty answer, short sort, string timeStamp, int year, QuestionType type){
         var code = (type == QuestionType.Numeric ? answer.Name.Split(new char[]{'[', ']'})[1] : answer.Name);
         var prefix = code.Substring(0, 3);
         var cut = 0;
@@ -188,6 +234,27 @@ public class TeachingStats : System.IDisposable{
         };
     }
 
+    private EF.Answer ParseAnswerFromGoogleForms(int evalID, DataColumnCollection cols, DataRow data, short sort, QuestionType type, string group, string topic){        
+        var timestamp = DateTime.Parse(data[0].ToString() ?? "");
+        var level = group.Substring(0, group.Length-1);
+
+        return new EF.Answer(){
+            EvaluationId = evalID,
+            QuestionSort = sort,
+            Timestamp = timestamp,
+            Year = timestamp.Year,
+            Value = data[sort+1].ToString(),
+            QuestionStatement = cols[sort+1].ColumnName,
+            QuestionType = type.ToString(),
+            Degree = level,
+            Level = level,
+            Group = group,
+            Topic = topic,
+            SubjectCode = topic,
+            SubjectName = topic
+        };
+    }
+
     public void ImportFromTeachingStats(){        
         NpgsqlTransaction? trans = null;
 
@@ -222,7 +289,7 @@ public class TeachingStats : System.IDisposable{
             throw;
         }        
     }
-
+   
     public bool CheckIfUpgraded(){        
         try{
             //closed on dispose
