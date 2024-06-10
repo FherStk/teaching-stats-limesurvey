@@ -183,7 +183,7 @@
                 //"args": ["-ll", "SMX2D"],
 
             // ### LOAD DATA FROM Google Forms (CSV) TO TeachingStats BBDD
-                //"args": ["-lg", "<somepath>/*.csv"],
+                //"args": ["-lg", "<some path>"],
                         
             "cwd": "${workspaceFolder}",
             // For more information about the 'console' field, see https://aka.ms/VSCode-CS-LaunchJson-Console

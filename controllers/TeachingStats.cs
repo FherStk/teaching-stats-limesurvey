@@ -102,22 +102,26 @@ public class TeachingStats : System.IDisposable{
 
                     foreach (DataRow row in dt.Rows)
                     {
-                        //5 numeric questions (schools) 
-                        for(short sort = 1; sort < 6; sort++){                            
-                            data.Add(ParseAnswerFromGoogleForms(evalID, dt.Columns, row, sort, QuestionType.Numeric, group, "Centre"));
-                        }                                                
-
+                        int limit = 0;
                         var timestamp = DateTime.Parse(row[0].ToString() ?? "");
+                        if(timestamp.Year == 2022) limit = 6;
+                        else if(timestamp.Year >= 2023) limit = 5;
+
+                        for(int sort = 1; sort < limit; sort++){                            
+                            data.Add(ParseAnswerFromGoogleForms(evalID, dt.Columns, row, sort, sort+1, QuestionType.Numeric, group, "Centre"));
+                        }                                                                                        
+
                         if(timestamp.Year < 2024){
-                            data.Add(ParseAnswerFromGoogleForms(evalID, dt.Columns, row, 6, QuestionType.Text, group, "Centre"));
+                            data.Add(ParseAnswerFromGoogleForms(evalID, dt.Columns, row, limit, limit+1, QuestionType.Text, group, "Centre"));  
                         }
-                        else{
-                            data.Add(ParseAnswerFromGoogleForms(evalID, dt.Columns, row, 14, QuestionType.Text, group, "Centre"));
+                        else{    
+                            int newLimit = limit + 7;
+                            data.Add(ParseAnswerFromGoogleForms(evalID, dt.Columns, row, limit, newLimit+1, QuestionType.Text, group, "Centre"));
                             
-                            //+ 7 numeric questions (services)
+                            //+ 7 numeric questions (services)                            
                             evalID++;
-                            for(short sort = 6; sort < 14; sort++){
-                                data.Add(ParseAnswerFromGoogleForms(evalID, dt.Columns, row, sort, QuestionType.Numeric, group, "Serveis"));
+                            for(int statement = limit+1, sort = 1; statement < newLimit; statement++, sort++){
+                                data.Add(ParseAnswerFromGoogleForms(evalID, dt.Columns, row, sort, statement, QuestionType.Numeric, group, "Serveis"));
                             }                             
                         }
                         
@@ -234,17 +238,23 @@ public class TeachingStats : System.IDisposable{
         };
     }
 
-    private EF.Answer ParseAnswerFromGoogleForms(int evalID, DataColumnCollection cols, DataRow data, short sort, QuestionType type, string group, string topic){        
+    private EF.Answer ParseAnswerFromGoogleForms(int evalID, DataColumnCollection cols, DataRow data, int sort, int column, QuestionType type, string group, string topic){        
         var timestamp = DateTime.Parse(data[0].ToString() ?? "");
-        var level = group.Substring(0, group.Length-1);
+        var level = group.Substring(0, 3);
+
+        string? value = data[column].ToString();
+        if(timestamp.Year > 2022 && type == QuestionType.Numeric){
+            //Range [1,5] should be transformed into [0-10]
+            value = (int.Parse(data[column].ToString() ?? "-1") / 5 * 10).ToString();
+        }
 
         return new EF.Answer(){
             EvaluationId = evalID,
-            QuestionSort = sort,
+            QuestionSort = (short)sort,
             Timestamp = timestamp,
             Year = timestamp.Year,
-            Value = data[sort+1].ToString(),
-            QuestionStatement = cols[sort+1].ColumnName,
+            Value = value,
+            QuestionStatement = cols[column].ColumnName,
             QuestionType = type.ToString(),
             Degree = level,
             Level = level,
