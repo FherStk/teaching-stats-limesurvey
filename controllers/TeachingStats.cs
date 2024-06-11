@@ -81,6 +81,11 @@ public class TeachingStats : System.IDisposable{
             }                
         }
         
+        //TODO: 2024-2025: remove this commented block, already fixed (has been used to manually fix some incorrect data)
+        // foreach(var d in data.Where(x => x.Topic == "Serveis")){
+        //     d.Topic = "Serveis (professorat)";
+        // }
+
         StoreDataIntoTeachingStatsBBDD(data);        
     }
 
@@ -178,7 +183,7 @@ public class TeachingStats : System.IDisposable{
             groups[prefix].Add((JProperty)answer);            
         }
 
-        foreach(var answer in allAnswersFromOneUser.Children().Where(x => x.GetType() == typeof(JProperty)).Where(x => ((JProperty)x).Name.StartsWith("FCT") || ((JProperty)x).Name.StartsWith("MNT") || ((JProperty)x).Name.StartsWith("SCH") || ((JProperty)x).Name.StartsWith("SRV"))){
+        foreach(var answer in allAnswersFromOneUser.Children().Where(x => x.GetType() == typeof(JProperty)).Where(x => ((JProperty)x).Name.StartsWith("FCT") || ((JProperty)x).Name.StartsWith("MNT") || ((JProperty)x).Name.StartsWith("SCH") || ((JProperty)x).Name.StartsWith("SRV") || ((JProperty)x).Name.StartsWith("PAS") || ((JProperty)x).Name.StartsWith("TCH"))){
             var prefix = ((JProperty)answer).Name.Substring(0,3);                        
             if(!groups.ContainsKey(prefix)) groups.Add(prefix, new List<JProperty>());
             groups[prefix].Add((JProperty)answer);            
@@ -217,6 +222,9 @@ public class TeachingStats : System.IDisposable{
             }
         }
         degree = degree.Substring(0, cut);
+
+        //TODO: 2024-2025: the following line can be removed (already fixed)
+        if(prefix == "SQ0") prefix = "PAS";
 
         //Note: the answers will come as teaching-stats database needs, because has been setup like this within the 'equation' property.
         return new EF.Answer(){
