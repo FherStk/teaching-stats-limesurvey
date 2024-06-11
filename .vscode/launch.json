@@ -182,6 +182,10 @@
                 //"args": ["-ll", "SMX2C"],
                 //"args": ["-ll", "SMX2D"],
 
+                //"args": ["-ll", "TEACHERS-ESO"],
+                //"args": ["-ll", "TEACHERS-CCFF"],
+                //"args": ["-ll", "PAS"],
+
             // ### LOAD DATA FROM Google Forms (CSV) TO TeachingStats BBDD
                 //"args": ["-lg", "<some path>/*.csv"],
                         
