@@ -89,7 +89,7 @@ public class TeachingStats : System.IDisposable{
         StoreDataIntoTeachingStatsBBDD(data);        
     }
 
-    public void ImportFromGoogleFormsCSV(string csvFilePath){  
+    public void ImportFromGoogleFormsESO(string csvFilePath){  
         var data = new List<EF.Answer>();
 
         using (var reader = new StreamReader(csvFilePath, System.Text.Encoding.UTF8))
@@ -129,6 +129,93 @@ public class TeachingStats : System.IDisposable{
                                 data.Add(ParseAnswerFromGoogleForms(evalID, dt.Columns, row, sort, statement, QuestionType.Numeric, group, "Serveis"));
                             }                             
                         }
+                        
+                        evalID++;
+                    }
+                }                                
+            }
+            
+        StoreDataIntoTeachingStatsBBDD(data);    
+    }
+
+    public void ImportFromGoogleFormsRisks(string csvFilePath){  
+        var data = new List<EF.Answer>();
+
+        using (var reader = new StreamReader(csvFilePath, System.Text.Encoding.UTF8))
+            using (var csv = new CsvHelper.CsvReader(reader, System.Globalization.CultureInfo.InvariantCulture))
+            {  
+
+                // Do any configuration to `CsvReader` before creating CsvDataReader.
+                using (var dr = new CsvHelper.CsvDataReader(csv))
+                {		
+                    var dt = new System.Data.DataTable();
+                    dt.Load(dr);
+                    
+                    int evalID = 1;                                        
+                    foreach (DataRow row in dt.Rows)
+                    {
+                        int limit = 6;                        
+                        for(int col = 0; col < limit; col++){                            
+                            data.Add(ParseAnswerFromGoogleForms(evalID, dt.Columns, row, col+1, col, QuestionType.Numeric, string.Empty, "Riscos"));
+                        }                                                                                        
+
+                        data.Add(ParseAnswerFromGoogleForms(evalID, dt.Columns, row, limit+1, limit, QuestionType.Text, string.Empty, "Riscos"));                                                 
+                        evalID++;
+                    }
+                }                                
+            }
+            
+        StoreDataIntoTeachingStatsBBDD(data);    
+    }
+
+    public void ImportFromGoogleFormsFamilies(string csvFilePath){  
+        var data = new List<EF.Answer>();
+
+        using (var reader = new StreamReader(csvFilePath, System.Text.Encoding.UTF8))
+            using (var csv = new CsvHelper.CsvReader(reader, System.Globalization.CultureInfo.InvariantCulture))
+            {  
+
+                // Do any configuration to `CsvReader` before creating CsvDataReader.
+                using (var dr = new CsvHelper.CsvDataReader(csv))
+                {		
+                    var dt = new System.Data.DataTable();
+                    dt.Load(dr);
+                    
+                    int evalID = 1;                   
+                    foreach (DataRow row in dt.Rows)
+                    {
+                        string level = string.Empty;
+                        switch(row[1].ToString()){
+                            case "ESO":
+                                level = "ESO";
+                                break;
+
+                            case "Batxillerat":
+                                level = "BTX";
+                                break;
+
+                            default:
+                                level = "CF";
+                                break;
+                        }
+                        
+                        int limit1 = 4;                        
+                        for(int sort = 1; sort < limit1; sort++){                            
+                            data.Add(ParseAnswerFromGoogleForms(evalID, dt.Columns, row, sort, sort+1, QuestionType.Numeric, level, "Families-Centre"));
+                        }                                                                                        
+                        data.Add(ParseAnswerFromGoogleForms(evalID, dt.Columns, row, limit1, limit1+1, QuestionType.Text, level, "Families-Centre"));  
+
+                        int limit2 = 3;                        
+                        for(int sort = 1; sort < limit2; sort++){      
+                            data.Add(ParseAnswerFromGoogleForms(evalID, dt.Columns, row, sort, sort+limit1+1, QuestionType.Numeric, level, "Families-Secretaria"));
+                        }                                                                                        
+                        data.Add(ParseAnswerFromGoogleForms(evalID, dt.Columns, row, limit2, limit1+limit2+1, QuestionType.Text, level, "Families-Secretaria"));  
+                        
+                        int limit3 = 2;                        
+                        for(int sort = 1; sort < limit3; sort++){      
+                            data.Add(ParseAnswerFromGoogleForms(evalID, dt.Columns, row, sort, sort+limit1+limit2+1, QuestionType.Numeric, level, "Families-Conserjeria"));
+                        }                                                                                        
+                        data.Add(ParseAnswerFromGoogleForms(evalID, dt.Columns, row, limit2, limit1+limit2+limit3+1, QuestionType.Text, level, "Families-Conserjeria"));  
                         
                         evalID++;
                     }
@@ -248,7 +335,7 @@ public class TeachingStats : System.IDisposable{
 
     private EF.Answer ParseAnswerFromGoogleForms(int evalID, DataColumnCollection cols, DataRow data, int sort, int column, QuestionType type, string group, string topic){        
         var timestamp = DateTime.Parse(data[0].ToString() ?? "");
-        var level = group.Substring(0, 3);
+        var level = string.IsNullOrEmpty(group) || group.Length < 3 ? group : group.Substring(0, 3);
 
         string? value = data[column].ToString();
         if(timestamp.Year > 2022 && type == QuestionType.Numeric){

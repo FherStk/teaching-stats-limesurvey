@@ -85,10 +85,20 @@ internal class Program
                         }
                         break;   
 
-                    case "--load-googleforms":
-                    case "-lg":      
-                        GoogleFormsToMetabase(Directory.GetFiles(Path.GetDirectoryName(args[i+1]) ?? "", Path.GetFileName(args[i+1])));                
-                        break;                                        
+                    case "--load-googleforms-eso":
+                    case "-lg-eso":      
+                        GoogleFormsToMetabaseESO(Directory.GetFiles(Path.GetDirectoryName(args[i+1]) ?? "", Path.GetFileName(args[i+1])));                
+                        break;        
+
+                    case "--load-googleforms-risks":
+                    case "-lg-risks":      
+                        GoogleFormsToMetabaseRisks(Directory.GetFiles(Path.GetDirectoryName(args[i+1]) ?? "", Path.GetFileName(args[i+1])));                
+                        break;        
+
+                    case "--load-googleforms-families":
+                    case "-lg-families":      
+                        GoogleFormsToMetabaseFamilies(Directory.GetFiles(Path.GetDirectoryName(args[i+1]) ?? "", Path.GetFileName(args[i+1])));                
+                        break;                           
                 }  
 
                 i++;
@@ -463,7 +473,7 @@ internal class Program
     /// Imports all the GoogleForms results to Metabase.
     /// </summary>
     /// <param name="files">A set of CSV file paths, the group will be taken from the file name.</param>
-    private static void GoogleFormsToMetabase(string[] files){ 
+    private static void GoogleFormsToMetabaseFamilies(string[] files){ 
         if(files.Length == 0) Error("Unable to find the specified file");
         else{
             foreach (var f in files.OrderBy(x => x))
@@ -471,7 +481,7 @@ internal class Program
                 //Conversions must be done first for 1st level (which generates the 1st level file) and then for 2nd level (which
                 //generates the 2nd level file and updates the 1st level ones).
                 if(!File.Exists(f)) throw new FileNotFoundException("File not found!", f);
-                GoogleFormsToMetabase(f);                    
+                GoogleFormsToMetabaseFamilies(f);                    
             }     
         }                                   
     }
@@ -480,12 +490,82 @@ internal class Program
     /// Imports to Metabase the provided Google Forms CSV file. The group data will be taken from the file's name.
     /// </summary>
     /// <param name="files">A single CSV file path.</param>
-    private static void GoogleFormsToMetabase(string filePath){
+    private static void GoogleFormsToMetabaseFamilies(string filePath){
         Info($"Importing Google Froms CSV data from ({Path.GetFileName(filePath)})... ");        
 
         using(var ts = new TeachingStats()){      
             try{
-                ts.ImportFromGoogleFormsCSV(filePath);           
+                ts.ImportFromGoogleFormsFamilies(filePath);           
+                Success($"OK");
+            }
+            catch(Exception ex){
+                Error($"ERROR: {ex}");
+            }
+        }        
+    }
+    
+    /// <summary>
+    /// Imports all the GoogleForms results to Metabase.
+    /// </summary>
+    /// <param name="files">A set of CSV file paths, the group will be taken from the file name.</param>
+    private static void GoogleFormsToMetabaseRisks(string[] files){ 
+        if(files.Length == 0) Error("Unable to find the specified file");
+        else{
+            foreach (var f in files.OrderBy(x => x))
+            {
+                //Conversions must be done first for 1st level (which generates the 1st level file) and then for 2nd level (which
+                //generates the 2nd level file and updates the 1st level ones).
+                if(!File.Exists(f)) throw new FileNotFoundException("File not found!", f);
+                GoogleFormsToMetabaseRisks(f);                    
+            }     
+        }                                   
+    }
+
+    /// <summary>
+    /// Imports to Metabase the provided Google Forms CSV file. The group data will be taken from the file's name.
+    /// </summary>
+    /// <param name="files">A single CSV file path.</param>
+    private static void GoogleFormsToMetabaseRisks(string filePath){
+        Info($"Importing Google Froms CSV data from ({Path.GetFileName(filePath)})... ");        
+
+        using(var ts = new TeachingStats()){      
+            try{
+                ts.ImportFromGoogleFormsRisks(filePath);           
+                Success($"OK");
+            }
+            catch(Exception ex){
+                Error($"ERROR: {ex}");
+            }
+        }        
+    }
+    
+    /// <summary>
+    /// Imports all the GoogleForms results to Metabase.
+    /// </summary>
+    /// <param name="files">A set of CSV file paths, the group will be taken from the file name.</param>
+    private static void GoogleFormsToMetabaseESO(string[] files){ 
+        if(files.Length == 0) Error("Unable to find the specified file");
+        else{
+            foreach (var f in files.OrderBy(x => x))
+            {
+                //Conversions must be done first for 1st level (which generates the 1st level file) and then for 2nd level (which
+                //generates the 2nd level file and updates the 1st level ones).
+                if(!File.Exists(f)) throw new FileNotFoundException("File not found!", f);
+                GoogleFormsToMetabaseESO(f);                    
+            }     
+        }                                   
+    }
+
+    /// <summary>
+    /// Imports to Metabase the provided Google Forms CSV file. The group data will be taken from the file's name.
+    /// </summary>
+    /// <param name="files">A single CSV file path.</param>
+    private static void GoogleFormsToMetabaseESO(string filePath){
+        Info($"Importing Google Froms CSV data from ({Path.GetFileName(filePath)})... ");        
+
+        using(var ts = new TeachingStats()){      
+            try{
+                ts.ImportFromGoogleFormsESO(filePath);           
                 Success($"OK");
             }
             catch(Exception ex){
