@@ -1,17 +1,8 @@
-<<<<<<< HEAD
-﻿
-Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.5.002.0
-MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "teaching-stats-limesurvey", "teaching-stats-limesurvey.csproj", "{D2CA812D-B8BF-47CE-B94F-6A8B583050D5}"
-=======
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.5.2.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "teaching-stats-limesurvey", "teaching-stats-limesurvey.csproj", "{28D5062D-B15E-07A6-326E-3A70E6E293CD}"
->>>>>>> a00fc55584472896af840fe86fcc1a3391510201
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -19,26 +10,15 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-<<<<<<< HEAD
-		{D2CA812D-B8BF-47CE-B94F-6A8B583050D5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D2CA812D-B8BF-47CE-B94F-6A8B583050D5}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D2CA812D-B8BF-47CE-B94F-6A8B583050D5}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D2CA812D-B8BF-47CE-B94F-6A8B583050D5}.Release|Any CPU.Build.0 = Release|Any CPU
-=======
 		{28D5062D-B15E-07A6-326E-3A70E6E293CD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{28D5062D-B15E-07A6-326E-3A70E6E293CD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{28D5062D-B15E-07A6-326E-3A70E6E293CD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{28D5062D-B15E-07A6-326E-3A70E6E293CD}.Release|Any CPU.Build.0 = Release|Any CPU
->>>>>>> a00fc55584472896af840fe86fcc1a3391510201
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-<<<<<<< HEAD
-		SolutionGuid = {91F3FC90-EBD9-4889-9788-F38C1ACA0F41}
-=======
 		SolutionGuid = {BE40F9A4-E5E9-4179-86CF-4D33D5285278}
->>>>>>> a00fc55584472896af840fe86fcc1a3391510201
 	EndGlobalSection
 EndGlobal
