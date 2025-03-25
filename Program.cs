@@ -2,7 +2,7 @@
 
 internal class Program
 {
-    public const string Version = "2023-2024.2.0";
+    public const string Version = "2023-2024.2.1";
     public static Dictionary<Survey.Participant, List<Settings.SubjectData>>? EnrollmentWarnings {get; private set;}
 
     static void Main(string[] args)
