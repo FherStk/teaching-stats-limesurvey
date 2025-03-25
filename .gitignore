@@ -2,8 +2,10 @@
 obj
 bin
 config/*
-actions/*
+data/*
+surveys/*
 
 # Allow
 !config/settings.yml.template
-!actions/create-surveys.yml.template
+!data/create-surveys.yml.template
+!surveys/template.txt

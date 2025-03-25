@@ -18,7 +18,12 @@ public class Settings
         public string? Host {get; set;}
         public string? Username {get; set;}
         public string? Password {get; set;}
-        public int Group {get; set;}
+        public List<GroupsData>? Groups {get; set;}
+    }
+
+    public class GroupsData{
+        public string? Group {get; set;}
+        public int Id {get; set;}
     }
 
     public class MasterData{
@@ -27,7 +32,12 @@ public class Settings
     }
 
     public class CaptionsData{
+        public string? Survey {get; set;}
         public string? School {get; set;}
+        public string? Services {get; set;}
+        
+        [YamlMember(Alias ="fct", ApplyNamingConventions = false)]
+        public string? FCT {get; set;}
         
         [YamlMember(Alias ="mentoring-1-ccff", ApplyNamingConventions = false)]
         public string? Mentoring1 {get; set;}
@@ -37,6 +47,8 @@ public class Settings
     }
 
     public class DegreeData{
+        public string? Code {get; set;}
+        public string? Acronym {get; set;}
         public string? Name {get; set;}
         public string? Department {get; set;}
         public List<SubjectData>? Subjects {get; set;}
@@ -44,6 +56,7 @@ public class Settings
 
     public class SubjectData{
         public string? Code {get; set;}
+        public string? Acronym {get; set;}
         public string? Name {get; set;}
         public List<string>? Ids {get; set;}
         public List<TrainerData>? Trainers {get; set;}

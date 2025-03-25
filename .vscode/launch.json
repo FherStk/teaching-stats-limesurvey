@@ -11,15 +11,186 @@
             "preLaunchTask": "build",
             // If you have changed target frameworks, make sure to update the program path.
             "program": "${workspaceFolder}/bin/Debug/net6.0/teaching-stats-limesurvey.dll",
-            //"args": ["-sc", "/home/fher/Descargas/pendents/AIF2A.csv"],               //--saga-create (single file)
-            //"args": ["-sc", "/home/fher/Descargas/input/*.csv"],                      //--saga-create (batch)            
-            //"args": ["-ss"],                                                          //--start-surveys
-            //"args": ["-sr"],                                                          //--send-reminders
-            //"args": ["-si"],                                                          //--send-invitations
-            "args": ["-ll"],                                                            //--loads data from limesurvey to teaching-stats
-            //"args": ["-cs", "actions/create-surveys-ASIX1A.yml"],                     //--create-survey (single file)
-            //"args": ["-cs", "actions/*.yml"],                                         //--create-survey (batch)
-            //"args": ["-es"],                                                          //--expire-surveys
+            // ### SAGA CONVERT (CSV -> YAML) ###
+                //"args": ["-sc", "/home/fher/Descargas/CSV/*.csv"],
+
+                //"args": ["-sc", "/home/fher/Descargas/AIF1A.csv"],
+                //"args": ["-sc", "/home/fher/Descargas/AIF2A.csv"],
+
+                //"args": ["-sc", "/home/fher/Descargas/ASIX1A.csv"],
+                //"args": ["-sc", "/home/fher/Descargas/ASIX2A.csv"],
+                //"args": ["-sc", "/home/fher/Descargas/ASIX2B.csv"],
+
+                //"args": ["-sc", "/home/fher/Descargas/DAM1A.csv"],
+                //"args": ["-sc", "/home/fher/Descargas/DAM2A.csv"],
+                //"args": ["-sc", "/home/fher/Descargas/DAM2B.csv"],
+
+                //"args": ["-sc", "/home/fher/Descargas/DAW1A.csv"],
+
+                //"args": ["-sc", "/home/fher/Descargas/GA1A.csv"],
+                //"args": ["-sc", "/home/fher/Descargas/GA2A.csv"],
+
+                //"args": ["-sc", "/home/fher/Descargas/SMX1A.csv"],
+                //"args": ["-sc", "/home/fher/Descargas/SMX1B.csv"],
+                //"args": ["-sc", "/home/fher/Descargas/SMX1C.csv"],
+                //"args": ["-sc", "/home/fher/Descargas/SMX1D.csv"],
+                //"args": ["-sc", "/home/fher/Descargas/SMX2A.csv"],
+                //"args": ["-sc", "/home/fher/Descargas/SMX2B.csv"],
+                //"args": ["-sc", "/home/fher/Descargas/SMX2C.csv"],
+                //"args": ["-sc", "/home/fher/Descargas/SMX2D.csv"],
+                                   
+            // ### CREATE SURVEY (YAML -> LIMESURVEY) ###
+                //"args": ["-cs", "data/*.yml"],
+            
+                //"args": ["-cs", "data/create-surveys-AIF1A.yml"],
+                //"args": ["-cs", "data/create-surveys-AIF2A.yml"],
+
+                //"args": ["-cs", "data/create-surveys-ASIX1A.yml"],
+                //"args": ["-cs", "data/create-surveys-ASIX2A.yml"],
+                //"args": ["-cs", "data/create-surveys-ASIX2B.yml"],
+
+                //"args": ["-cs", "data/create-surveys-DAM1A.yml"],
+                //"args": ["-cs", "data/create-surveys-DAM2A.yml"],
+                //"args": ["-cs", "data/create-surveys-DAM2B.yml"],
+
+                //"args": ["-cs", "data/create-surveys-DAW1A.yml"],
+
+                //"args": ["-cs", "data/create-surveys-GA1A.yml"],
+                //"args": ["-cs", "data/create-surveys-GA2A.yml"],
+
+                //"args": ["-cs", "data/create-surveys-SMX1A.yml"],
+                //"args": ["-cs", "data/create-surveys-SMX1B.yml"],
+                //"args": ["-cs", "data/create-surveys-SMX1C.yml"],
+                //"args": ["-cs", "data/create-surveys-SMX1D.yml"],
+                //"args": ["-cs", "data/create-surveys-SMX2A.yml"],
+                //"args": ["-cs", "data/create-surveys-SMX2B.yml"],
+                //"args": ["-cs", "data/create-surveys-SMX2C.yml"],
+                //"args": ["-cs", "data/create-surveys-SMX2D.yml"],
+
+            // ### START SURVEY (ALSO SEND INVITATIONS) ###
+                //"args": ["-ss"],
+
+                //"args": ["-ss", "AIF1A"],
+                //"args": ["-ss", "AIF2A"],
+
+                //"args": ["-ss", "ASIX1A"],
+                //"args": ["-ss", "ASIX2A"],
+                //"args": ["-ss", "ASIX2B"],
+
+                //"args": ["-ss", "DAM1A"],
+                //"args": ["-ss", "DAM2A"],
+                //"args": ["-ss", "DAM2B"],
+
+                //"args": ["-ss", "DAW1A"],
+
+                //"args": ["-ss", "GA1A"],
+                //"args": ["-ss", "GA2A"],
+
+                //"args": ["-ss", "SMX1A"],
+                //"args": ["-ss", "SMX1B"],
+                //"args": ["-ss", "SMX1C"],
+                //"args": ["-ss", "SMX1D"],
+                //"args": ["-ss", "SMX2A"],
+                //"args": ["-ss", "SMX2B"],
+                //"args": ["-ss", "SMX2C"],
+                //"args": ["-ss", "SMX2D"],
+
+            // ### SEND PENDING INVITATIONS ###
+                //"args": ["-si"],
+
+            // ### SEND REMINDERS ###
+                //"args": ["-sr"],
+
+                //"args": ["-sr", "AIF1A"],
+                //"args": ["-sr", "AIF2A"],
+
+                //"args": ["-sr", "ASIX1A"],
+                //"args": ["-sr", "ASIX2A"],
+                //"args": ["-sr", "ASIX2B"],
+
+                //"args": ["-sr", "DAM1A"],
+                //"args": ["-sr", "DAM2A"],
+                //"args": ["-sr", "DAM2B"],
+
+                //"args": ["-sr", "DAW1A"],
+
+                //"args": ["-sr", "GA1A"],
+                //"args": ["-sr", "GA2A"],
+
+                //"args": ["-sr", "SMX1A"],
+                //"args": ["-sr", "SMX1B"],
+                //"args": ["-sr", "SMX1C"],
+                //"args": ["-sr", "SMX1D"],
+                //"args": ["-sr", "SMX2A"],
+                //"args": ["-sr", "SMX2B"],
+                //"args": ["-sr", "SMX2C"],
+                //"args": ["-sr", "SMX2D"],
+
+            // ### EXPIRE SURVEYS (NO MORE ANSWERS ALLOWED BUT NOTHING REMOVED) ###
+                //"args": ["-es"],
+
+                //"args": ["-es", "AIF1A"],
+                //"args": ["-es", "AIF2A"],
+
+                //"args": ["-es", "ASIX1A"],
+                //"args": ["-es", "ASIX2A"],
+                //"args": ["-es", "ASIX2B"],
+
+                //"args": ["-es", "DAM1A"],
+                //"args": ["-es", "DAM2A"],
+                //"args": ["-es", "DAM2B"],
+
+                //"args": ["-es", "DAW1A"],
+
+                //"args": ["-es", "GA1A"],
+                //"args": ["-es", "GA2A"],
+
+                //"args": ["-es", "SMX1A"],
+                //"args": ["-es", "SMX1B"],
+                //"args": ["-es", "SMX1C"],
+                //"args": ["-es", "SMX1D"],
+                //"args": ["-es", "SMX2A"],
+                //"args": ["-es", "SMX2B"],
+                //"args": ["-es", "SMX2C"],
+                //"args": ["-es", "SMX2D"],
+            
+            // ### LOAD DATA FROM LimeSurvey TO TeachingStats BBDD (BEWARE: DO NOT LOAD ALREADY LOADED SURVEYS, DUPED DATA WILL BE CREATED) ###
+                //"args": ["-ll"],
+
+                //"args": ["-ll", "AIF1A"],
+                //"args": ["-ll", "AIF2A"],
+
+                //"args": ["-ll", "ASIX1A"],
+                //"args": ["-ll", "ASIX2A"],
+                //"args": ["-ll", "ASIX2B"],
+
+                //"args": ["-ll", "DAM1A"],
+                //"args": ["-ll", "DAM2A"],
+                //"args": ["-ll", "DAM2B"],
+
+                //"args": ["-ll", "DAW1A"],
+
+                //"args": ["-ll", "GA1A"],
+                //"args": ["-ll", "GA2A"],
+
+                //"args": ["-ll", "SMX1A"],
+                //"args": ["-ll", "SMX1B"],
+                //"args": ["-ll", "SMX1C"],
+                //"args": ["-ll", "SMX1D"],
+                //"args": ["-ll", "SMX2A"],
+                //"args": ["-ll", "SMX2B"],
+                //"args": ["-ll", "SMX2C"],
+                //"args": ["-ll", "SMX2D"],
+
+                //"args": ["-ll", "TEACHERS-ESO"],
+                //"args": ["-ll", "TEACHERS-CCFF"],
+                //"args": ["-ll", "PAS"],
+
+            // ### LOAD DATA FROM Google Forms (CSV) TO TeachingStats BBDD
+                //"args": ["-lg-eso", "<some path>/*.csv"],
+                //"args": ["-lg-risks", "<some path>/*.csv"],
+                //"args": ["-lg-families", "<some path>/*.csv"],
+                        
             "cwd": "${workspaceFolder}",
             // For more information about the 'console' field, see https://aka.ms/VSCode-CS-LaunchJson-Console
             "console": "integratedTerminal",

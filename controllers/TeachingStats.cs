@@ -1,6 +1,8 @@
 using Npgsql;
 using System;
 using Newtonsoft.Json.Linq;
+using System.Runtime.InteropServices;
+using System.Data;
 
 public class TeachingStats : System.IDisposable{    
     public NpgsqlConnection Connection {get; private set;}
@@ -20,8 +22,211 @@ public class TeachingStats : System.IDisposable{
     public void ImportFromLimeSurvey(JArray questions, JObject answers){
         //TODO: with the new "import CSV survey" mechanism, no quesion data will be needed. Everything will come at answer level.
         //      the only problem with the "import CSV mechanism" is that the "survey group/section" cannot be assigned automatically.
-        var data = ParseFromLimeSurveyToTeachingStats(questions, answers);
+       //NOTE: the questions json is needed because the LimeSurvey API is not exporting the question statement even when requested for...
         
+        //Setup global data
+        var statements = new Dictionary<string, string>();
+        foreach(var q in questions){
+            var title = (q["title"] ?? "").ToString();
+            var parentID = int.Parse((q["parent_qid"] ?? "0").ToString());
+            
+            /*
+                Questions that should be added are:
+                    Comments -> Title contains "comments.
+                    Questions -> parent_quid != "0"
+            */
+            if(title.Contains("comments") || parentID > 0) statements.Add(title, (q["question"] ?? "").ToString());
+        }            
+
+        //Setting up responses
+        var responses = answers["responses"];
+        if(responses == null) throw new Exception("Unable to parse, the 'responses' array seems to be missing.");
+
+        int evalID = 1;
+        var data = new List<EF.Answer>();
+        foreach(var response in responses){            
+            if(response.First == null || response.First.First == null) throw new Exception("Unable to parse, the 'responses' array seems to be empty.");
+            var allAnswersFromOneUser = response.First.First;            
+
+            //TODO: 2024-2025 -> SUB1 should be SUB01 -> SUB1 vs SUB11 -> SUB01 vs SUB11. This will simplify A LOT of work. (substring(0,5) for all SUB) 
+                //Group by question type (SUBx, FCT, MNT, SCH, SRV), in order to correctly set the "sort" and the "evalID".
+                //var subjects = allAnswersFromOneUser.Children().Where(x => x.GetType() == typeof(JProperty)).Where(x => ((JProperty)x).Name.StartsWith("SUB")).GroupBy(x => ((JProperty)x).Name.Substring(0, 4));
+                //var topics = subjects.Concat(allAnswersFromOneUser.Children().Where(x => x.GetType() == typeof(JProperty)).Where(x => ((JProperty)x).Name.StartsWith("FCT") || ((JProperty)x).Name.StartsWith("MNT") || ((JProperty)x).Name.StartsWith("SCH") || ((JProperty)x).Name.StartsWith("SRV")).GroupBy(x => ((JProperty)x).Name.Substring(0, 3))).ToDictionary(x => x.Key);
+            
+            var topics = GroupAnswersByTopic(allAnswersFromOneUser);
+            foreach(var key in topics.Keys){                                
+                var numeric = topics[key].Where(x => x.Name.Contains("questions")).Cast<JProperty>().ToList();
+                var comments = topics[key].Where(x => x.Name.Contains("comments")).Cast<JProperty>().ToList();                             
+
+                //Setup the question shared values
+                //Unable to get only the completed ones (the API fails on filtering, so it will be filtered here) using the timestamp field.            
+                var timeStamp = (allAnswersFromOneUser["submitdate"] ?? "").ToString();
+
+                if(!string.IsNullOrEmpty(timeStamp)){
+                    var parsedDateTime = DateTime.Now;
+                    DateTime.TryParse(timeStamp, out parsedDateTime);
+                    var year = parsedDateTime.Year;
+                
+                    //Store the splitted answers            
+                    short sort = 1;
+                    foreach(var answer in numeric.OrderBy(x => x.Name))
+                        data.Add(ParseAnswerFromLimeSurvey(evalID, statements, allAnswersFromOneUser, answer, sort++, timeStamp, year, QuestionType.Numeric));
+
+                    foreach(var answer in comments.OrderBy(x => x.Name))
+                        data.Add(ParseAnswerFromLimeSurvey(evalID, statements, allAnswersFromOneUser, answer, sort++, timeStamp, year, QuestionType.Text));
+                    
+                    //All the responses from the same group will share the ID;
+                    evalID++;    
+                }  
+            }                
+        }
+        
+        //TODO: 2024-2025: remove this commented block, already fixed (has been used to manually fix some incorrect data)
+        // foreach(var d in data.Where(x => x.Topic == "Serveis")){
+        //     d.Topic = "Serveis (professorat)";
+        // }
+
+        StoreDataIntoTeachingStatsBBDD(data);        
+    }
+
+    public void ImportFromGoogleFormsESO(string csvFilePath){  
+        var data = new List<EF.Answer>();
+
+        using (var reader = new StreamReader(csvFilePath, System.Text.Encoding.UTF8))
+            using (var csv = new CsvHelper.CsvReader(reader, System.Globalization.CultureInfo.InvariantCulture))
+            {  
+
+                // Do any configuration to `CsvReader` before creating CsvDataReader.
+                using (var dr = new CsvHelper.CsvDataReader(csv))
+                {		
+                    var dt = new System.Data.DataTable();
+                    dt.Load(dr);
+                    
+                    int evalID = 1;                                        
+                    var group = Path.GetFileNameWithoutExtension(csvFilePath);
+
+                    foreach (DataRow row in dt.Rows)
+                    {
+                        int limit = 0;
+                        var timestamp = DateTime.Parse(row[0].ToString() ?? "");
+                        if(timestamp.Year == 2022) limit = 6;
+                        else if(timestamp.Year >= 2023) limit = 5;
+
+                        for(int sort = 1; sort < limit; sort++){                            
+                            data.Add(ParseAnswerFromGoogleForms(evalID, dt.Columns, row, sort, sort+1, QuestionType.Numeric, group, "Centre"));
+                        }                                                                                        
+
+                        if(timestamp.Year < 2024){
+                            data.Add(ParseAnswerFromGoogleForms(evalID, dt.Columns, row, limit, limit+1, QuestionType.Text, group, "Centre"));  
+                        }
+                        else{    
+                            int newLimit = limit + 8;
+                            data.Add(ParseAnswerFromGoogleForms(evalID, dt.Columns, row, limit, newLimit, QuestionType.Text, group, "Centre"));
+                            
+                            //+ 7 numeric questions (services)                            
+                            evalID++;
+                            for(int statement = limit+1, sort = 1; statement < newLimit; statement++, sort++){
+                                data.Add(ParseAnswerFromGoogleForms(evalID, dt.Columns, row, sort, statement, QuestionType.Numeric, group, "Serveis"));
+                            }                             
+                        }
+                        
+                        evalID++;
+                    }
+                }                                
+            }
+            
+        StoreDataIntoTeachingStatsBBDD(data);    
+    }
+
+    public void ImportFromGoogleFormsRisks(string csvFilePath){  
+        var data = new List<EF.Answer>();
+
+        using (var reader = new StreamReader(csvFilePath, System.Text.Encoding.UTF8))
+            using (var csv = new CsvHelper.CsvReader(reader, System.Globalization.CultureInfo.InvariantCulture))
+            {  
+
+                // Do any configuration to `CsvReader` before creating CsvDataReader.
+                using (var dr = new CsvHelper.CsvDataReader(csv))
+                {		
+                    var dt = new System.Data.DataTable();
+                    dt.Load(dr);
+                    
+                    int evalID = 1;                                        
+                    foreach (DataRow row in dt.Rows)
+                    {
+                        int limit = 6;                        
+                        for(int col = 0; col < limit; col++){                            
+                            data.Add(ParseAnswerFromGoogleForms(evalID, dt.Columns, row, col+1, col, QuestionType.Numeric, string.Empty, "Riscos"));
+                        }                                                                                        
+
+                        data.Add(ParseAnswerFromGoogleForms(evalID, dt.Columns, row, limit+1, limit, QuestionType.Text, string.Empty, "Riscos"));                                                 
+                        evalID++;
+                    }
+                }                                
+            }
+            
+        StoreDataIntoTeachingStatsBBDD(data);    
+    }
+
+    public void ImportFromGoogleFormsFamilies(string csvFilePath){  
+        var data = new List<EF.Answer>();
+
+        using (var reader = new StreamReader(csvFilePath, System.Text.Encoding.UTF8))
+            using (var csv = new CsvHelper.CsvReader(reader, System.Globalization.CultureInfo.InvariantCulture))
+            {  
+
+                // Do any configuration to `CsvReader` before creating CsvDataReader.
+                using (var dr = new CsvHelper.CsvDataReader(csv))
+                {		
+                    var dt = new System.Data.DataTable();
+                    dt.Load(dr);
+                    
+                    int evalID = 1;                   
+                    foreach (DataRow row in dt.Rows)
+                    {
+                        string level = string.Empty;
+                        switch(row[1].ToString()){
+                            case "ESO":
+                                level = "ESO";
+                                break;
+
+                            case "Batxillerat":
+                                level = "BTX";
+                                break;
+
+                            default:
+                                level = "CF";
+                                break;
+                        }
+                        
+                        int limit1 = 4;                        
+                        for(int sort = 1; sort < limit1; sort++){                            
+                            data.Add(ParseAnswerFromGoogleForms(evalID, dt.Columns, row, sort, sort+1, QuestionType.Numeric, level, "Families-Centre"));
+                        }                                                                                        
+                        data.Add(ParseAnswerFromGoogleForms(evalID, dt.Columns, row, limit1, limit1+1, QuestionType.Text, level, "Families-Centre"));  
+
+                        int limit2 = 3;                        
+                        for(int sort = 1; sort < limit2; sort++){      
+                            data.Add(ParseAnswerFromGoogleForms(evalID, dt.Columns, row, sort, sort+limit1+1, QuestionType.Numeric, level, "Families-Secretaria"));
+                        }                                                                                        
+                        data.Add(ParseAnswerFromGoogleForms(evalID, dt.Columns, row, limit2, limit1+limit2+1, QuestionType.Text, level, "Families-Secretaria"));  
+                        
+                        int limit3 = 2;                        
+                        for(int sort = 1; sort < limit3; sort++){      
+                            data.Add(ParseAnswerFromGoogleForms(evalID, dt.Columns, row, sort, sort+limit1+limit2+1, QuestionType.Numeric, level, "Families-Conserjeria"));
+                        }                                                                                        
+                        data.Add(ParseAnswerFromGoogleForms(evalID, dt.Columns, row, limit2, limit1+limit2+limit3+1, QuestionType.Text, level, "Families-Conserjeria"));  
+                        
+                        evalID++;
+                    }
+                }                                
+            }
+            
+        StoreDataIntoTeachingStatsBBDD(data);    
+    }
+
+
+    private void StoreDataIntoTeachingStatsBBDD(List<EF.Answer> data){
         using(var context = new EF.TeachingStatsContext()){
             var lastID = context.Answers.OrderByDescending(x => x.EvaluationId).Select(x => x.EvaluationId).FirstOrDefault();            
 
@@ -47,58 +252,66 @@ public class TeachingStats : System.IDisposable{
         return (!string.IsNullOrEmpty(text) && text.Length > maxLength ? text.Substring(0, maxLength) : text);        
     }
 
-    private List<EF.Answer> ParseFromLimeSurveyToTeachingStats(JArray questions, JObject answers){
-        //NOTE: the questions json is needed because the LimeSurvey API is not exporting the question statement even when requested for...
-        
-        //Setup global data
-        var statements = new Dictionary<string, string>();
-        foreach(var q in questions){
-            var title = (q["title"] ?? "").ToString();
-            if(title.StartsWith("SQ") || title == "comments") statements.Add(title, (q["question"] ?? "").ToString());
-        }            
+    private Dictionary<string, List<JProperty>> GroupAnswersByTopic(JToken allAnswersFromOneUser){
+        var groups = new Dictionary<string, List<JProperty>>();
 
-        //Setting up responses
-        var list = answers["responses"];
-        if(list == null) throw new Exception("Unable to parse, the 'responses' array seems to be missing.");
+        foreach(var answer in allAnswersFromOneUser.Children().Where(x => x.GetType() == typeof(JProperty)).Where(x => ((JProperty)x).Name.StartsWith("SUB"))){           
+            var name = ((JProperty)answer).Name;
+            var cut = name.Length;
+            for(int i=3; i < name.Length; i++){
+                if(!char.IsNumber(name[i])){
+                    cut = i;
+                    break;
+                }
+            }
 
-        int evalID = 1;
-        var importData = new List<EF.Answer>();
-        foreach(var item in list){
-            //TODO: check this "1" for multiple responses
-            if(item.First == null || item.First.First == null) throw new Exception("Unable to parse, the 'responses' array seems to be empty.");
-            var data = item.First.First;            
-
-            //Load the responses
-            var numeric = data.Children().Where(x => x.GetType() == typeof(JProperty)).Where(x => ((JProperty)x).Name.StartsWith("questions")).Cast<JProperty>().ToList();
-            var comments = data.Children().Where(x => x.GetType() == typeof(JProperty)).Where(x => ((JProperty)x).Name.StartsWith("comments")).Cast<JProperty>().ToList();
-            
-            //Setup the question shared values
-            //Unable to get only the completed ones (the API fails on filtering, so it will be filtered here)                                    
-            //Timestamp and year
-            var timeStamp = (data["submitdate"] ?? "").ToString();
-            if(!string.IsNullOrEmpty(timeStamp)){
-                var parsedDateTime = DateTime.Now;
-                DateTime.TryParse(timeStamp, out parsedDateTime);
-                var year = parsedDateTime.Year;
-            
-                //Store the splitted answers            
-                short sort = 1;
-                foreach(var answer in numeric.OrderBy(x => x.Name))
-                    importData.Add(ParseAnswer(evalID, statements, data, answer, sort++, timeStamp, year, QuestionType.Numeric));
-
-                foreach(var answer in comments.OrderBy(x => x.Name))
-                    importData.Add(ParseAnswer(evalID, statements, data, answer, sort++, timeStamp, year, QuestionType.Text));
-                
-                //All the responses from the same group will share the ID;
-                evalID++;    
-            }                  
+            var prefix = name.Substring(0, cut);  
+            if(!groups.ContainsKey(prefix)) groups.Add(prefix, new List<JProperty>());
+            groups[prefix].Add((JProperty)answer);            
         }
 
-        return importData;
+        foreach(var answer in allAnswersFromOneUser.Children().Where(x => x.GetType() == typeof(JProperty)).Where(x => ((JProperty)x).Name.StartsWith("FCT") || ((JProperty)x).Name.StartsWith("MNT") || ((JProperty)x).Name.StartsWith("SCH") || ((JProperty)x).Name.StartsWith("SRV") || ((JProperty)x).Name.StartsWith("PAS") || ((JProperty)x).Name.StartsWith("TCH"))){
+            var prefix = ((JProperty)answer).Name.Substring(0,3);                        
+            if(!groups.ContainsKey(prefix)) groups.Add(prefix, new List<JProperty>());
+            groups[prefix].Add((JProperty)answer);            
+        }    
+
+        return groups;    
     }
 
-    private EF.Answer ParseAnswer(int evalID, Dictionary<string, string> statements, JToken data, JProperty answer, short sort, string timeStamp, int year, QuestionType type){
+    private EF.Answer ParseAnswerFromLimeSurvey(int evalID, Dictionary<string, string> statements, JToken data, JProperty answer, short sort, string timeStamp, int year, QuestionType type){
         var code = (type == QuestionType.Numeric ? answer.Name.Split(new char[]{'[', ']'})[1] : answer.Name);
+        var prefix = code.Substring(0, 3);
+        var cut = 0;
+        if(prefix == "SUB"){
+            //TODO: 2024-2025 -> SUB1 should be SUB01 -> SUB1 vs SUB11 -> SUB01 vs SUB11. This will simplify A LOT of work. 
+            //SUB1xxx -> SUB1 or SUB11xxx -> SUB11            
+            var a = answer.Name.Split(new char[]{'[', ']'})[0].ToCharArray();
+            cut = a.Length;
+            for(int i=3; i<a.Length; i++){
+                if(!char.IsNumber(a[i])){
+                    cut = i;
+                    break;
+                }
+            }
+
+            prefix = code.Substring(0, cut);            
+        }
+
+        //TODO: For the 2024-2025 course -> degreeName and degreeAcronym should be sent to the YML file. The acronym should be setup into the "degree" field in order to avoid this transformation.
+        var degree = (data[$"{prefix}group"] ?? "").ToString();
+        var dArray = degree.ToCharArray();  
+        cut = degree.Length;
+        for(int i=0; i<degree.Length; i++){
+            if(char.IsNumber(dArray[i])){
+                cut = i;
+                break;
+            }
+        }
+        degree = degree.Substring(0, cut);
+
+        //TODO: 2024-2025: the following line can be removed (already fixed)
+        if(prefix == "SQ0") prefix = "PAS";
 
         //Note: the answers will come as teaching-stats database needs, because has been setup like this within the 'equation' property.
         return new EF.Answer(){
@@ -109,14 +322,41 @@ public class TeachingStats : System.IDisposable{
             Value = answer.Value.ToString(),
             QuestionStatement = statements[code],
             QuestionType = type.ToString(),
-            Degree = (data["degree"] ?? "").ToString(),
-            Department = (data["department"] ?? "").ToString(),
-            Group = (data["group"] ?? "").ToString(),
-            Level = (data["level"] ?? "").ToString(),
-            SubjectCode = (data["subjectcode"] ?? "").ToString(),
-            SubjectName = (data["subjectname"] ?? "").ToString(),
-            Topic = (data["topic"] ?? "").ToString(),
-            Trainer = (data["trainer"] ?? "").ToString()
+            Degree = degree,
+            Department = (data[$"{prefix}department"] ?? "").ToString(),
+            Group = (data[$"{prefix}group"] ?? "").ToString(),
+            Level = (data[$"{prefix}level"] ?? "").ToString(),
+            SubjectCode = (data[$"{prefix}subjectcode"] ?? "").ToString(),
+            SubjectName = (data[$"{prefix}subjectname"] ?? "").ToString(),
+            Topic = (data[$"{prefix}topic"] ?? "").ToString(),
+            Trainer = (data[$"{prefix}trainer"] ?? "").ToString()
+        };
+    }
+
+    private EF.Answer ParseAnswerFromGoogleForms(int evalID, DataColumnCollection cols, DataRow data, int sort, int column, QuestionType type, string group, string topic){        
+        var timestamp = DateTime.Parse(data[0].ToString() ?? "");
+        var level = string.IsNullOrEmpty(group) || group.Length < 3 ? group : group.Substring(0, 3);
+
+        string? value = data[column].ToString();
+        if(timestamp.Year > 2022 && type == QuestionType.Numeric){
+            //Range [1,5] should be transformed into [0-10]
+            value = (float.Parse(data[column].ToString() ?? "-1") / 5 * 10).ToString();
+        }
+
+        return new EF.Answer(){
+            EvaluationId = evalID,
+            QuestionSort = (short)sort,
+            Timestamp = timestamp,
+            Year = timestamp.Year,
+            Value = value,
+            QuestionStatement = cols[column].ColumnName,
+            QuestionType = type.ToString(),
+            Degree = level,
+            Level = level,
+            Group = group,
+            Topic = topic,
+            SubjectCode = topic,
+            SubjectName = topic
         };
     }
 
@@ -154,7 +394,7 @@ public class TeachingStats : System.IDisposable{
             throw;
         }        
     }
-
+   
     public bool CheckIfUpgraded(){        
         try{
             //closed on dispose

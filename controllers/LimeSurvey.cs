@@ -1,3 +1,4 @@
+using System.IO.Compression;
 using JsonRPC;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -23,7 +24,9 @@ public class LimeSurvey : IDisposable{
         MENTORING_2_CCFF,
         SUBJECT_CCFF,
         STAFF,
-        TEACHERS        
+        TEACHERS,
+        FCT,
+        SERVICES        
     }
 
     public enum Status{
@@ -65,22 +68,25 @@ public class LimeSurvey : IDisposable{
         SessionKey = String.Empty;
     }
 #region Survey        
-    public JArray ListSurveys(Status? status = null){
+    public JArray ListSurveys(int group = 0, Status? status = null){
         this.Client.Method = "list_surveys";
         this.Client.Parameters.Add("sSessionKey", this.SessionKey);        
         this.Client.Post();
         this.Client.ClearParameters();
-        
-        var group = (Utils.Settings.LimeSurvey == null ? 0 : Utils.Settings.LimeSurvey.Group);
-        var list = JArray.Parse(this.ReadClientResult() ?? "");
-        
+                
+        var list = JArray.Parse(this.ReadClientResult() ?? "");        
         var filtered = new JArray();
+    
+        var groups = new HashSet<int>();
+        if(group > 0) groups.Add(group);
+        else groups = (Utils.Settings.LimeSurvey == null || Utils.Settings.LimeSurvey.Groups == null ? new HashSet<int>() : Utils.Settings.LimeSurvey.Groups.Select(x => x.Id).Distinct().ToHashSet());
+        
         foreach(var survey in list){
             var id = int.Parse((survey["sid"] ?? "").ToString());
             var props = GetSurveyProperties(id);
             var gsid = int.Parse((props["gsid"] ?? "").ToString());
 
-            if(gsid == group){
+            if(groups.Contains(gsid)){
                 var active = char.Parse((props["active"] ?? "").ToString());
                 var expired = (props["expires"] ?? "").ToString();
 
@@ -129,85 +135,16 @@ public class LimeSurvey : IDisposable{
         return JObject.Parse(this.ReadClientResult() ?? "");
     }
 
-    public int CreateSurvey(Survey.SurveyData data){    
-        var topic = (LimeSurvey.Topic)Enum.Parse(typeof(LimeSurvey.Topic), (data.Topic ?? "").Replace("-", "_"), true);        
-        var template = $"{Path.Combine(Utils.TemplatesFolder, topic.ToString().ToLower().Replace("_", "-"))}.txt";    
-        var content = File.ReadAllText(template);               
+    public int CreateSurvey(Survey.SurveyData data){  
+        //Note: the import process can be done without file generation, but this helps in order to fix possible import errors.        
+        string file = GenerateSurveyTxtFile(data);
+        return CreateSurvey(file, data.Participants);
+    }
 
-        //Setting up template values
-        var surveyName = string.Empty;
-        var description = string.Empty;
-        var captions = (Utils.Settings.Data == null ? null : Utils.Settings.Data.Captions);
-        switch(topic){
-            case Topic.SCHOOL:
-                data.SubjectCode = "Centre";
-                data.SubjectName = "Instal·lacions i estada";
-                surveyName = $"{data.GroupName} {(captions == null ? "SCHOOL" : captions.School)}";
-                description = @"<p><strong>Si us plau, abans de contestar l'enquesta, tingues en compte el següent:</strong></p>
-                                <ol style='text-align: left;'>
-                                    <li>Aquesta enquesta és completament anònima, si us plau, sigues sincer.</li>
-                                    <li>Sigues constructiu, explica'ns quines coses fem bé i com podem millorar.</li>
-                                    <li>Sigues educat i respectuós, així ens ajudes a fer millor el nostre institut.</li>
-                                </ol>";                
-                break;
-
-            case Topic.MENTORING_1_CCFF:
-                data.SubjectCode = "Tutoria";
-                data.SubjectName = "1er Curs";
-                surveyName = $"{data.GroupName} {(captions == null ? "MENTORING 1ST" : captions.Mentoring1)} ({data.TrainerName})";
-                description = @"<p><strong>Si us plau, abans de contestar l'enquesta, tingues en compte el següent:</strong></p>
-                                <ol style='text-align: left;'>
-                                    <li>Aquesta enquesta és completament anònima, si us plau, sigues sincer.</li>
-                                    <li>Sigues constructiu, explica'ns quines coses fem bé i com podem millorar.</li>
-                                    <li>Sigues educat i respectuós, així ens ajudes a fer millor el nostre institut.</li>
-                                </ol>";
-                break;
-
-            case Topic.MENTORING_2_CCFF:
-                data.SubjectCode = "Tutoria";
-                data.SubjectName = "2n Curs";
-                surveyName = $"{data.GroupName} {(captions == null ? "MENTORING 2ND" : captions.Mentoring2)} ({data.TrainerName})";
-                description = @"<p><strong>Si us plau, abans de contestar l'enquesta, tingues en compte el següent:</strong></p>
-                                <ol style='text-align: left;'>
-                                    <li>Aquesta enquesta és completament anònima, si us plau, sigues sincer.</li>
-                                    <li>Sigues constructiu, explica'ns quines coses fem bé i com podem millorar.</li>
-                                    <li>Sigues educat i respectuós, així ens ajudes a fer millor el nostre institut.</li>
-                                </ol>";
-                break;
-
-            case Topic.SUBJECT_CCFF:
-                surveyName = $"{data.GroupName} {data.SubjectCode}: {data.SubjectName} ({data.TrainerName})";
-                description = @"<p><strong>Si us plau, abans de contestar l'enquesta, tingues en compte el següent:</strong></p>
-                                <ol style='text-align: left;'>
-                                    <li>Si no estàs matriculat d'aquest Mòdul Professional o en trobes a faltar enquestes sobre altres Mòduls que tens matriculats, posa't en contacte amb el teu tutor.</li>
-                                    <li>Aquesta enquesta és completament anònima, si us plau, sigues sincer.</li>
-                                    <li>Sigues constructiu, explica'ns quines coses fem bé i com podem millorar.</li>
-                                    <li>Sigues educat i respectuós, així ens ajudes a fer millor el nostre institut.</li>
-                                </ol>";
-            break;
-
-            case Topic.STAFF:
-            case Topic.TEACHERS:
-            default:
-                throw new NotImplementedException();
-        }
-
-                        
-        //Replacing template values
-        content = content.Replace("{'TITLE'}", $"{surveyName}");
-        content = content.Replace("{'DESCRIPTION'}", $"{description}");
-        content = content.Replace("{'DEPARTMENT'}", "{'" + data.DepartmentName + "'}");
-        content = content.Replace("{'DEGREE'}", "{'" + data.DegreeName + "'}");
-        content = content.Replace("{'GROUP'}", "{'" + data.GroupName + "'}");
-        content = content.Replace("{'TRAINER'}", "{'" + data.TrainerName + "'}");
-
-        if(topic == Topic.SUBJECT_CCFF){
-            content = content.Replace("{'SUBJECT_CODE'}", "{'" + data.SubjectCode + "'}");
-            content = content.Replace("{'SUBJECT_NAME'}", "{'" + data.SubjectName + "'}");
-        }
-
+    public int CreateSurvey(string file, List<Survey.Participant>? participants){      
         //Encoding
-        var plainTextBytes = System.Text.Encoding.UTF8.GetBytes(content);
+        var fileContent = File.ReadAllText(file);
+        var plainTextBytes = System.Text.Encoding.UTF8.GetBytes(fileContent);
         var base64EncodedBytes =  System.Convert.ToBase64String(plainTextBytes);
         
         //Import
@@ -218,9 +155,14 @@ public class LimeSurvey : IDisposable{
         this.Client.Post();
         this.Client.ClearParameters();
 
-        //Returing the new survey's ID
-        int newID = int.Parse(this.ReadClientResult() ?? "");
-        SetSurveyProperties(newID, JObject.Parse(@"{'gsid': " + (Utils.Settings.LimeSurvey == null ? 1 : Utils.Settings.LimeSurvey.Group) + "}"));
+        //Retreibing the newly created survey UD
+        int newID = int.Parse(this.ReadClientResult() ?? "0");
+        if(newID == 0) throw new UnableToCreateSurveyException();
+
+        //Setting up the group, for some reason, the gsid field is not working
+        fileContent = fileContent.Substring(fileContent.IndexOf("gsid") + 6);
+        fileContent = fileContent.Substring(0, fileContent.IndexOf("\t"));
+        SetSurveyProperties(newID, JObject.Parse(@"{'gsid': " + fileContent + "}"));
 
         //Creating the participants table
         this.Client.Method = "activate_tokens";
@@ -230,9 +172,147 @@ public class LimeSurvey : IDisposable{
         this.Client.ClearParameters();
 
         //Adding participants
-        if(data.Participants != null && data.Participants.Count > 0) AddSurveyParticipants(newID, data.Participants);
+        if(participants != null && participants.Count > 0) AddSurveyParticipants(newID, participants);
 
         return newID;
+    }
+    
+    public string GenerateSurveyTxtFile(Survey.SurveyData data){          
+        //Setting up the main template
+        var template = Path.Combine(Utils.TemplatesFolder, "main-students-ccff.txt");
+        var content = File.ReadAllText(template);
+        
+        var captions = (Utils.Settings.Data == null ? null : Utils.Settings.Data.Captions);
+        content = content.Replace("{'DESCRIPTION'}", (captions == null ? data.GroupName : captions.Survey));
+        content = content.Replace("{'TITLE'}", data.Topics == null ? data.GroupName : $"{data.GroupName} | {string.Join(", ", data.Topics.Where(x => !string.IsNullOrEmpty(x.SubjectAcronym)).Select(x => x.SubjectAcronym).OrderBy(x => x).ToList())}");
+
+        var grp = GetSurveyGroup(data.GroupName ?? "");
+        content = content.Replace("{'GSID'}", grp.ToString());
+
+        //Setting up each topic template
+        var questionID = 4;   //each question must have a unique numerical id, for subject it should star with 4 (400, 4001, 4002...)
+        if(data.Topics != null){
+            //This is the easiest way to order and process the surveys (less code, less methods, etc.)
+            var orderedItems = data.Topics.Where(x => x.Topic == "SUBJECT-CCFF").OrderBy(x => x.SubjectAcronym).ToList();
+            orderedItems.AddRange(data.Topics.Where(x => x.Topic != "SUBJECT-CCFF").OrderBy(x => x.Topic).ToList());
+
+            foreach(var entry in orderedItems){
+                var block = string.Empty;                     
+                var subjectCode = string.Empty;
+                var subjectName = string.Empty;
+                var blockName = string.Empty;
+                var description = string.Empty;                
+                var topic = (LimeSurvey.Topic)Enum.Parse(typeof(LimeSurvey.Topic), (entry.Topic ?? "").Replace("-", "_"), true);        
+
+                switch(topic){
+                    case Topic.SCHOOL:
+                        template = "block-school";
+                        subjectCode = "Centre";
+                        subjectName = "Instal·lacions i estada";
+                        blockName = $"{data.GroupName} {(captions == null ? "SCHOOL" : captions.School)}";
+                        description = @"<p><strong>Si us plau, abans de contestar l'enquesta, tingues en compte el següent:</strong></p>
+                                        <ol style='text-align: left;'>
+                                            <li>Aquesta enquesta és completament anònima, si us plau, sigues sincer.</li>
+                                            <li>Sigues constructiu, explica'ns quines coses fem bé i com podem millorar.</li>
+                                            <li>Sigues educat i respectuós, així ens ajudes a fer millor el nostre institut.</li>
+                                        </ol>";                
+                        break;
+
+                    case Topic.MENTORING_1_CCFF:
+                        template = "block-mentoring-1-ccff";
+                        subjectCode = "Tutoria";
+                        subjectName = "1er Curs";
+                        blockName = $"{data.GroupName} {(captions == null ? "MENTORING 1ST" : captions.Mentoring1)} ({entry.TrainerName})";
+                        description = @"<p><strong>Si us plau, abans de contestar l'enquesta, tingues en compte el següent:</strong></p>
+                                        <ol style='text-align: left;'>
+                                            <li>Aquesta enquesta és completament anònima, si us plau, sigues sincer.</li>
+                                            <li>Sigues constructiu, explica'ns quines coses fem bé i com podem millorar.</li>
+                                            <li>Sigues educat i respectuós, així ens ajudes a fer millor el nostre institut.</li>
+                                        </ol>";
+                        break;
+
+                    case Topic.MENTORING_2_CCFF:
+                        template = "block-mentoring-2-ccff";
+                        subjectCode = "Tutoria";
+                        subjectName = "2n Curs";
+                        blockName = $"{data.GroupName} {(captions == null ? "MENTORING 2ND" : captions.Mentoring2)} ({entry.TrainerName})";
+                        description = @"<p><strong>Si us plau, abans de contestar l'enquesta, tingues en compte el següent:</strong></p>
+                                        <ol style='text-align: left;'>
+                                            <li>Aquesta enquesta és completament anònima, si us plau, sigues sincer.</li>
+                                            <li>Sigues constructiu, explica'ns quines coses fem bé i com podem millorar.</li>
+                                            <li>Sigues educat i respectuós, així ens ajudes a fer millor el nostre institut.</li>
+                                        </ol>";
+                        break;
+
+                    case Topic.SUBJECT_CCFF:
+                        template = "block-subject-ccff";
+                        blockName = $"{data.GroupName} {entry.SubjectAcronym}: {entry.SubjectName} ({entry.TrainerName})";
+                        description = @"<p><strong>Si us plau, abans de contestar l'enquesta, tingues en compte el següent:</strong></p>
+                                        <ol style='text-align: left;'>
+                                            <li>Si no estàs matriculat d'aquest Mòdul Professional o en trobes a faltar enquestes sobre altres Mòduls que tens matriculats, posa't en contacte amb el teu tutor.</li>
+                                            <li>Aquesta enquesta és completament anònima, si us plau, sigues sincer.</li>
+                                            <li>Sigues constructiu, explica'ns quines coses fem bé i com podem millorar.</li>
+                                            <li>Sigues educat i respectuós, així ens ajudes a fer millor el nostre institut.</li>
+                                        </ol>";
+                        break;
+
+                    case Topic.FCT:
+                        //Todo: change how the FCT is setup at settings.yaml (should be as mentoring)
+                        template = "block-fct";
+                        blockName = $"{data.GroupName} {(captions == null ? "FCT" : captions.FCT)} ({entry.TrainerName})";
+                        description = @"<p><strong>Si us plau, abans de contestar l'enquesta, tingues en compte el següent:</strong></p>
+                                        <ol style='text-align: left;'>
+                                            <li>Si no has matriculat les FCT o en trobes a faltar enquestes sobre altres Mòduls que tens matriculats, posa't en contacte amb el teu tutor.</li>
+                                            <li>Aquesta enquesta és completament anònima, si us plau, sigues sincer.</li>
+                                            <li>Sigues constructiu, explica'ns quines coses fem bé i com podem millorar.</li>
+                                            <li>Sigues educat i respectuós, així ens ajudes a fer millor el nostre institut.</li>
+                                        </ol>";
+                        break;
+
+                     case Topic.SERVICES:
+                        template = "block-services";
+                        subjectCode = "Centre";
+                        subjectName = "Serveis";
+                        blockName = $"{data.GroupName} {(captions == null ? "SERVICES" : captions.Services)}";
+                        description = @"<p><strong>Si us plau, abans de contestar l'enquesta, tingues en compte el següent:</strong></p>
+                                        <ol style='text-align: left;'>
+                                            <li>Aquesta enquesta és completament anònima, si us plau, sigues sincer.</li>
+                                            <li>Sigues constructiu, explica'ns quines coses fem bé i com podem millorar.</li>
+                                            <li>Sigues educat i respectuós, així ens ajudes a fer millor el nostre institut.</li>
+                                        </ol>";                
+                        break;
+
+                    case Topic.STAFF:
+                    case Topic.TEACHERS:
+                    default:
+                        //TODO: implement this.
+                        throw new NotImplementedException();
+                }
+                
+                template = Path.Combine(Utils.TemplatesFolder, $"{template}.txt");
+                block = File.ReadAllText(template);
+
+                block = block.Replace("{'TITLE'}", $"{blockName}");
+                block = block.Replace("{'DESCRIPTION'}", $"{description}");
+                block = block.Replace("{'DEPARTMENT'}", "{'" + data.DepartmentName + "'}");
+                block = block.Replace("{'DEGREE'}", "{'" + data.DegreeName + "'}");
+                block = block.Replace("{'GROUP'}", "{'" + data.GroupName + "'}");
+                block = block.Replace("{'TRAINER'}", "{'" + entry.TrainerName + "'}");
+
+                if(topic == Topic.SUBJECT_CCFF){
+                    block = block.Replace("{'SUBJECT_CODE'}", "{'" + entry.SubjectAcronym + "'}");
+                    block = block.Replace("{'SUBJECT_NAME'}", "{'" + entry.SubjectName + "'}");
+                    block = block.Replace("{'X'}", (questionID++).ToString());
+                }
+
+                content += block;                
+            }              
+        }
+
+        string file = Path.Combine(Utils.SurveysFolder, $"{data.GroupName ?? "UNKNOWN"}.txt");
+        File.WriteAllText(file, content);    
+
+        return file;                        
     }
 
     public JArray AddSurveyParticipants(int surveyID, List<Survey.Participant> parts){
@@ -282,7 +362,7 @@ public class LimeSurvey : IDisposable{
 
         //For some reason (SMTP server limits, too much logint attempts, etc.) an OK is received but no invitations has been sent...
         //A retry will be performed till "No candidate tokens" has been received.
-        if(data.Contains("0 left to send")) return result;
+        if(data.Contains("0 left to send") || data.Contains("No candidate tokens")) return result;
         else{
             if(retries < maxRetries) return SendRemindersToParticipants(surveyID, retries+1);        
             else throw new SmtpException();
@@ -436,7 +516,7 @@ public class LimeSurvey : IDisposable{
 
     
 #endregion
-#region Private
+#region Private helpers
     private static string GetSessionKey(){
         var executionFolder = Path.TrimEndingDirectorySeparator(AppContext.BaseDirectory);
         var appFolder = executionFolder.Substring(0, executionFolder.IndexOf("bin"));
@@ -447,6 +527,16 @@ public class LimeSurvey : IDisposable{
     private string? ReadClientResult(){
         if(this.Client.Response != null && this.Client.Response.result != null) return this.Client.Response.result.ToString();
         else return null;
+    }
+
+    private int GetSurveyGroup(string groupName){
+        int id = 1; //the default one
+        if(Utils.Settings.LimeSurvey != null && Utils.Settings.LimeSurvey.Groups != null){
+            var grp = Utils.Settings.LimeSurvey.Groups.Where(x => x.Group == groupName).SingleOrDefault();
+            if(grp != null) id = grp.Id;
+        }
+        
+        return id;
     }
 #endregion 
 }
