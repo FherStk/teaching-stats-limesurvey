@@ -1,5 +1,5 @@
 50		G	4	{'TITLE'}				ca																																																																																																																																									
-501		Q	B	SRVquestions	1	"Tria una opció, 1 és la puntuació més baixa i 10 la puntuació més alta."		ca		Y	N		0																																																																																																																																				
+501		Q	B	SRVquestions	1	"Tria una opció, 1 és la puntuació més baixa i 10 la puntuació més alta."		ca		N	N		0																																																																																																																																				
 502		SQ		SRV001	1	"Funciona bé la Consergeria del centre?"		ca		N	N		0																																																																																																																																				
 503		SQ		SRV002	1	"Funciona bé la Secretaria del centre?"		ca		N	N		0																																																																																																																																				
 504		SQ		SRV003	1	"Funciona bé la Borsa de Treball del centre?"		ca		N	N		0																																																																																																																																				
