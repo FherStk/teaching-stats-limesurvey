@@ -285,8 +285,6 @@ internal class Program
         else{
             foreach (var f in files.OrderBy(x => x))
             {
-                //Conversions must be done first for 1st level (which generates the 1st level file) and then for 2nd level (which
-                //generates the 2nd level file and updates the 1st level ones).
                 if(!File.Exists(f)) throw new FileNotFoundException("File not found!", f);
                 EsferaCsvToYml(f);                    
             }
@@ -310,8 +308,6 @@ internal class Program
         else{
             foreach (var f in files.OrderBy(x => x))
             {
-                //Conversions must be done first for 1st level (which generates the 1st level file) and then for 2nd level (which
-                //generates the 2nd level file and updates the 1st level ones).
                 if(!File.Exists(f)) throw new FileNotFoundException("File not found!", f);
                 SagaCsvToYml(f);                    
             }     
