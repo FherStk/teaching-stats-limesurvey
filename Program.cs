@@ -2,7 +2,7 @@
 
 internal class Program
 {
-    public const string Version = "2023-2024.2.1";
+    public const string Version = "2024-2025.0.0";
     public static Dictionary<Survey.Participant, List<Settings.SubjectData>>? EnrollmentWarnings {get; private set;}
 
     static void Main(string[] args)
@@ -28,6 +28,11 @@ internal class Program
                     case "--saga-convert":
                     case "-sc":                
                         SagaCsvToYml(Directory.GetFiles(Path.GetDirectoryName(args[i+1]) ?? "", Path.GetFileName(args[i+1])));                
+                        break;  
+
+                    case "--esfera-convert":
+                    case "-ec":                
+                        EsferaCsvToYml(Directory.GetFiles(Path.GetDirectoryName(args[i+1]) ?? "", Path.GetFileName(args[i+1])));                
                         break;  
 
                     case "--create-surveys":
@@ -270,7 +275,30 @@ internal class Program
         Console.WriteLine($": {description}");    
     }
 #endregion
-#region SAGA to LimeSurvey
+#region Esfera / Saga to YML
+    /// <summary>
+    /// Converts all the provided Esfera's CSV files to LimeSurvey compatible YAML files.
+    /// </summary>
+    /// <param name="files">A set of CSV file paths.</param>
+    private static void EsferaCsvToYml(string[] files){ 
+        if(files.Length == 0) Error("Unable to find the specified file");
+        else{
+            foreach (var f in files.OrderBy(x => x))
+            {
+                if(!File.Exists(f)) throw new FileNotFoundException("File not found!", f);
+                EsferaCsvToYml(f);                    
+            }
+        }                                   
+    }
+
+    /// <summary>
+    /// Converts all the provided Esfera's CSV files to LimeSurvey compatible YAML files.
+    /// </summary>
+    /// <param name="files">A single CSV file path.</param>
+    private static void EsferaCsvToYml(string filePath){     
+        EnrollmentCsvToYml(filePath, false);
+    }    
+
     /// <summary>
     /// Converts all the provided SAGA's CSV files to LimeSurvey compatible YAML files.
     /// </summary>
@@ -280,8 +308,6 @@ internal class Program
         else{
             foreach (var f in files.OrderBy(x => x))
             {
-                //Conversions must be done first for 1st level (which generates the 1st level file) and then for 2nd level (which
-                //generates the 2nd level file and updates the 1st level ones).
                 if(!File.Exists(f)) throw new FileNotFoundException("File not found!", f);
                 SagaCsvToYml(f);                    
             }     
@@ -293,10 +319,19 @@ internal class Program
     /// </summary>
     /// <param name="files">A single CSV file path.</param>
     private static void SagaCsvToYml(string filePath){     
+        EnrollmentCsvToYml(filePath, true);
+    }
+
+    /// <summary>
+    /// Converts all the provided enrollment data CSV files to LimeSurvey compatible YAML files.
+    /// </summary>
+    /// <param name="files">A single CSV file path.</param>
+    /// <param name="saga">true = Saga; false = Esfera</param>
+    private static void EnrollmentCsvToYml(string filePath, bool saga){
         var currentGroupName = Path.GetFileNameWithoutExtension(filePath);  //Must be like ASIX2B
         EnrollmentWarnings = new Dictionary<Survey.Participant, List<Settings.SubjectData>>();
         
-        Info($"Converting from SAGA's CSV to a LimeSurvey compatible YAML file ({Path.GetFileName(filePath)}):");
+        Info($"Converting from Esfera's CSV to a LimeSurvey compatible YAML file ({Path.GetFileName(filePath)}):");
         try{
             Info("   Loading degree data... ", false);
             var degreeName = string.Empty;
@@ -325,21 +360,37 @@ internal class Program
             {  
                 var records = csv.GetRecords<dynamic>();
                 foreach (var r in records)
-                {
-                    string completeName = r.NOM;
-                    var coma = completeName.IndexOf(",");                               
-                    if(coma == -1) throw new InvalidDataException("NAME fields should be formated as 'Surname(s), Name'");
+                {   
+                    Survey.Participant p;
+                    List<string> subjects;
+                    string surveyID; 
+                    var studentSurveys = new List<Survey.SurveyData>();     
 
-                    var p = new Survey.Participant(){
-                        Firstname = completeName.Substring(coma+1).Trim(),
-                        Lastname = completeName.Substring(0, coma).Trim(),
-                        Email = r.EMAIL
-                    };
-                                    
-                    var studentSurveys = new List<Survey.SurveyData>();            
-                    var subjects = ((string)r.MATRICULADES).Split(",").Where(x => x.Length > 3).ToList().OrderBy(x => x); //UF codes should be used, when the same MP is coursed along 1st and 2nd course (like DAM M03)
-                    var surveyID = $"{currentGroupName}-{string.Join('-', subjects)}";
-                    
+                    if(saga){
+                        string completeName = r.NOM;
+                        var coma = completeName.IndexOf(",");                               
+                        if(coma == -1) throw new InvalidDataException("NAME fields should be formated as 'Surname(s), Name'");
+
+                        p = new Survey.Participant(){
+                            Firstname = completeName.Substring(coma+1).Trim(),
+                            Lastname = completeName.Substring(0, coma).Trim(),
+                            Email = r.EMAIL
+                        };
+                                        
+                        subjects = ((string)r.MATRICULADES).Split(",").Where(x => x.Length > 3).OrderBy(x => x).ToList(); //UF codes should be used, when the same MP is coursed along 1st and 2nd course (like DAM M03)
+                        surveyID = $"{currentGroupName}-{string.Join('-', subjects)}";
+                    }
+                    else{
+                        p = new Survey.Participant(){
+                            Firstname = r.Nom.Trim(),
+                            Lastname = $"{r.PrimerCognom} {r.SegonCognom}".Trim(),
+                            Email = r.Email //TODO: manca incloure el correu al document
+                        };
+                                        
+                        subjects = ((string)r.Curriculum).Split(" - ").Select(x => x.Substring(0, 4)).OrderBy(x => x).Distinct().ToList();
+                        surveyID = $"{currentGroupName}-{string.Join('-', subjects)}";
+                    }
+                   
                     List<Survey.Participant> participants;
                     if(surveyByEnrollment.ContainsKey(surveyID)) participants = surveyByEnrollment[surveyID].Participants ?? new List<Survey.Participant>();
                     else {
@@ -358,6 +409,8 @@ internal class Program
                                 });
                             }                        
                         }
+
+                        //TODO: for 2025-2026 --> FCT block for 2n grade students comming from Esfera.
 
                         //Adding the school survey
                         topics.Add(new Survey.SurveyTopic(){                                                    
@@ -419,7 +472,8 @@ internal class Program
 
         Console.WriteLine();
     }
-
+#endregion
+#region YML to LimeSurvey
     /// <summary>
     /// Imports to LimeSurvey all the provided YAML files.
     /// </summary>
