@@ -18,11 +18,15 @@
                 //"args": ["-ec", "/home/fher/Descargas/CSV/Esfera/SMX1A.csv"],
                 //"args": ["-ec", "/home/fher/Descargas/CSV/Esfera/SMX1B.csv"],
                 //"args": ["-ec", "/home/fher/Descargas/CSV/Esfera/SMX1C.csv"],
+                //"args": ["-ec", "/home/fher/Descargas/CSV/Esfera/SMX1D.csv"],
+                //"args": ["-ec", "/home/fher/Descargas/CSV/Esfera/DAM1A.csv"],
+                //"args": ["-ec", "/home/fher/Descargas/CSV/Esfera/DAW1A.csv"],
 
             // ### SAGA CONVERT (CSV -> YAML) ###
                 //"args": ["-sc", "/home/fher/Descargas/CSV/SAGA/*.csv"],
 
                 //"args": ["-sc", "/home/fher/Descargas/CSV/SAGA/AIF2A.csv"],
+                //"args": ["-sc", "/home/fher/Descargas/CSV/SAGA/AIF2B.csv"],
 
                 //"args": ["-sc", "/home/fher/Descargas/CSV/SAGA/ASIX2A.csv"],
                 //"args": ["-sc", "/home/fher/Descargas/CSV/SAGA/ASIX2B.csv"],
@@ -30,12 +34,14 @@
                 //"args": ["-sc", "/home/fher/Descargas/CSV/SAGA/DAM2A.csv"],
                 //"args": ["-sc", "/home/fher/Descargas/CSV/SAGA/DAM2B.csv"],
 
+                "args": ["-sc", "/home/fher/Descargas/CSV/SAGA/DAW2A.csv"],
+
                 //"args": ["-sc", "/home/fher/Descargas/CSV/SAGA/GA2A.csv"],
 
                 //"args": ["-sc", "/home/fher/Descargas/CSV/SAGA/SMX2A.csv"],
                 //"args": ["-sc", "/home/fher/Descargas/CSV/SAGA/SMX2B.csv"],
                 //"args": ["-sc", "/home/fher/Descargas/CSV/SAGA/SMX2C.csv"],
-                "args": ["-sc", "/home/fher/Descargas/CSV/SAGA/SMX2D.csv"],
+                //"args": ["-sc", "/home/fher/Descargas/CSV/SAGA/SMX2D.csv"],
                                    
             // ### CREATE SURVEY (YAML -> LIMESURVEY) ###
                 //"args": ["-cs", "data/*.yml"],
