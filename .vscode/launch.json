@@ -10,34 +10,39 @@
             "request": "launch",
             "preLaunchTask": "build",
             // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceFolder}/bin/Debug/net6.0/teaching-stats-limesurvey.dll",
+            "program": "${workspaceFolder}/bin/Debug/net8.0/teaching-stats-limesurvey.dll",
+            // ### ESFERA  CONVERT (CSV -> YAML) ###
+                //"args": ["-ec", "/home/fher/Descargas/CSV/Esfera/*.csv"],               
+
+                //"args": ["-ec", "/home/fher/Descargas/CSV/Esfera/GA1A.csv"],
+                "args": ["-ec", "/home/fher/Descargas/CSV/Esfera/AIF1A.csv"],
+                //"args": ["-ec", "/home/fher/Descargas/CSV/Esfera/SMX1A.csv"],
+                //"args": ["-ec", "/home/fher/Descargas/CSV/Esfera/SMX1B.csv"],
+                //"args": ["-ec", "/home/fher/Descargas/CSV/Esfera/SMX1C.csv"],
+                //"args": ["-ec", "/home/fher/Descargas/CSV/Esfera/SMX1D.csv"],
+                //"args": ["-ec", "/home/fher/Descargas/CSV/Esfera/DAM1A.csv"],
+                //"args": ["-ec", "/home/fher/Descargas/CSV/Esfera/DAW1A.csv"],
+
             // ### SAGA CONVERT (CSV -> YAML) ###
-                //"args": ["-sc", "/home/fher/Descargas/CSV/*.csv"],
+                //"args": ["-sc", "/home/fher/Descargas/CSV/SAGA/*.csv"],
 
-                //"args": ["-sc", "/home/fher/Descargas/AIF1A.csv"],
-                //"args": ["-sc", "/home/fher/Descargas/AIF2A.csv"],
+                //"args": ["-sc", "/home/fher/Descargas/CSV/SAGA/AIF2A.csv"],
+                //"args": ["-sc", "/home/fher/Descargas/CSV/SAGA/AIF2B.csv"],
 
-                //"args": ["-sc", "/home/fher/Descargas/ASIX1A.csv"],
-                //"args": ["-sc", "/home/fher/Descargas/ASIX2A.csv"],
-                //"args": ["-sc", "/home/fher/Descargas/ASIX2B.csv"],
+                //"args": ["-sc", "/home/fher/Descargas/CSV/SAGA/ASIX2A.csv"],
+                //"args": ["-sc", "/home/fher/Descargas/CSV/SAGA/ASIX2B.csv"],
 
-                //"args": ["-sc", "/home/fher/Descargas/DAM1A.csv"],
-                //"args": ["-sc", "/home/fher/Descargas/DAM2A.csv"],
-                //"args": ["-sc", "/home/fher/Descargas/DAM2B.csv"],
+                //"args": ["-sc", "/home/fher/Descargas/CSV/SAGA/DAM2A.csv"],
+                //"args": ["-sc", "/home/fher/Descargas/CSV/SAGA/DAM2B.csv"],
 
-                //"args": ["-sc", "/home/fher/Descargas/DAW1A.csv"],
+                //"args": ["-sc", "/home/fher/Descargas/CSV/SAGA/DAW2A.csv"],
 
-                //"args": ["-sc", "/home/fher/Descargas/GA1A.csv"],
-                //"args": ["-sc", "/home/fher/Descargas/GA2A.csv"],
+                //"args": ["-sc", "/home/fher/Descargas/CSV/SAGA/GA2A.csv"],
 
-                //"args": ["-sc", "/home/fher/Descargas/SMX1A.csv"],
-                //"args": ["-sc", "/home/fher/Descargas/SMX1B.csv"],
-                //"args": ["-sc", "/home/fher/Descargas/SMX1C.csv"],
-                //"args": ["-sc", "/home/fher/Descargas/SMX1D.csv"],
-                //"args": ["-sc", "/home/fher/Descargas/SMX2A.csv"],
-                //"args": ["-sc", "/home/fher/Descargas/SMX2B.csv"],
-                //"args": ["-sc", "/home/fher/Descargas/SMX2C.csv"],
-                //"args": ["-sc", "/home/fher/Descargas/SMX2D.csv"],
+                //"args": ["-sc", "/home/fher/Descargas/CSV/SAGA/SMX2A.csv"],
+                //"args": ["-sc", "/home/fher/Descargas/CSV/SAGA/SMX2B.csv"],
+                //"args": ["-sc", "/home/fher/Descargas/CSV/SAGA/SMX2C.csv"],
+                //"args": ["-sc", "/home/fher/Descargas/CSV/SAGA/SMX2D.csv"],
                                    
             // ### CREATE SURVEY (YAML -> LIMESURVEY) ###
                 //"args": ["-cs", "data/*.yml"],
