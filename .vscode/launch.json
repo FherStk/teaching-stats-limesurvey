@@ -15,11 +15,12 @@
                 //"args": ["-ec", "/home/fher/Descargas/CSV/Esfera/*.csv"],               
 
                 //"args": ["-ec", "/home/fher/Descargas/CSV/Esfera/GA1A.csv"],
-                "args": ["-ec", "/home/fher/Descargas/CSV/Esfera/AIF1A.csv"],
+                //"args": ["-ec", "/home/fher/Descargas/CSV/Esfera/AIF1A.csv"],
                 //"args": ["-ec", "/home/fher/Descargas/CSV/Esfera/SMX1A.csv"],
                 //"args": ["-ec", "/home/fher/Descargas/CSV/Esfera/SMX1B.csv"],
                 //"args": ["-ec", "/home/fher/Descargas/CSV/Esfera/SMX1C.csv"],
                 //"args": ["-ec", "/home/fher/Descargas/CSV/Esfera/SMX1D.csv"],
+                //"args": ["-ec", "/home/fher/Descargas/CSV/Esfera/ASIX1A.csv"],
                 //"args": ["-ec", "/home/fher/Descargas/CSV/Esfera/DAM1A.csv"],
                 //"args": ["-ec", "/home/fher/Descargas/CSV/Esfera/DAW1A.csv"],
 
@@ -104,7 +105,7 @@
                 //"args": ["-si"],
 
             // ### SEND REMINDERS ###
-                //"args": ["-sr"],
+                "args": ["-sr"],
 
                 //"args": ["-sr", "AIF1A"],
                 //"args": ["-sr", "AIF2A"],
