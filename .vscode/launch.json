@@ -105,7 +105,7 @@
                 //"args": ["-si"],
 
             // ### SEND REMINDERS ###
-                "args": ["-sr"],
+                //"args": ["-sr"],
 
                 //"args": ["-sr", "AIF1A"],
                 //"args": ["-sr", "AIF2A"],
@@ -159,6 +159,10 @@
                 //"args": ["-es", "SMX2B"],
                 //"args": ["-es", "SMX2C"],
                 //"args": ["-es", "SMX2D"],
+
+                //"args": ["-es", "TEACHERS-ESO"],
+                //"args": ["-es", "TEACHERS-CCFF"],
+                //"args": ["-es", "PAS"],
             
             // ### LOAD DATA FROM LimeSurvey TO TeachingStats BBDD (BEWARE: DO NOT LOAD ALREADY LOADED SURVEYS, DUPED DATA WILL BE CREATED) ###
                 //"args": ["-ll"],
@@ -190,7 +194,7 @@
 
                 //"args": ["-ll", "TEACHERS-ESO"],
                 //"args": ["-ll", "TEACHERS-CCFF"],
-                //"args": ["-ll", "PAS"],
+                "args": ["-ll", "PAS"],
 
             // ### LOAD DATA FROM Google Forms (CSV) TO TeachingStats BBDD
                 //"args": ["-lg-eso", "<some path>/*.csv"],
