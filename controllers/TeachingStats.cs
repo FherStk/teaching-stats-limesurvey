@@ -46,7 +46,7 @@ public class TeachingStats : System.IDisposable{
         var data = new List<EF.Answer>();
         foreach(var response in responses){            
             if(response.First == null || response.First.First == null) throw new Exception("Unable to parse, the 'responses' array seems to be empty.");
-            var allAnswersFromOneUser = response.First.First;            
+            var allAnswersFromOneUser = response.First.First;
 
             //TODO: 2024-2025 -> SUB1 should be SUB01 -> SUB1 vs SUB11 -> SUB01 vs SUB11. This will simplify A LOT of work. (substring(0,5) for all SUB) 
                 //Group by question type (SUBx, FCT, MNT, SCH, SRV), in order to correctly set the "sort" and the "evalID".
@@ -228,9 +228,10 @@ public class TeachingStats : System.IDisposable{
 
     private void StoreDataIntoTeachingStatsBBDD(List<EF.Answer> data){
         using(var context = new EF.TeachingStatsContext()){
-            var lastID = context.Answers.OrderByDescending(x => x.EvaluationId).Select(x => x.EvaluationId).FirstOrDefault();            
+            var lastID = context.Answers.OrderByDescending(x => x.EvaluationId).Select(x => x.EvaluationId).FirstOrDefault();
 
-            foreach(var item in data){                
+            foreach (var item in data)
+            {
                 item.EvaluationId += lastID;
                 item.Level = Cut(item.Level ?? "", 3);
                 item.Department = Cut(item.Department ?? "", 75);
@@ -241,6 +242,7 @@ public class TeachingStats : System.IDisposable{
                 item.Trainer = Cut(item.Trainer ?? "", 75);
                 item.Topic = Cut(item.Topic ?? "", 25);
                 item.QuestionType = Cut(item.QuestionType ?? "", 25);
+                //TODO: 2025-2026, collect the 'target' and store it!
             }
             
             context.Answers.AddRange(data);
@@ -270,11 +272,20 @@ public class TeachingStats : System.IDisposable{
             groups[prefix].Add((JProperty)answer);            
         }
 
-        foreach(var answer in allAnswersFromOneUser.Children().Where(x => x.GetType() == typeof(JProperty)).Where(x => ((JProperty)x).Name.StartsWith("FCT") || ((JProperty)x).Name.StartsWith("MNT") || ((JProperty)x).Name.StartsWith("SCH") || ((JProperty)x).Name.StartsWith("SRV") || ((JProperty)x).Name.StartsWith("PAS") || ((JProperty)x).Name.StartsWith("TCH"))){
-            var prefix = ((JProperty)answer).Name.Substring(0,3);                        
-            if(!groups.ContainsKey(prefix)) groups.Add(prefix, new List<JProperty>());
-            groups[prefix].Add((JProperty)answer);            
-        }    
+        foreach (var answer in allAnswersFromOneUser.Children().Where(x => x.GetType() == typeof(JProperty)).Where(x => ((JProperty)x).Name.StartsWith("FCT") || ((JProperty)x).Name.StartsWith("MNT") || ((JProperty)x).Name.StartsWith("SCH") || ((JProperty)x).Name.StartsWith("SRV") || ((JProperty)x).Name.StartsWith("PAS") || ((JProperty)x).Name.StartsWith("TCH") || ((JProperty)x).Name.StartsWith("PRL") || ((JProperty)x).Name.StartsWith("CON")))
+        {
+            var prefix = ((JProperty)answer).Name.Substring(0, 3);
+            if (!groups.ContainsKey(prefix)) groups.Add(prefix, new List<JProperty>());
+
+            //TODO: 2025-2026 -> Use the commented line
+            //groups[prefix].Add((JProperty)answer); 
+
+            var ans = (JProperty)answer;
+            if (ans.Name == "PRLtopic") ans.Value = "Riscos";
+            else if (ans.Name == "CONtopic") ans.Value = "Consergeria";
+            groups[prefix].Add(ans);   
+            //TODO: 2025-2026 -> remove the previous uncommented lines, leave only "groups[prefix].Add((JProperty)answer);"            
+        }            
 
         return groups;    
     }
@@ -309,9 +320,6 @@ public class TeachingStats : System.IDisposable{
             }
         }
         degree = degree.Substring(0, cut);
-
-        //TODO: 2024-2025: the following line can be removed (already fixed)
-        if(prefix == "SQ0") prefix = "PAS";
 
         //Note: the answers will come as teaching-stats database needs, because has been setup like this within the 'equation' property.
         return new EF.Answer(){
