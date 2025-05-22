@@ -13,3 +13,4 @@
 112		Q	*	FCTdegree	1	"degree: {'DEGREE'}"		ca		N	N		0																																				{'DEGREE'}			1																																																																																													
 113		Q	*	FCTgroup	1	"group: {'GROUP'}"		ca		N	N		0																																				{'GROUP'}			1																																																																																													
 114		Q	*	FCTtrainer	1	"trainer: {'TRAINER'}"		ca		N	N		0																																				{'TRAINER'}			1																																																																																													
+115		Q	*	FCTtarget	1	"target: {'TARGET'}"		ca		N	N		0																																				{'Alumnat'}			1																																																																																													

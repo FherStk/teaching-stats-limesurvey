@@ -13,3 +13,4 @@
 {'X'}012		Q	*	SUB{'X'}subjectcode	1	"subject_code: {'SUBJECT_CODE'}"		ca		N	N		0																																				{'SUBJECT_CODE'}			1																																																																																													
 {'X'}013		Q	*	SUB{'X'}subjectname	1	"subject_name: {'SUBJECT_NAME'}"		ca		N	N		0																																				{'SUBJECT_NAME'}			1																																																																																													
 {'X'}014		Q	*	SUB{'X'}trainer	1	"trainer: {'TRAINER'}"		ca		N	N		0																																				{'TRAINER'}			1																																																																																													
+{'X'}015		Q	*	SUB{'X'}target	1	"target: {'TARGET'}"		ca		N	N		0																																				{'Alumnat'}			1																																																																																													

@@ -12,3 +12,4 @@
 211		Q	*	MNTdegree	1	"degree: {'DEGREE'}"		ca		N	N		0																																				{'DEGREE'}			1																																																																																													
 212		Q	*	MNTgroup	1	"group: {'GROUP'}"		ca		N	N		0																																				{'GROUP'}			1																																																																																													
 213		Q	*	MNTtrainer	1	"trainer: {'TRAINER'}"		ca		N	N		0																																				{'TRAINER'}			1																																																																																													
+214		Q	*	MNTtarget	1	"target: {'TARGET'}"		ca		N	N		0																																				{'Alumnat'}			1																																																																																													

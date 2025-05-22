@@ -13,3 +13,4 @@
 414		Q	*	SCHdegree	1	"degree: {'DEGREE'}"		ca		N	N		0																																				{'DEGREE'}			1																																																																																													
 415		Q	*	SCHgroup	1	"group: {'GROUP'}"		ca		N	N		0																																				{'GROUP'}			1																																																																																													
 416		Q	*	SCHtrainer	1	"trainer: {'TRAINER'}"		ca		N	N		0																																				{'TRAINER'}			1																																																																																													
+417		Q	*	SCHtarget	1	"target: {'TARGET'}"		ca		N	N		0																																				{'Alumnat'}			1																																																																																													

@@ -19,3 +19,4 @@
 518		Q	*	SRVdegree	1	"degree: {'DEGREE'}"		ca		N	N		0																																				"{'DEGREE'}"			1																																																																																													
 519		Q	*	SRVgroup	1	"group: {'GROUP'}"		ca		N	N		0																																				{'GROUP'}			1																																																																																													
 520		Q	*	SRVtrainer	1	"trainer: {'TRAINER'}"		ca		N	N		0																																				{'TRAINER'}			1																																																																																													
+521		Q	*	SRVtarget	1	"target: {'TARGET'}"		ca		N	N		0																																				{'Alumnat'}			1																																																																																													
