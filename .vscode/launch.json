@@ -197,8 +197,7 @@
                 //"args": ["-ll", "PAS"],
 
             // ### LOAD DATA FROM Google Forms (CSV) TO TeachingStats BBDD
-                //"args": ["-lg-eso", "<some path>/*.csv"],
-                //"args": ["-lg-risks", "<some path>/*.csv"],
+                "args": ["-lg-eso", "/home/fher/Descargas/ESO1.csv"],
                 //"args": ["-lg-families", "<some path>/*.csv"],
                         
             "cwd": "${workspaceFolder}",

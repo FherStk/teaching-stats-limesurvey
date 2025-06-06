@@ -203,6 +203,9 @@ public partial class TeachingStatsContext : DbContext
                 .HasColumnName("trainer");
             entity.Property(e => e.Value).HasColumnName("value");
             entity.Property(e => e.Year).HasColumnName("year");
+            entity.Property(e => e.Target)
+                .HasMaxLength(25)
+                .HasColumnName("target");
         });
 
         modelBuilder.Entity<AnswerAll>(entity =>

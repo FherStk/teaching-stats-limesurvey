@@ -93,80 +93,76 @@ public class TeachingStats : System.IDisposable{
         var data = new List<EF.Answer>();
 
         using (var reader = new StreamReader(csvFilePath, System.Text.Encoding.UTF8))
-            using (var csv = new CsvHelper.CsvReader(reader, System.Globalization.CultureInfo.InvariantCulture))
-            {  
+        using (var csv = new CsvHelper.CsvReader(reader, System.Globalization.CultureInfo.InvariantCulture))
+        {  
 
-                // Do any configuration to `CsvReader` before creating CsvDataReader.
-                using (var dr = new CsvHelper.CsvDataReader(csv))
-                {		
-                    var dt = new System.Data.DataTable();
-                    dt.Load(dr);
-                    
-                    int evalID = 1;                                        
-                    var group = Path.GetFileNameWithoutExtension(csvFilePath);
+            // Do any configuration to `CsvReader` before creating CsvDataReader.
+            using (var dr = new CsvHelper.CsvDataReader(csv))
+            {		
+                var dt = new System.Data.DataTable();
+                dt.Load(dr);
+                
+                int evalID = 0;                                        
+                var group = Path.GetFileNameWithoutExtension(csvFilePath);
 
-                    foreach (DataRow row in dt.Rows)
-                    {
-                        int limit = 0;
-                        var timestamp = DateTime.Parse(row[0].ToString() ?? "");
-                        if(timestamp.Year == 2022) limit = 6;
-                        else if(timestamp.Year >= 2023) limit = 5;
+                foreach (DataRow row in dt.Rows)
+                {
+                    int limit = 6;
+                    var timestamp = DateTime.Parse(row[0].ToString() ?? "");
 
-                        for(int sort = 1; sort < limit; sort++){                            
-                            data.Add(ParseAnswerFromGoogleForms(evalID, dt.Columns, row, sort, sort+1, QuestionType.Numeric, group, "Centre"));
-                        }                                                                                        
+                    evalID++;
+                    for (int sort = 1; sort < limit; sort++)
+                        data.Add(ParseAnswerFromGoogleForms(evalID, dt.Columns, row, sort, sort + 1, QuestionType.Numeric, group, "Centre", "Alumnat"));
+                    data.Add(ParseAnswerFromGoogleForms(evalID, dt.Columns, row, limit, limit+1, QuestionType.Text, group, "Centre", "Alumnat"));
 
-                        if(timestamp.Year < 2024){
-                            data.Add(ParseAnswerFromGoogleForms(evalID, dt.Columns, row, limit, limit+1, QuestionType.Text, group, "Centre"));  
-                        }
-                        else{    
-                            int newLimit = limit + 8;
-                            data.Add(ParseAnswerFromGoogleForms(evalID, dt.Columns, row, limit, newLimit, QuestionType.Text, group, "Centre"));
-                            
-                            //+ 7 numeric questions (services)                            
-                            evalID++;
-                            for(int statement = limit+1, sort = 1; statement < newLimit; statement++, sort++){
-                                data.Add(ParseAnswerFromGoogleForms(evalID, dt.Columns, row, sort, statement, QuestionType.Numeric, group, "Serveis"));
-                            }                             
-                        }
-                        
-                        evalID++;
-                    }
-                }                                
-            }
+                    evalID++;
+                    limit = 8;
+                    for (int sort = 1; sort < limit; sort++)
+                        data.Add(ParseAnswerFromGoogleForms(evalID, dt.Columns, row, sort, sort + 7, QuestionType.Numeric, group, "Serveis", "Alumnat"));
+                    data.Add(ParseAnswerFromGoogleForms(evalID, dt.Columns, row, limit, limit + 9, QuestionType.Text, group, "Serveis", "Alumnat"));
+
+                    //Curs 2024-2025: han afegit una pregunta sense consultar, sobre apadrinament lector. Això dificulta que tots els informes siguin parells i comparables. 
+                    evalID++;
+                    data.Add(ParseAnswerFromGoogleForms(evalID, dt.Columns, row, 1, limit + 8, QuestionType.Numeric, group, "Altres", "Alumnat"));                                    
+                }
+            }                                
+        }
             
         StoreDataIntoTeachingStatsBBDD(data);    
     }
 
-    public void ImportFromGoogleFormsRisks(string csvFilePath){  
-        var data = new List<EF.Answer>();
+    ///OBSOLETE
+    // public void ImportFromGoogleFormsRisks(string csvFilePath)
+    // {
+    //     var data = new List<EF.Answer>();
 
-        using (var reader = new StreamReader(csvFilePath, System.Text.Encoding.UTF8))
-            using (var csv = new CsvHelper.CsvReader(reader, System.Globalization.CultureInfo.InvariantCulture))
-            {  
+    //     using (var reader = new StreamReader(csvFilePath, System.Text.Encoding.UTF8))
+    //     using (var csv = new CsvHelper.CsvReader(reader, System.Globalization.CultureInfo.InvariantCulture))
+    //     {
 
-                // Do any configuration to `CsvReader` before creating CsvDataReader.
-                using (var dr = new CsvHelper.CsvDataReader(csv))
-                {		
-                    var dt = new System.Data.DataTable();
-                    dt.Load(dr);
-                    
-                    int evalID = 1;                                        
-                    foreach (DataRow row in dt.Rows)
-                    {
-                        int limit = 6;                        
-                        for(int col = 0; col < limit; col++){                            
-                            data.Add(ParseAnswerFromGoogleForms(evalID, dt.Columns, row, col+1, col, QuestionType.Numeric, string.Empty, "Riscos"));
-                        }                                                                                        
+    //         // Do any configuration to `CsvReader` before creating CsvDataReader.
+    //         using (var dr = new CsvHelper.CsvDataReader(csv))
+    //         {
+    //             var dt = new System.Data.DataTable();
+    //             dt.Load(dr);
 
-                        data.Add(ParseAnswerFromGoogleForms(evalID, dt.Columns, row, limit+1, limit, QuestionType.Text, string.Empty, "Riscos"));                                                 
-                        evalID++;
-                    }
-                }                                
-            }
-            
-        StoreDataIntoTeachingStatsBBDD(data);    
-    }
+    //             int evalID = 1;
+    //             foreach (DataRow row in dt.Rows)
+    //             {
+    //                 int limit = 6;
+    //                 for (int col = 0; col < limit; col++)
+    //                 {
+    //                     data.Add(ParseAnswerFromGoogleForms(evalID, dt.Columns, row, col + 1, col, QuestionType.Numeric, string.Empty, "Riscos"));
+    //                 }
+
+    //                 data.Add(ParseAnswerFromGoogleForms(evalID, dt.Columns, row, limit + 1, limit, QuestionType.Text, string.Empty, "Riscos"));
+    //                 evalID++;
+    //             }
+    //         }
+    //     }
+
+    //     StoreDataIntoTeachingStatsBBDD(data);
+    // }
 
     public void ImportFromGoogleFormsFamilies(string csvFilePath){  
         var data = new List<EF.Answer>();
@@ -201,21 +197,21 @@ public class TeachingStats : System.IDisposable{
                         
                         int limit1 = 4;                        
                         for(int sort = 1; sort < limit1; sort++){                            
-                            data.Add(ParseAnswerFromGoogleForms(evalID, dt.Columns, row, sort, sort+1, QuestionType.Numeric, level, "Families-Centre"));
+                            data.Add(ParseAnswerFromGoogleForms(evalID, dt.Columns, row, sort, sort+1, QuestionType.Numeric, level, "Families-Centre", "Families"));
                         }                                                                                        
-                        data.Add(ParseAnswerFromGoogleForms(evalID, dt.Columns, row, limit1, limit1+1, QuestionType.Text, level, "Families-Centre"));  
+                        data.Add(ParseAnswerFromGoogleForms(evalID, dt.Columns, row, limit1, limit1+1, QuestionType.Text, level, "Families-Centre", "Families"));  
 
                         int limit2 = 3;                        
                         for(int sort = 1; sort < limit2; sort++){      
-                            data.Add(ParseAnswerFromGoogleForms(evalID, dt.Columns, row, sort, sort+limit1+1, QuestionType.Numeric, level, "Families-Secretaria"));
+                            data.Add(ParseAnswerFromGoogleForms(evalID, dt.Columns, row, sort, sort+limit1+1, QuestionType.Numeric, level, "Families-Secretaria", "Families"));
                         }                                                                                        
-                        data.Add(ParseAnswerFromGoogleForms(evalID, dt.Columns, row, limit2, limit1+limit2+1, QuestionType.Text, level, "Families-Secretaria"));  
+                        data.Add(ParseAnswerFromGoogleForms(evalID, dt.Columns, row, limit2, limit1+limit2+1, QuestionType.Text, level, "Families-Secretaria", "Families"));  
                         
                         int limit3 = 2;                        
                         for(int sort = 1; sort < limit3; sort++){      
-                            data.Add(ParseAnswerFromGoogleForms(evalID, dt.Columns, row, sort, sort+limit1+limit2+1, QuestionType.Numeric, level, "Families-Conserjeria"));
+                            data.Add(ParseAnswerFromGoogleForms(evalID, dt.Columns, row, sort, sort+limit1+limit2+1, QuestionType.Numeric, level, "Families-Conserjeria", "Families"));
                         }                                                                                        
-                        data.Add(ParseAnswerFromGoogleForms(evalID, dt.Columns, row, limit2, limit1+limit2+limit3+1, QuestionType.Text, level, "Families-Conserjeria"));  
+                        data.Add(ParseAnswerFromGoogleForms(evalID, dt.Columns, row, limit2, limit1+limit2+limit3+1, QuestionType.Text, level, "Families-Conserjeria", "Families"));  
                         
                         evalID++;
                     }
@@ -242,7 +238,6 @@ public class TeachingStats : System.IDisposable{
                 item.Trainer = Cut(item.Trainer ?? "", 75);
                 item.Topic = Cut(item.Topic ?? "", 25);
                 item.QuestionType = Cut(item.QuestionType ?? "", 25);
-                //TODO: 2025-2026, collect the 'target' and store it!
             }
             
             context.Answers.AddRange(data);
@@ -322,7 +317,8 @@ public class TeachingStats : System.IDisposable{
         degree = degree.Substring(0, cut);
 
         //Note: the answers will come as teaching-stats database needs, because has been setup like this within the 'equation' property.
-        return new EF.Answer(){
+        return new EF.Answer()
+        {
             EvaluationId = evalID,
             QuestionSort = sort,
             Timestamp = DateTime.Parse(timeStamp),
@@ -338,25 +334,27 @@ public class TeachingStats : System.IDisposable{
             SubjectName = (data[$"{prefix}subjectname"] ?? "").ToString(),
             Topic = (data[$"{prefix}topic"] ?? "").ToString(),
             Trainer = (data[$"{prefix}trainer"] ?? "").ToString()
+            //TODO: collect also the 'target'
         };
     }
 
-    private EF.Answer ParseAnswerFromGoogleForms(int evalID, DataColumnCollection cols, DataRow data, int sort, int column, QuestionType type, string group, string topic){        
+    private EF.Answer ParseAnswerFromGoogleForms(int evalID, DataColumnCollection cols, DataRow data, int sort, int column, QuestionType type, string group, string topic, string target){        
         var timestamp = DateTime.Parse(data[0].ToString() ?? "");
         var level = string.IsNullOrEmpty(group) || group.Length < 3 ? group : group.Substring(0, 3);
 
-        string? value = data[column].ToString();
-        if(timestamp.Year > 2022 && type == QuestionType.Numeric){
-            //Range [1,5] should be transformed into [0-10]
-            value = (float.Parse(data[column].ToString() ?? "-1") / 5 * 10).ToString();
-        }
+        //string? value = data[column].ToString();
+        // if(timestamp.Year > 2022 && timestamp.Year < 2025 && type == QuestionType.Numeric){
+        //     //Range [1,5] should be transformed into [0-10]
+        //     value = (float.Parse(data[column].ToString() ?? "-1") / 5 * 10).ToString();
+        // }
 
-        return new EF.Answer(){
+        return new EF.Answer()
+        {
             EvaluationId = evalID,
             QuestionSort = (short)sort,
             Timestamp = timestamp,
             Year = timestamp.Year,
-            Value = value,
+            Value = data[column].ToString(),
             QuestionStatement = cols[column].ColumnName,
             QuestionType = type.ToString(),
             Degree = level,
@@ -364,7 +362,8 @@ public class TeachingStats : System.IDisposable{
             Group = group,
             Topic = topic,
             SubjectCode = topic,
-            SubjectName = topic
+            SubjectName = topic,
+            Target = target     
         };
     }
 
@@ -403,6 +402,7 @@ public class TeachingStats : System.IDisposable{
         }        
     }
    
+    
     public bool CheckIfUpgraded(){        
         try{
             //closed on dispose
