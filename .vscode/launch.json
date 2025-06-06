@@ -197,8 +197,8 @@
                 //"args": ["-ll", "PAS"],
 
             // ### LOAD DATA FROM Google Forms (CSV) TO TeachingStats BBDD
-                "args": ["-lg-eso", "/home/fher/Descargas/ESO1.csv"],
-                //"args": ["-lg-families", "<some path>/*.csv"],
+                //"args": ["-lg-eso", "/home/fher/Descargas/BTX202.csv"],
+                //"args": ["-lg-families", "/home/fher/Descargas/FAMILIES.csv"],
                         
             "cwd": "${workspaceFolder}",
             // For more information about the 'console' field, see https://aka.ms/VSCode-CS-LaunchJson-Console

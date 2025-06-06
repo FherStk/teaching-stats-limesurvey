@@ -119,11 +119,16 @@ public class TeachingStats : System.IDisposable{
                     limit = 8;
                     for (int sort = 1; sort < limit; sort++)
                         data.Add(ParseAnswerFromGoogleForms(evalID, dt.Columns, row, sort, sort + 7, QuestionType.Numeric, group, "Serveis", "Alumnat"));
-                    data.Add(ParseAnswerFromGoogleForms(evalID, dt.Columns, row, limit, limit + 9, QuestionType.Text, group, "Serveis", "Alumnat"));
 
-                    //Curs 2024-2025: han afegit una pregunta sense consultar, sobre apadrinament lector. Això dificulta que tots els informes siguin parells i comparables. 
-                    evalID++;
-                    data.Add(ParseAnswerFromGoogleForms(evalID, dt.Columns, row, 1, limit + 8, QuestionType.Numeric, group, "Altres", "Alumnat"));                                    
+                    var offset = (group.ToUpper().StartsWith("BTX") ? 8 : 9);
+                    data.Add(ParseAnswerFromGoogleForms(evalID, dt.Columns, row, limit, limit + offset, QuestionType.Text, group, "Serveis", "Alumnat"));
+
+                    if (group.ToUpper().StartsWith("ESO"))
+                    {
+                        //Curs 2024-2025: han afegit una pregunta sense consultar, sobre apadrinament lector. Això dificulta que tots els informes siguin parells i comparables. 
+                        evalID++;
+                        data.Add(ParseAnswerFromGoogleForms(evalID, dt.Columns, row, 1, limit + 8, QuestionType.Numeric, group, "Altres", "Alumnat"));
+                    }
                 }
             }                                
         }
@@ -197,21 +202,21 @@ public class TeachingStats : System.IDisposable{
                         
                         int limit1 = 4;                        
                         for(int sort = 1; sort < limit1; sort++){                            
-                            data.Add(ParseAnswerFromGoogleForms(evalID, dt.Columns, row, sort, sort+1, QuestionType.Numeric, level, "Families-Centre", "Families"));
+                            data.Add(ParseAnswerFromGoogleForms(evalID, dt.Columns, row, sort, sort+1, QuestionType.Numeric, level, "Centre", "Families"));
                         }                                                                                        
-                        data.Add(ParseAnswerFromGoogleForms(evalID, dt.Columns, row, limit1, limit1+1, QuestionType.Text, level, "Families-Centre", "Families"));  
+                        data.Add(ParseAnswerFromGoogleForms(evalID, dt.Columns, row, limit1, limit1+1, QuestionType.Text, level, "Centre", "Families"));  
 
                         int limit2 = 3;                        
                         for(int sort = 1; sort < limit2; sort++){      
-                            data.Add(ParseAnswerFromGoogleForms(evalID, dt.Columns, row, sort, sort+limit1+1, QuestionType.Numeric, level, "Families-Secretaria", "Families"));
+                            data.Add(ParseAnswerFromGoogleForms(evalID, dt.Columns, row, sort, sort+limit1+1, QuestionType.Numeric, level, "Secretaria", "Families"));
                         }                                                                                        
-                        data.Add(ParseAnswerFromGoogleForms(evalID, dt.Columns, row, limit2, limit1+limit2+1, QuestionType.Text, level, "Families-Secretaria", "Families"));  
+                        data.Add(ParseAnswerFromGoogleForms(evalID, dt.Columns, row, limit2, limit1+limit2+1, QuestionType.Text, level, "Secretaria", "Families"));  
                         
                         int limit3 = 2;                        
                         for(int sort = 1; sort < limit3; sort++){      
-                            data.Add(ParseAnswerFromGoogleForms(evalID, dt.Columns, row, sort, sort+limit1+limit2+1, QuestionType.Numeric, level, "Families-Conserjeria", "Families"));
+                            data.Add(ParseAnswerFromGoogleForms(evalID, dt.Columns, row, sort, sort+limit1+limit2+1, QuestionType.Numeric, level, "Conserjeria", "Families"));
                         }                                                                                        
-                        data.Add(ParseAnswerFromGoogleForms(evalID, dt.Columns, row, limit2, limit1+limit2+limit3+1, QuestionType.Text, level, "Families-Conserjeria", "Families"));  
+                        data.Add(ParseAnswerFromGoogleForms(evalID, dt.Columns, row, limit2, limit1+limit2+limit3+1, QuestionType.Text, level, "Conserjeria", "Families"));  
                         
                         evalID++;
                     }
